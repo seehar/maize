@@ -1,2 +1,6 @@
+loguru==0.5.3
 twine==4.0.2
 pytest==7.4.0
+black==23.12.1
+isort==5.13.2
+pre-commit==3.6.0

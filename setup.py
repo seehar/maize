@@ -1,8 +1,9 @@
-
-from os.path import dirname, join
+from os.path import dirname
+from os.path import join
 from sys import version_info
 
 import setuptools
+
 
 if version_info < (3, 6, 0):
     raise SystemExit("Sorry! maize requires python 3.6.0 or later.")

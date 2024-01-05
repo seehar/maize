@@ -36,7 +36,7 @@ def retry(retry_times: int = 3, interval: int = 0):
     return _retry
 
 
-def retry_asyncio(retry_times: int=3, interval: int=0):
+def retry_asyncio(retry_times: int = 3, interval: int = 0):
     """
     协程的重试装饰器
     Args:
