@@ -15,3 +15,9 @@ pip install maize
 ```shell
 pre-commit install
 ```
+
+代码覆盖率
+
+```shell
+pytest --cov=./maize --cov-report=html
+```
