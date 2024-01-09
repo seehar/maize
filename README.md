@@ -1,5 +1,12 @@
 # maize
-python tools package
+
+> 一个 Python 爬虫框架
+
+### 安装
+
+```shell
+pip install maize
+```
 
 ### 开发
 
