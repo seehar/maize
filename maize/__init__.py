@@ -1,4 +1,4 @@
-from maize.core.hello import Maize
+from maize.core.spider import SyncSpider
 
 
-__all__ = ["Maize"]
+__all__ = ["SyncSpider"]

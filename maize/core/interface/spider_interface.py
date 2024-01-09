@@ -1,61 +1,65 @@
+import typing
 from abc import ABC
 from abc import abstractmethod
 
+from maize.models import DownLoaderModel
 from maize.models.enums import SpiderStatus
-
-from .downloader_interface import DownloadInterface
-from .middleware_interface import MiddlewareInterface
-from .parser_interface import ParserInterface
-from .pipeline_interface import PipelineInterface
+from maize.utils.logger_util import logger
 
 
 class SpiderInterface(ABC):
     _status: SpiderStatus = SpiderStatus.DEFAULT
+    task_list: typing.List[DownLoaderModel] = []
 
-    def __init__(
-        self,
-        downloader: DownloadInterface,
-        parser: ParserInterface,
-        middleware: MiddlewareInterface,
-        pipeline: PipelineInterface,
-    ):
-        self._downloader = downloader
-        self._parser = parser
-        self._middleware_chain = middleware
-        self._pipeline_chain = pipeline
-
-        self._status = SpiderStatus.INITIALIZED
+    def __init__(self):
+        self.status = SpiderStatus.INITIALIZED
 
     @abstractmethod
     def start(self):
+        """启动爬虫"""
         raise NotImplementedError
 
     @abstractmethod
     def stop(self):
+        """停止爬虫"""
+        raise NotImplementedError
+
+    @abstractmethod
+    def finish(self):
+        """完成爬虫"""
+        raise NotImplementedError
+
+    @abstractmethod
+    def make_requests(
+        self,
+    ) -> typing.Generator[
+        typing.Union[typing.Dict[str, str], DownLoaderModel], typing.Any, None
+    ]:
+        """生成请求"""
+        raise NotImplementedError
+
+    @abstractmethod
+    def parse(self, task: DownLoaderModel, response):
+        """解析响应"""
+        raise NotImplementedError
+
+    @abstractmethod
+    def download(self, task_list: typing.List[DownLoaderModel]):
+        """下载"""
+        raise NotImplementedError
+
+    @abstractmethod
+    def _process_download_task(self, task: DownLoaderModel):
+        """处理下载任务"""
         raise NotImplementedError
 
     @property
     def status(self):
+        """获取爬虫状态"""
         return self._status
 
     @status.setter
-    def status(self, status):
+    def status(self, status: SpiderStatus):
+        """设置爬虫状态"""
         self._status = status
-
-    def _task(self, task_name):
-        pass
-
-    def _complete_message(self):
-        pass
-
-    def _save_state(self):
-        pass
-
-    def _load_state(self):
-        pass
-
-    def _log_error(self, task_name, error_message):
-        pass
-
-    def _process_task(self, task_name):
-        pass
+        logger.info(f"爬虫状态已更新为：{status.name}")
