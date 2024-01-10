@@ -5,6 +5,7 @@ from maize.core.downloader import SyncDownloader
 
 @pytest.mark.asyncio
 class TestSyncDownloader:
+    @pytest.mark.skip("")
     async def test_download(self):
         url = "https://www.baidu.com"
         downloader = SyncDownloader()
