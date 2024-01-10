@@ -1,8 +1,8 @@
 name: Workflow for Codecov maize
 on:
-  pull_request:
   push:
-    branches: [ "main" ]
+    branches:
+      - '*'
 
 jobs:
   run:
@@ -14,18 +14,14 @@ jobs:
         uses: actions/setup-python@v2
         with:
           python-version: '3.10'
-      - name: Install build wheel
-        run: pip install --user wheel
-      - name: Install build dependencies
-        run: pip install --user dill
-      - name: Check installed modules
-        run: pip list
-      - name: Init maize project
-        run: pip install -e .
-      - name: Install dependencies
-        run: pip install -r requirements.txt
+      - name: Install Poetry
+        run: |
+          curl -sSL https://install.python-poetry.org | python3 -
+          source $HOME/.poetry/env
+      - name: Install project dependencies
+        run: poetry install
       - name: Run tests and collect coverage
-        run: pytest --cov maize
+        run: poetry run pytest --cov maize
       - name: Upload coverage to Codecov
         uses: codecov/codecov-action@v3
         env:

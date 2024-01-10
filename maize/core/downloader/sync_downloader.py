@@ -18,7 +18,7 @@ class SyncDownloader(DownloadInterface):
     def _download_task(
         self, url: str, headers: typing.Optional[dict] = None
     ) -> Response:
-        return self.session.get(url, headers=headers or self.headers, verify=False)
+        return self.session.get(url, headers=headers or self.headers)
 
     def verify(self, url: str, response) -> bool:
         return True

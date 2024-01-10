@@ -1,4 +1,3 @@
-import pytest
 from requests import Response
 
 from maize import SyncSpider
@@ -8,7 +7,7 @@ from maize.utils.logger_util import logger
 
 class SimpleSpider(SyncSpider):
     def make_requests(self):
-        yield {"url": "https://www.baidu.com"}
+        yield {"url": "http://www.seehar.com"}
 
     def parse(self, task: DownLoaderModel, response: Response) -> str:
         logger.info(f"开始解析: {task.url}")
@@ -20,7 +19,7 @@ class SimpleSpider(SyncSpider):
 class MultiprocessSpider(SyncSpider):
     def make_requests(self):
         for i in range(10):
-            yield {"url": "https://www.baidu.com"}
+            yield {"url": "http://www.seehar.com"}
 
     def parse(self, task: DownLoaderModel, response: Response) -> str:
         logger.info(f"开始解析: {task.url}")
@@ -30,12 +29,10 @@ class MultiprocessSpider(SyncSpider):
 
 
 class TestSyncSpider:
-    @pytest.mark.skip("")
     def test_success_spider(self):
         spider = SimpleSpider()
         spider.start()
 
-    @pytest.mark.skip("")
     def test_multiprocess_spider(self):
         spider = MultiprocessSpider(process_num=2)
         spider.start()
