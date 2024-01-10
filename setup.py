@@ -11,7 +11,7 @@ if version_info < (3, 6, 0):
 with open(join(dirname(__file__), "maize/VERSION"), "rb") as fh:
     version = fh.read().decode("ascii").strip()
 
-with open("README.md", "r", encoding="utf8") as fh:
+with open("README.md", encoding="utf8") as fh:
     long_description = fh.read()
 
 packages = setuptools.find_packages()

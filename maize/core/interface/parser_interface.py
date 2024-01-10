@@ -17,7 +17,6 @@ class ParserInterface(ABC):
         Returns:
         - dict: 解析结果，通常是一个字典。
         """
-        pass
 
     @abstractmethod
     def extract_links(self, content):
@@ -30,7 +29,6 @@ class ParserInterface(ABC):
         Returns:
         - list: 包含提取到的链接的列表。
         """
-        pass
 
     # 可选的扩展方法，根据需要实现
     def preprocess(self, content):

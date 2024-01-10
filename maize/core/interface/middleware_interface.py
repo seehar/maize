@@ -11,7 +11,6 @@ class MiddlewareInterface(ABC):
         :param request: 请求对象
         :type request: Request
         """
-        pass
 
     @abstractmethod
     async def process_response(self, request, response):
@@ -23,7 +22,6 @@ class MiddlewareInterface(ABC):
         :param response: 响应对象
         :type response: Response
         """
-        pass
 
     @abstractmethod
     async def process_error(self, request, error):
@@ -35,4 +33,3 @@ class MiddlewareInterface(ABC):
         :param error: 错误对象
         :type error: Exception
         """
-        pass

@@ -13,7 +13,7 @@ from maize.utils.logger_util import logger
 class SyncSpider(SpiderInterface):
     def __init__(
         self,
-        downloader: typing.Type[SyncDownloader] = SyncDownloader,
+        downloader: type[SyncDownloader] = SyncDownloader,
         process_num: int = 1,
     ):
         super().__init__()
@@ -30,7 +30,7 @@ class SyncSpider(SpiderInterface):
         self.download(self.task_list)
         self.finish()
 
-    def download(self, task_list: typing.List[typing.Union[DownLoaderModel, dict]]):
+    def download(self, task_list: list[typing.Union[DownLoaderModel, dict]]):
         with multiprocessing.Pool(processes=self.process_num) as pool:
             results = pool.map(self._process_download_task, task_list)
             return results

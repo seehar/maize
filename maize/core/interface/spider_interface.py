@@ -9,7 +9,7 @@ from maize.utils.logger_util import logger
 
 class SpiderInterface(ABC):
     _status: SpiderStatus = SpiderStatus.DEFAULT
-    task_list: typing.List[DownLoaderModel] = []
+    task_list: list[DownLoaderModel] = []
 
     def __init__(self):
         self.status = SpiderStatus.INITIALIZED
@@ -33,7 +33,7 @@ class SpiderInterface(ABC):
     def make_requests(
         self,
     ) -> typing.Generator[
-        typing.Union[typing.Dict[str, str], DownLoaderModel], typing.Any, None
+        typing.Union[dict[str, str], DownLoaderModel], typing.Any, None
     ]:
         """生成请求"""
         raise NotImplementedError
@@ -44,7 +44,7 @@ class SpiderInterface(ABC):
         raise NotImplementedError
 
     @abstractmethod
-    def download(self, task_list: typing.List[DownLoaderModel]):
+    def download(self, task_list: list[DownLoaderModel]):
         """下载"""
         raise NotImplementedError
 
