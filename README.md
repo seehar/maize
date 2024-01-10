@@ -1,5 +1,7 @@
 # maize
 
+[![codecov](https://codecov.io/gh/seehar/maize/graph/badge.svg?token=ZG5ESDLPX6)](https://codecov.io/gh/seehar/maize)
+
 > 一个 Python 爬虫框架
 
 ### 安装
