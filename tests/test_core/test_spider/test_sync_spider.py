@@ -1,8 +1,9 @@
+import logging
+
 from requests import Response
 
 from maize import SyncSpider
 from maize.models import DownLoaderModel
-from maize.utils.logger_util import logger
 
 
 class SimpleSpider(SyncSpider):
@@ -10,10 +11,13 @@ class SimpleSpider(SyncSpider):
         yield {"url": "http://www.seehar.com"}
 
     def parse(self, task: DownLoaderModel, response: Response) -> str:
-        logger.info(f"开始解析: {task.url}")
+        logging.info(f"开始解析: {task.url}")
         result = response.text[:100]
-        logger.info(f"解析完成: {task.url}")
+        logging.info(f"解析完成: {task.url}")
         return result
+
+    def verify(self, task: DownLoaderModel, response: Response) -> bool:
+        return "seehar" in response.text
 
 
 class MultiprocessSpider(SyncSpider):
@@ -22,9 +26,9 @@ class MultiprocessSpider(SyncSpider):
             yield {"url": "http://www.seehar.com"}
 
     def parse(self, task: DownLoaderModel, response: Response) -> str:
-        logger.info(f"开始解析: {task.url}")
+        logging.info(f"开始解析: {task.url}")
         result = response.text[:100]
-        logger.info(f"解析完成: {task.url}")
+        logging.info(f"解析完成: {task.url}")
         return result
 
 

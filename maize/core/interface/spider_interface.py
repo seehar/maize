@@ -1,10 +1,10 @@
+import logging
 import typing
 from abc import ABC
 from abc import abstractmethod
 
 from maize.models import DownLoaderModel
 from maize.models.enums import SpiderStatus
-from maize.utils.logger_util import logger
 
 
 class SpiderInterface(ABC):
@@ -62,4 +62,15 @@ class SpiderInterface(ABC):
     def status(self, status: SpiderStatus):
         """设置爬虫状态"""
         self._status = status
-        logger.info(f"爬虫状态已更新为：{status.name}")
+        logging.info(f"爬虫状态已更新为：{status.name}")
+
+    @abstractmethod
+    def verify(self, task: DownLoaderModel, response):
+        raise NotImplementedError
+
+    @abstractmethod
+    def handle_exception(
+        self, task: DownLoaderModel, exception: typing.Type[Exception]
+    ):
+        """处理捕获到的异常"""
+        raise NotImplementedError
