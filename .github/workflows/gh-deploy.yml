@@ -25,6 +25,7 @@ jobs:
       - name: Install project dependencies
         run: poetry install --with docs
 
+      - run: poetry shell
       - run: mkdocs build
 
       - name: Deploy
