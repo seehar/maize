@@ -1,0 +1,52 @@
+site_name: Maize
+theme:
+  name: material
+  language: zh
+  features:
+    - search.highlight
+    - navigation.sections
+    - navigation.top
+    - navigation.tabs
+    - navigation.tracking # 锚点导航
+  palette: # 主题模式切换。
+    - media: "(prefers-color-scheme: light)" # 跟随系统主题模式
+      scheme: default
+      toggle:
+        icon: material/weather-sunny
+        name: Switch to dark mode
+    - media: "(prefers-color-scheme: dark)"
+      scheme: slate
+      toggle:
+        icon: material/weather-night
+        name: Switch to light mode
+  icon:
+    repo: fontawesome/brands/github
+
+markdown_extensions:
+- footnotes
+- admonition
+- pymdownx.details
+- pymdownx.superfences
+- pymdownx.tabbed
+- pymdownx.caret
+- pymdownx.mark
+- pymdownx.tilde
+- attr_list
+- md_in_html
+- pymdownx.tasklist:
+    custom_checkbox: true
+- pymdownx.tabbed:
+    alternate_style: true
+- pymdownx.highlight:
+    anchor_linenums: true
+    line_spans: __span
+    pygments_lang_class: true
+- pymdownx.inlinehilite
+- pymdownx.snippets
+
+repo_url: https://github.com/seehar/maize
+repo_name: seehar/maize
+site_url: https://seehar.github.io/maize/
+
+plugins:
+- search
