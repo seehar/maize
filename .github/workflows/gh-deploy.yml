@@ -35,7 +35,7 @@ jobs:
             ${{ runner.os }}-pip-
 
       - name: Install dependencies
-        run: python3 -m pip install mkdocs-material==^9.5.4
+        run: python3 -m pip install mkdocs-material==9.5.4
 
       - run: mkdocs build
 
