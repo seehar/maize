@@ -23,7 +23,7 @@ jobs:
           export PATH=$PATH:$HOME/.poetry/bin
 
       - name: Install project dependencies
-        run: poetry install --docs
+        run: poetry install --with docs
 
       - run: mkdocs build
 
