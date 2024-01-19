@@ -4,17 +4,10 @@ import asyncio
 import typing
 from inspect import iscoroutine
 
-
-if typing.TYPE_CHECKING:
-    from maize.core.crawler import Crawler
-
-from maize.core.downloader.base_downloader import BaseDownloader
 from maize.core.http.request import Request
 from maize.core.items.items import Item
 from maize.core.processor import Processor
 from maize.core.scheduler import Scheduler
-from maize.core.settings.settings_manager import SettingsManager
-from maize.core.spider.spider import Spider
 from maize.core.task_manager import TaskManager
 from maize.exceptions.spider_exception import OutputException
 from maize.utils.log_util import get_logger
@@ -22,18 +15,25 @@ from maize.utils.project_util import load_class
 from maize.utils.spider_util import transform
 
 
-class Engine:
-    def __init__(self, crawler: Crawler):
-        self.logger = get_logger(self.__class__.__name__)
-        self.crawler = crawler
-        self.settings: SettingsManager = self.crawler.settings
+if typing.TYPE_CHECKING:
+    from maize.core.crawler import Crawler
+    from maize.core.downloader.base_downloader import BaseDownloader
+    from maize.core.settings.settings_manager import SettingsManager
+    from maize.core.spider.spider import Spider
 
-        self.downloader: typing.Optional[BaseDownloader] = None
+
+class Engine:
+    def __init__(self, crawler: "Crawler"):
+        self.logger = get_logger(name=self.__class__.__name__, crawler=crawler)
+        self.crawler: "Crawler" = crawler
+        self.settings: "SettingsManager" = self.crawler.settings
+
+        self.downloader: typing.Optional["BaseDownloader"] = None
         self.scheduler: typing.Optional[Scheduler] = None
         self.processor: typing.Optional[Processor] = None
 
         self.start_requests: typing.Optional[typing.Generator] = None
-        self.spider: typing.Optional[Spider] = None
+        self.spider: typing.Optional["Spider"] = None
         self.task_manager: TaskManager = TaskManager(
             self.settings.getint("CONCURRENCY")
         )
@@ -48,12 +48,9 @@ class Engine:
             )
         return downloader_cls
 
-    async def start_spider(self, spider: Spider):
+    async def start_spider(self, spider: "Spider"):
         self.running = True
         self.logger.info(
-            f"spider started. (project name: {self.settings.get('PROJECT_NAME')})"
-        )
-        self.logger.debug(
             f"spider started. (project name: {self.settings.get('PROJECT_NAME')})"
         )
         self.spider = spider
@@ -61,7 +58,6 @@ class Engine:
         if getattr(self.scheduler, "open"):
             self.scheduler.open()
 
-        # self.downloader = HTTPXDownloader(self.crawler)
         downloader_cls = load_class(self.settings.get("DOWNLOADER"))
         self.downloader = downloader_cls(self.crawler)
 
@@ -110,7 +106,9 @@ class Engine:
         await self.task_manager.semaphore.acquire()
         self.task_manager.create_task(crawl_task())
 
-    async def _fetch(self, request: Request):
+    async def _fetch(
+        self, request: Request
+    ) -> typing.Optional[typing.AsyncGenerator[Request | Item, typing.Any]]:
         async def _success(_response):
             callback: typing.Callable = request.callback or self.spider.parse
             if _output := callback(_response):
@@ -126,17 +124,19 @@ class Engine:
         outputs = await _success(_response)
         return outputs
 
-    async def enqueue_request(self, request):
+    async def enqueue_request(self, request: Request):
         # TODO: 去重
         await self._schedule_request(request)
 
-    async def _schedule_request(self, request):
+    async def _schedule_request(self, request: Request):
         await self.scheduler.enqueue_request(request)
 
     async def _get_next_request(self):
         return await self.scheduler.next_request()
 
-    async def _handle_spider_output(self, outputs):
+    async def _handle_spider_output(
+        self, outputs: typing.AsyncGenerator[Request | Item, typing.Any]
+    ):
         async for spider_output in outputs:
             if isinstance(spider_output, (Request, Item)):
                 await self.processor.enqueue(spider_output)

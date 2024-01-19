@@ -1,5 +1,11 @@
-from maize.core.http.response import Response
+import typing
+
 from maize.core.http.request import Request
+from maize.core.http.response import Response
+
+
+if typing.TYPE_CHECKING:
+    from maize.core.crawler import Crawler
 
 
 class Spider:
@@ -7,15 +13,15 @@ class Spider:
         if not hasattr(self, "start_urls"):
             self.start_urls = []
 
-        self.crawler = None
+        self.crawler: typing.Optional["Crawler"] = None
 
     @classmethod
-    def create_instance(cls, crawler):
+    def create_instance(cls, crawler: "Crawler"):
         instance = cls()
         instance.crawler = crawler
         return instance
 
-    def start_requests(self):
+    def start_requests(self) -> typing.Generator[Request, typing.Any, None]:
         if self.start_urls:
             for url in self.start_urls:
                 yield Request(url=url)

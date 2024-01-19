@@ -77,8 +77,8 @@ class Item(MutableMapping, metaclass=ItemMeta):
     def __len__(self):
         return len(self._values)
 
-    def to_dict(self):
+    def to_dict(self) -> dict:
         return dict(self)
 
-    def copy(self):
+    def copy(self) -> "Item":
         return deepcopy(self)

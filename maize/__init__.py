@@ -6,12 +6,10 @@ from maize.core.http.request import Request
 from maize.core.http.response import Response
 from maize.core.items.field import Field
 from maize.core.items.items import Item
-from maize.core.spider import SyncSpider
 from maize.core.spider.spider import Spider
 
 
 __all__ = [
-    "SyncSpider",
     "Request",
     "Response",
     "HTTPXDownloader",

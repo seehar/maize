@@ -43,12 +43,12 @@ class DownloaderMeta(ABCMeta):
 
 
 class BaseDownloader(metaclass=DownloaderMeta):
-    def __init__(self, crawler: 'Crawler'):
+    def __init__(self, crawler: "Crawler"):
         self.crawler = crawler
         self._active = ActiveRequestManager()
 
         self.logger = get_logger(
-            self.__class__.__name__, crawler.settings.get("LOG_LEVEL")
+            crawler, self.__class__.__name__, crawler.settings.get("LOG_LEVEL")
         )
 
     @classmethod

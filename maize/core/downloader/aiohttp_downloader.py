@@ -1,9 +1,5 @@
 import typing
 
-
-if typing.TYPE_CHECKING:
-    from maize.core.crawler import Crawler
-
 from aiohttp import BaseConnector
 from aiohttp import ClientResponse
 from aiohttp import ClientSession
@@ -17,8 +13,12 @@ from maize.core.http.request import Request
 from maize.core.http.response import Response
 
 
+if typing.TYPE_CHECKING:
+    from maize.core.crawler import Crawler
+
+
 class AioHttpDownloader(BaseDownloader):
-    def __init__(self, crawler: 'Crawler'):
+    def __init__(self, crawler: "Crawler"):
         super().__init__(crawler)
         self.session: typing.Optional[ClientSession] = None
         self.connector: typing.Optional[BaseConnector] = None
@@ -27,11 +27,6 @@ class AioHttpDownloader(BaseDownloader):
         self._timeout: typing.Optional[ClientTimeout] = None
         self._use_session: typing.Optional[bool] = None
         self.trace_config: typing.Optional[TraceConfig] = None
-
-        self.request_method = {
-            "get": self._get,
-            "post": self._post,
-        }
 
     def open(self):
         super().open()
@@ -85,30 +80,15 @@ class AioHttpDownloader(BaseDownloader):
             request=request,
         )
 
-    async def send_request(
-        self, session: ClientSession, request: Request
-    ) -> ClientResponse:
-        return await self.request_method[request.method.lower()](session, request)
-
     @staticmethod
-    async def _get(session: ClientSession, request: Request) -> ClientResponse:
-        return await session.get(
+    async def send_request(session: ClientSession, request: Request) -> ClientResponse:
+        return await session.request(
+            method=request.method,
             url=request.url,
             data=request.body,
             headers=request.headers,
             cookies=request.cookies,
             proxy=request.proxies,
-            params=request.params,
-        )
-
-    @staticmethod
-    async def _post(session: ClientSession, request: Request) -> ClientResponse:
-        return await session.post(
-            url=request.url,
-            data=request.body,
-            headers=request.headers,
-            cookies=request.cookies,
-            proxies=request.proxies,
             params=request.params,
         )
 

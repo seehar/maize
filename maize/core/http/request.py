@@ -39,5 +39,5 @@ class Request:
         return self.priority < other.priority
 
     @property
-    def meta(self):
+    def meta(self) -> dict:
         return self._meta

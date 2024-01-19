@@ -1,15 +1,13 @@
-import json
 import re
 import typing
 from urllib.parse import urljoin as _urljoin
 
+import ujson
 from parsel import Selector
+from parsel import SelectorList
 
 from maize.core.http.request import Request
 from maize.exceptions.spider_exception import DecodeException
-
-
-# import ujson
 
 
 class Response:
@@ -59,13 +57,13 @@ class Response:
                 )
         return self._text_cache
 
-    def json(self):
-        return json.loads(self.text)
+    def json(self) -> dict:
+        return ujson.loads(self.text)
 
     def urljoin(self, url: str) -> str:
         return _urljoin(self.url, url)
 
-    def xpath(self, xpath: str):
+    def xpath(self, xpath: str) -> SelectorList[Selector]:
         if self._selector is None:
             self._selector = Selector(self.text)
 
@@ -75,5 +73,5 @@ class Response:
         return f"<{self.status}> {self.url}"
 
     @property
-    def meta(self):
+    def meta(self) -> dict:
         return self.request.meta

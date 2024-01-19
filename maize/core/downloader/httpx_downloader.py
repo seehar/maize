@@ -12,7 +12,7 @@ if typing.TYPE_CHECKING:
 
 
 class HTTPXDownloader(BaseDownloader):
-    def __init__(self, crawler: 'Crawler'):
+    def __init__(self, crawler: "Crawler"):
         super().__init__(crawler)
 
         self._timeout: typing.Optional[httpx.Timeout] = None
