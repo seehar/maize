@@ -1,7 +1,7 @@
 [tool.poetry]
 name = "maize"
-version = "0.1.0"
-description = "一个易用的爬虫框架"
+version = "0.2.0"
+description = "一个强大易用的爬虫框架"
 authors = ["seehar <seehar@qq.com>"]
 license = "MIT"
 readme = "README.md"

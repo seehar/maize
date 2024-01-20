@@ -5,8 +5,8 @@ from sys import version_info
 import setuptools
 
 
-if version_info < (3, 6, 0):
-    raise SystemExit("Sorry! maize requires python 3.6.0 or later.")
+if version_info < (3, 10, 0):
+    raise SystemExit("Sorry! maize requires python 3.10.0 or later.")
 
 with open(join(dirname(__file__), "maize/VERSION"), "rb") as fh:
     version = fh.read().decode("ascii").strip()
@@ -61,8 +61,8 @@ setuptools.setup(
     author="seehar",
     license="MIT",
     author_email="seehar@qq.com",
-    python_requires=">=3.6",
-    description="maize是一个python工具包",
+    python_requires=">=3.10",
+    description="一个强大易用的爬虫框架",
     long_description=long_description,
     long_description_content_type="text/markdown",
     # install_requires=requires,
