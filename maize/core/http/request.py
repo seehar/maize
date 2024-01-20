@@ -13,11 +13,25 @@ class Request:
         params: typing.Optional[dict] = None,
         data: typing.Optional[dict] = None,
         cookies: typing.Optional[dict] = None,
-        body: typing.Optional[bytes] = None,
         proxies: typing.Optional[dict] = None,
         encoding: typing.Optional[str] = "utf-8",
         meta: typing.Optional[dict] = None,
     ):
+        """
+        请求
+
+        @param url: 待抓取的url
+        @param method: 请求方式，如 GET, POST, PUT，默认 GET
+        @param callback: 自定义的解析函数，默认为 parse
+        @param priority: 请求优先级，默认为 0
+        @param headers: 请求头
+        @param params: 请求参数
+        @param data: 请求 body
+        @param cookies: 字典
+        @param proxies: 代理ip
+        @param encoding: 编码，默认utf-8，当无法解析时，使用响应中的编码
+        @param meta: 自定义数据
+        """
         self.url = url
         self.method = method.upper()
         self.callback = callback
@@ -26,7 +40,6 @@ class Request:
         self.params = params
         self.data = data
         self.cookies = cookies
-        self.body = body
         self.proxies = proxies
 
         self.encoding = encoding

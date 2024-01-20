@@ -22,6 +22,19 @@ theme:
   icon:
     repo: fontawesome/brands/github
 
+nav:
+  - 简介: index.md
+  - 快速上手: quick_start.md
+  - 使用说明:
+      - 使用前必读: use/before_use.md
+  - 进阶:
+      - Request: features/request.md
+      - Response: features/response.md
+      - Item: features/item.md
+      - Spider 进阶: features/spider.md
+      - 日志配置: features/log.md
+      - 配置文件: features/settings.md
+
 markdown_extensions:
 - footnotes
 - admonition

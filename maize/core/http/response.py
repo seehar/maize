@@ -20,6 +20,14 @@ class Response:
         body: bytes = b"",
         status: int = 200,
     ):
+        """
+        响应
+        @param url: url
+        @param headers: 响应头
+        @param request: 请求 Response
+        @param body: 响应体 bytes 类型
+        @param status: 响应状态码，如 200
+        """
         self.url = url
         self.request = request
         self.headers = headers

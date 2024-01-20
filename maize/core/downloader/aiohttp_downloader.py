@@ -85,7 +85,7 @@ class AioHttpDownloader(BaseDownloader):
         return await session.request(
             method=request.method,
             url=request.url,
-            data=request.body,
+            data=request.data,
             headers=request.headers,
             cookies=request.cookies,
             proxy=request.proxies,
