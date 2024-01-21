@@ -60,9 +60,9 @@ class Engine:
 
         downloader_cls = load_class(self.settings.get("DOWNLOADER"))
         self.downloader = downloader_cls(self.crawler)
-
         if getattr(self.downloader, "open"):
             self.downloader.open()
+
         self.processor = Processor(self.crawler)
         self.start_requests = iter(spider.start_requests())
         await self._open_spider()
