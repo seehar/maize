@@ -42,6 +42,9 @@ class Request:
         self.cookies = cookies
         self.proxies = proxies
 
+        # 当前重试次数
+        self._current_retry_count: int = 0
+
         self.encoding = encoding
         self._meta = meta if meta is not None else {}
 
@@ -54,3 +57,10 @@ class Request:
     @property
     def meta(self) -> dict:
         return self._meta
+
+    @property
+    def current_retry_count(self):
+        return self._current_retry_count
+
+    def retry(self):
+        self._current_retry_count += 1

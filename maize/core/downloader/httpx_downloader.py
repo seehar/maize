@@ -44,6 +44,9 @@ class HTTPXDownloader(BaseDownloader):
                 )
                 body = await response.aread()
         except Exception as e:
+            if new_request := await self._download_retry(request, e):
+                return new_request
+
             self.logger.error(f"Error during request: {e}")
             return None
         return self.structure_response(request, response, body)

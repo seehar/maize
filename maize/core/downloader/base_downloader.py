@@ -46,6 +46,7 @@ class BaseDownloader(metaclass=DownloaderMeta):
     def __init__(self, crawler: "Crawler"):
         self.crawler = crawler
         self._active = ActiveRequestManager()
+        self._max_retry_count: int = self.crawler.settings.getint("MAX_RETRY_COUNT")
 
         self.logger = get_logger(
             crawler, self.__class__.__name__, crawler.settings.get("LOG_LEVEL")
@@ -61,13 +62,35 @@ class BaseDownloader(metaclass=DownloaderMeta):
             f"<concurrency: {self.crawler.settings.getint('CONCURRENCY')}>"
         )
 
-    async def fetch(self, request: Request) -> typing.Optional[Response]:
+    async def fetch(self, request: Request) -> typing.Optional[Response | Request]:
         async with self._active(request):
             return await self.download(request)
 
     @abstractmethod
     async def download(self, request: Request) -> typing.Optional[Response]:
         raise NotImplementedError
+
+    async def _download_retry(
+        self, request: Request, exception: Exception
+    ) -> typing.Optional[Request]:
+        """
+        下载重试
+        :param request: 请求
+        :param exception: 上次请求失败的异常
+        :return:
+        """
+        if request.current_retry_count < self._max_retry_count:
+            self.logger.info(
+                f"Retrying request({request.current_retry_count + 1}/{self._max_retry_count}): {request.url}. "
+                f"Error during request {exception}. "
+            )
+            request.retry()
+            return request
+
+        self.logger.error(
+            f"Max retry count reached ({self._max_retry_count}). Skipping request: {request.url}"
+        )
+        return None
 
     @staticmethod
     @abstractmethod

@@ -117,12 +117,15 @@ class Engine:
                 else:
                     return transform(_output)
 
-        _response = await self.downloader.download(request)
-        if _response is None:
+        download_result = await self.downloader.download(request)
+        if download_result is None:
             return None
 
-        outputs = await _success(_response)
-        return outputs
+        if isinstance(download_result, Request):
+            await self.enqueue_request(download_result)
+            return None
+
+        return await _success(download_result)
 
     async def enqueue_request(self, request: Request):
         # TODO: 去重

@@ -24,4 +24,7 @@ LOG_LEVEL = "INFO"
 # 日志 handler
 # 如不想使用默认的 logging 模块，可以自定义日志处理模块
 LOGGER_HANDLER = ""
+
+# 最大重试次数
+MAX_RETRY_COUNT = 0
 ```

@@ -46,7 +46,7 @@ class AioHttpDownloader(BaseDownloader):
                 trace_configs=[self.trace_config],
             )
 
-    async def download(self, request: Request) -> typing.Optional[Response]:
+    async def download(self, request: Request) -> typing.Optional[Response | Request]:
         try:
             if self._use_session:
                 response = await self.send_request(self.session, request)
@@ -63,6 +63,9 @@ class AioHttpDownloader(BaseDownloader):
                     body = await response.content.read()
 
         except Exception as e:
+            if new_request := await self._download_retry(request, e):
+                return new_request
+
             self.logger.error(f"Error during request: {e}")
             return None
 
