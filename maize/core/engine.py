@@ -87,6 +87,8 @@ class Engine:
                     # 3. 下载器是否空闲
                     if not await self._exit():
                         continue
+
+                    await self.processor.close()
                     self.running = False
 
                     if self.start_requests is not None:

@@ -28,3 +28,15 @@ LOGGER_HANDLER = ""
 
 # 最大重试次数
 MAX_RETRY_COUNT = 0
+
+# item在内存队列中最大缓存数量
+ITEM_MAX_CACHE_COUNT = 5000
+
+# item每批入库的最大数量
+ITEM_HANDLE_BATCH_MAX_SIZE = 1000
+
+# item入库时间间隔，单位：秒
+ITEM_HANDLE_INTERVAL = 2
+
+# 数据管道，默认 BasePipeline 不做任何处理
+ITEM_PIPELINES = ["maize.BasePipeline"]
