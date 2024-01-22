@@ -1,5 +1,6 @@
 import re
 import typing
+from http.cookies import SimpleCookie
 from urllib.parse import urljoin as _urljoin
 
 import ujson
@@ -36,6 +37,8 @@ class Response:
         self.encoding = request.encoding
 
         self._text_cache: typing.Optional[str] = None
+        self._cookies_list_cache: typing.Optional[list[dict]] = None
+        self._cookies_cache: typing.Optional[list[dict]] = None
         self._selector: typing.Optional[Selector] = None
 
     @property
@@ -64,6 +67,41 @@ class Response:
                     e.encoding, e.object, e.start, e.end, f"{self.request}"
                 )
         return self._text_cache
+
+    @property
+    def cookies_list(self):
+        if self._cookies_list_cache:
+            return self._cookies_list_cache
+
+        set_cookie_header = self.headers.get("Set-Cookie", "")
+
+        cookie_obj = SimpleCookie()
+        cookie_obj.load(set_cookie_header)
+
+        self._cookies_list_cache = [
+            {
+                "key": key,
+                "value": morsel.value,
+                "domain": morsel.get("domain", ""),
+                "path": morsel.get("path", ""),
+                "expires": morsel.get("expires", ""),
+                "secure": morsel.get("secure", ""),
+                "httponly": morsel.get("httponly", ""),
+            }
+            for key, morsel in cookie_obj.items()
+        ]
+
+        return self._cookies_list_cache
+
+    @property
+    def cookies(self):
+        if self._cookies_cache:
+            return self._cookies_cache
+
+        self._cookies_cache = {
+            cookie["key"]: cookie["value"] for cookie in self.cookies_list
+        }
+        return self._cookies_cache
 
     def json(self) -> dict:
         return ujson.loads(self.text)
