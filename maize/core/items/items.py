@@ -22,6 +22,7 @@ class ItemMeta(ABCMeta):
 
 class Item(MutableMapping, metaclass=ItemMeta):
     FIELDS: dict
+    table_name: str
 
     def __init__(self, *args, **kwargs):
         self._values = {}

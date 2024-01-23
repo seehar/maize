@@ -64,6 +64,7 @@ class Engine:
             self.downloader.open()
 
         self.processor = Processor(self.crawler)
+        await self.processor.open()
         self.start_requests = iter(spider.start_requests())
         await self._open_spider()
 

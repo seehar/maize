@@ -5,3 +5,12 @@ LOG_LEVEL = "DEBUG"
 DOWNLOADER = "maize.HTTPXDownloader"
 
 LOGGER_HANDLER = "tests.test_full_process.logger_util.InterceptHandler"
+
+# ITEM_PIPELINES = ["maize.MysqlPipeline"]
+#
+# # mysql数据库配置
+# MYSQL_HOST = ""
+# MYSQL_PORT = 3306
+# MYSQL_DB = ""
+# MYSQL_USER = ""
+# MYSQL_PASSWORD = ""

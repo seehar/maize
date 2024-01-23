@@ -6,7 +6,8 @@ from maize.core.http.request import Request
 from maize.core.http.response import Response
 from maize.core.items.field import Field
 from maize.core.items.items import Item
-from maize.core.pipeline import BasePipeline
+from maize.core.pipelines.base_pipeline import BasePipeline
+from maize.core.pipelines.mysql_pipeline import MysqlPipeline
 from maize.core.spider.spider import Spider
 
 
@@ -21,4 +22,5 @@ __all__ = [
     "Field",
     "Item",
     "BasePipeline",
+    "MysqlPipeline",
 ]

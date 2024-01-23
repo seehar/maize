@@ -40,14 +40,23 @@ ITEM_HANDLE_BATCH_MAX_SIZE = 1000
 # item入库时间间隔，单位：秒
 ITEM_HANDLE_INTERVAL = 2
 
-# 数据管道，支持多个数据管道，默认 BasePipeline 不做任何处理
+# 数据管道，支持多个数据管道
+# BasePipeline: 默认数据管道，不做任何处理
+# MysqlPipeline: 集成 aiomysql 的数据管道，自动入库 mysql 数据库
 ITEM_PIPELINES = ["maize.BasePipeline"]
 
-# 隧道代理，示例：xxx.xxx:2132。注意：不包含 http:// 或 https://
-PROXY_TUNNEL = ""
+# # 隧道代理，示例：xxx.xxx:2132。注意：不包含 http:// 或 https://
+# PROXY_TUNNEL = ""
+#
+# # 隧道代理用户名
+# PROXY_TUNNEL_USERNAME = ""
+#
+# # 隧道代理密码
+# PROXY_TUNNEL_PASSWORD = ""
 
-# 隧道代理用户名
-PROXY_TUNNEL_USERNAME = ""
-
-# 隧道代理密码
-PROXY_TUNNEL_PASSWORD = ""
+# # mysql数据库配置
+# MYSQL_HOST = "localhost"
+# MYSQL_PORT = 3306
+# MYSQL_DB = ""
+# MYSQL_USER = ""
+# MYSQL_PASSWORD = ""

@@ -27,12 +27,15 @@ class Processor:
         self.queue = Queue(maxsize=item_max_cache_count)
         self.item_queue = Queue()
         self._last_handle_item_time = 0
-
-        item_pipeline_path_list = self.crawler.settings.getlist("ITEM_PIPELINES")
         self.item_pipelines: list["BasePipeline"] = []
+
+    async def open(self):
+        item_pipeline_path_list = self.crawler.settings.getlist("ITEM_PIPELINES")
         for pipeline_path in item_pipeline_path_list:
             self.logger.info(f"Loading pipeline: {pipeline_path}")
-            self.item_pipelines.append(load_class(pipeline_path)())
+            pipeline_instance = load_class(pipeline_path)(self.crawler.settings)
+            await pipeline_instance.open()
+            self.item_pipelines.append(pipeline_instance)
 
     async def process(self):
         while not self.idle():
@@ -68,13 +71,15 @@ class Processor:
             self.logger.debug("no more items to process")
             return
 
-        # self.logger.info(f"processing {len(batch_items)}")
         for pipeline in self.item_pipelines:
-            await pipeline.handle_items(batch_items)
+            await pipeline.process_item(batch_items)
 
     async def close(self):
         while not self.item_queue.empty():
             await self.single_process_item()
+
+        for pipeline in self.item_pipelines:
+            await pipeline.close()
 
     async def enqueue(self, output: Request | Item):
         await self.queue.put(output)
