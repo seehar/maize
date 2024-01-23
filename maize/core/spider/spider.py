@@ -9,6 +9,11 @@ if typing.TYPE_CHECKING:
 
 
 class Spider:
+    start_urls: list[str] = []
+    start_url: typing.Optional[str] = None
+
+    custom_settings: dict
+
     def __init__(self):
         if not hasattr(self, "start_urls"):
             self.start_urls = []
@@ -26,11 +31,8 @@ class Spider:
             for url in self.start_urls:
                 yield Request(url=url)
 
-        else:
-            if hasattr(self, "start_url") and isinstance(
-                getattr(self, "start_url"), str
-            ):
-                yield Request(url=getattr(self, "start_url"))
+        elif self.start_url and isinstance(self.start_url, str):
+            yield Request(url=self.start_url)
 
     def parse(self, response: Response):
         raise NotImplementedError

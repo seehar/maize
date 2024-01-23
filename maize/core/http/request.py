@@ -13,7 +13,9 @@ class Request:
         params: typing.Optional[dict] = None,
         data: typing.Optional[dict] = None,
         cookies: typing.Optional[dict] = None,
-        proxies: typing.Optional[dict] = None,
+        proxy: typing.Optional[str] = None,
+        proxy_username: typing.Optional[str] = None,
+        proxy_password: typing.Optional[str] = None,
         encoding: typing.Optional[str] = "utf-8",
         meta: typing.Optional[dict] = None,
     ):
@@ -28,7 +30,9 @@ class Request:
         @param params: 请求参数
         @param data: 请求 body
         @param cookies: 字典
-        @param proxies: 代理ip
+        @param proxy: 代理ip
+        @param proxy_username: 代理 ip 用户名
+        @param proxy_password: 代理 ip 密码
         @param encoding: 编码，默认utf-8，当无法解析时，使用响应中的编码
         @param meta: 自定义数据
         """
@@ -40,7 +44,9 @@ class Request:
         self.params = params
         self.data = data
         self.cookies = cookies
-        self.proxies = proxies
+        self.proxy = proxy
+        self.proxy_username = proxy_username
+        self.proxy_password = proxy_password
 
         # 当前重试次数
         self._current_retry_count: int = 0

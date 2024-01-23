@@ -1,6 +1,7 @@
 import typing
 
 from aiohttp import BaseConnector
+from aiohttp import BasicAuth
 from aiohttp import ClientResponse
 from aiohttp import ClientSession
 from aiohttp import ClientTimeout
@@ -28,6 +29,9 @@ class AioHttpDownloader(BaseDownloader):
         self._use_session: typing.Optional[bool] = None
         self.trace_config: typing.Optional[TraceConfig] = None
 
+        self.proxy_tunnel: typing.Optional[str] = None
+        self.proxy_auth: typing.Optional[BasicAuth] = None
+
     def open(self):
         super().open()
 
@@ -35,6 +39,12 @@ class AioHttpDownloader(BaseDownloader):
         self._timeout = ClientTimeout(total=request_timeout)
         self._verify_ssl = self.crawler.settings.getbool("VERIFY_SSL")
         self._use_session = self.crawler.settings.getbool("USE_SESSION")
+
+        self.proxy_tunnel = self.crawler.settings.get("PROXY_TUNNEL")
+        proxy_tunnel_username = self.crawler.settings.get("PROXY_TUNNEL_USERNAME")
+        proxy_tunnel_password = self.crawler.settings.get("PROXY_TUNNEL_PASSWORD")
+        if proxy_tunnel_username and proxy_tunnel_password:
+            self.proxy_auth = BasicAuth(proxy_tunnel_username, proxy_tunnel_password)
 
         self.connector = TCPConnector(verify_ssl=self._verify_ssl)
         self.trace_config = TraceConfig()
@@ -83,16 +93,23 @@ class AioHttpDownloader(BaseDownloader):
             request=request,
         )
 
-    @staticmethod
-    async def send_request(session: ClientSession, request: Request) -> ClientResponse:
+    async def send_request(
+        self, session: ClientSession, request: Request
+    ) -> ClientResponse:
+        if request.proxy_username and request.proxy_password:
+            proxy_auth = BasicAuth(request.proxy_username, request.proxy_password)
+        else:
+            proxy_auth = self.proxy_auth
+
         return await session.request(
             method=request.method,
             url=request.url,
+            params=request.params,
             data=request.data,
             headers=request.headers,
             cookies=request.cookies,
-            proxy=request.proxies,
-            params=request.params,
+            proxy=request.proxy or self.proxy_tunnel,
+            proxy_auth=proxy_auth,
         )
 
     async def request_start(

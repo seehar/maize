@@ -12,6 +12,7 @@ VERIFY_SSL = True
 REQUEST_TIMEOUT = 60
 
 # 是否使用 session
+# 注意：基于 httpx 的下载器（HTTPXDownloader）不支持 session，所以此选项无效
 USE_SESSION = True
 
 # 下载器
@@ -20,6 +21,7 @@ USE_SESSION = True
 DOWNLOADER = "maize.AioHttpDownloader"
 
 # 日志级别，与 logging 日志级别相同
+# 如果您使用自定义日志处理模块，此选项无效，请您在自定义日志处理模块中设置日志级别
 LOG_LEVEL = "INFO"
 
 # 日志 handler
@@ -38,5 +40,14 @@ ITEM_HANDLE_BATCH_MAX_SIZE = 1000
 # item入库时间间隔，单位：秒
 ITEM_HANDLE_INTERVAL = 2
 
-# 数据管道，默认 BasePipeline 不做任何处理
+# 数据管道，支持多个数据管道，默认 BasePipeline 不做任何处理
 ITEM_PIPELINES = ["maize.BasePipeline"]
+
+# 隧道代理，示例：xxx.xxx:2132。注意：不包含 http:// 或 https://
+PROXY_TUNNEL = ""
+
+# 隧道代理用户名
+PROXY_TUNNEL_USERNAME = ""
+
+# 隧道代理密码
+PROXY_TUNNEL_PASSWORD = ""
