@@ -30,7 +30,9 @@ def _init_env():
         sys.path.append(project_dir)
 
 
-def get_settings(settings: str = "maize.settings.default_settings") -> SettingsManager:
+def get_settings(
+    settings: str = "maize.core.settings.default_settings",
+) -> SettingsManager:
     """
     获取settings配置文件
     :param settings:
