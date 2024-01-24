@@ -21,6 +21,11 @@
          <changefreq>daily</changefreq>
     </url>
     <url>
+         <loc>https://seehar.github.io/maize/features/mysql_util/</loc>
+         <lastmod>2024-01-24</lastmod>
+         <changefreq>daily</changefreq>
+    </url>
+    <url>
          <loc>https://seehar.github.io/maize/features/pipeline/</loc>
          <lastmod>2024-01-24</lastmod>
          <changefreq>daily</changefreq>
