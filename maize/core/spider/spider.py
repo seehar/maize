@@ -20,6 +20,18 @@ class Spider:
 
         self.crawler: typing.Optional["Crawler"] = None
 
+    async def open(self):
+        """
+        在 Spider 启动时执行一些初始化操作
+        :return:
+        """
+
+    async def close(self):
+        """
+        在 Spider 关闭时执行一些清理操作
+        :return:
+        """
+
     @classmethod
     def create_instance(cls, crawler: "Crawler"):
         instance = cls()

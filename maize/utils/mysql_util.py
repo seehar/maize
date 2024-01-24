@@ -2,6 +2,8 @@ import typing
 
 import aiomysql
 
+from .tools import SingletonType
+
 
 class MysqlUtil:
     def __init__(
@@ -30,6 +32,9 @@ class MysqlUtil:
         self.pool: typing.Optional[aiomysql.Pool] = None
 
     async def open(self):
+        if self.pool:
+            return
+
         self.pool = await aiomysql.create_pool(
             host=self.host,
             port=self.port,
@@ -45,6 +50,12 @@ class MysqlUtil:
     async def fetchone(
         self, sql: str, args: typing.Optional[list | set] = None
     ) -> dict[str, typing.Any]:
+        """
+        查询单条数据
+        :param sql: sql 语句
+        :param args: list 或 set 类型的参数
+        :return: 单条结果
+        """
         async with self.pool.acquire() as conn:
             async with conn.cursor(aiomysql.DictCursor) as cur:
                 await cur.execute(sql, args)
@@ -53,12 +64,24 @@ class MysqlUtil:
     async def fetchall(
         self, sql: str, args: typing.Optional[list | set] = None
     ) -> list[dict[str, typing.Any]]:
+        """
+        查询多条数据
+        :param sql: sql 语句
+        :param args: list 或 set 类型的参数
+        :return: 多条结果集
+        """
         async with self.pool.acquire() as conn:
             async with conn.cursor(aiomysql.DictCursor) as cur:
                 await cur.execute(sql, args)
                 return await cur.fetchall()
 
     async def execute(self, sql: str, args: typing.Optional[list | set] = None):
+        """
+        执行增删改操作
+        :param sql: sql 语句
+        :param args: list 或 set 类型的参数
+        :return: 无返回
+        """
         async with self.pool.acquire() as conn:
             async with conn.cursor(aiomysql.DictCursor) as cur:
                 try:
@@ -69,6 +92,12 @@ class MysqlUtil:
                     raise e
 
     async def executemany(self, sql: str, args: typing.Optional[list | set] = None):
+        """
+        批量执行增删改操作
+        :param sql: sql 语句
+        :param args: ist 或 set 类型的参数
+        :return: 无返回
+        """
         async with self.pool.acquire() as conn:
             async with conn.cursor(aiomysql.DictCursor) as cur:
                 try:
@@ -79,5 +108,13 @@ class MysqlUtil:
                     raise e
 
     async def close(self):
-        self.pool.close()
-        await self.pool.wait_closed()
+        if self.pool:
+            self.pool.close()
+            await self.pool.wait_closed()
+            self.pool = None
+
+
+class MysqlSingletonUtil(MysqlUtil, metaclass=SingletonType):
+    """
+    MysqlUtil单例模式
+    """

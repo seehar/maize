@@ -2,6 +2,7 @@ import asyncio
 import functools
 import logging
 import time
+from threading import RLock
 
 
 def retry(retry_times: int = 3, interval: int = 0):
@@ -58,3 +59,16 @@ def retry_asyncio(retry_times: int = 3, interval: int = 0):
         return wrapper
 
     return _retry
+
+
+class SingletonType(type):
+    single_lock = RLock()
+
+    def __call__(cls, *args, **kwargs):
+        with SingletonType.single_lock:
+            if not hasattr(cls, "_instance"):
+                cls._instance = super(SingletonType, cls).__call__(
+                    *args, **kwargs
+                )  # 创建cls的对象
+
+        return cls._instance

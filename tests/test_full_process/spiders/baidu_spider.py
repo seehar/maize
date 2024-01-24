@@ -6,6 +6,12 @@ from tests.test_full_process.items import BaiduItem
 class BaiduSpider(Spider):
     start_urls = ["http://www.baidu.com", "http://www.baidu.com"]
 
+    async def open(self):
+        print("custom open")
+
+    async def close(self):
+        print("custom close")
+
     async def parse(self, response):
         print(f"parse: {response}")
         for i in range(1):

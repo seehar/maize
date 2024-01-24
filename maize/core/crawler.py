@@ -21,8 +21,12 @@ class Crawler:
 
     async def crawl(self):
         self.spider = self._create_spider()
+        await self.spider.open()
+
         self.engine = self._create_engine()
         await self.engine.start_spider(self.spider)
+
+        await self.spider.close()
 
     def _create_spider(self) -> "Spider":
         spider = self.spider_cls.create_instance(self)

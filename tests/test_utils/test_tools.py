@@ -1,7 +1,23 @@
 import pytest
 
+from maize.utils.tools import SingletonType
 from maize.utils.tools import retry
 from maize.utils.tools import retry_asyncio
+
+
+class Demo:
+    def __init__(self):
+        self.count = None
+
+    async def open(self):
+        self.count = 0
+
+    async def close(self):
+        self.count = None
+
+
+class Singleton(Demo, metaclass=SingletonType):
+    pass
 
 
 @pytest.mark.asyncio
@@ -21,3 +37,15 @@ class TestTools:
     async def test_async_retry_demo(self):
         with pytest.raises(ZeroDivisionError):
             await self.async_retry_demo()
+
+    async def test_singleton_type(self):
+        cls_1: Singleton = Singleton()
+        cls_2 = Singleton()
+
+        await cls_1.open()
+        assert cls_1.count == 0
+        assert cls_2.count == 0
+
+        await cls_2.close()
+        assert cls_1.count is None
+        assert cls_2.count is None

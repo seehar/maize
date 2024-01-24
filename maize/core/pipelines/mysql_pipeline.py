@@ -1,7 +1,7 @@
 import typing
 
 from maize.core.pipelines.base_pipeline import BasePipeline
-from maize.utils import MysqlUtil
+from maize.utils import MysqlSingletonUtil
 
 
 if typing.TYPE_CHECKING:
@@ -12,7 +12,7 @@ if typing.TYPE_CHECKING:
 class MysqlPipeline(BasePipeline):
     def __init__(self, settings: "SettingsManager"):
         super().__init__(settings=settings)
-        self.mysql: typing.Optional[MysqlUtil] = None
+        self.mysql: typing.Optional[MysqlSingletonUtil] = None
 
     async def open(self):
         host = self.settings.get("MYSQL_HOST")
@@ -24,7 +24,7 @@ class MysqlPipeline(BasePipeline):
         if not host or not db or not user or not password:
             raise ValueError("Mysql settings not found")
 
-        self.mysql = MysqlUtil(
+        self.mysql = MysqlSingletonUtil(
             host=host, port=port, db=db, user=user, password=password
         )
         await self.mysql.open()
