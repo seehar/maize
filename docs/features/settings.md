@@ -1,5 +1,37 @@
 # 配置文件
 
+配置文件位于 `project/settings.py`，与 `run.py` 或 `settings.py` 同级。
+同样的，也可以在 `Spider` 中的 `custom_settings` 中进行设置，优先级高于 `settings.py`。
+
+
+```python
+from maize import Spider
+
+
+class CustomSpider(Spider):
+    custom_settings = {
+        # 并发数
+        'CONCURRENCY': 2,
+
+        # 是否验证 SSL 证书
+        'VERIFY_SSL': False,
+
+        # 请求超时时间
+        'REQUEST_TIMEOUT': 30,
+
+        # 是否使用 session
+        'USE_SESSION': False,
+        
+        # ...
+    }
+    
+    # ...
+```
+
+
+默认配置如下：
+
+
 ```python
 # 并发数
 CONCURRENCY = 1
@@ -23,9 +55,9 @@ DOWNLOADER = "maize.AioHttpDownloader"
 # 如果您使用自定义日志处理模块，此选项无效，请您在自定义日志处理模块中设置日志级别
 LOG_LEVEL = "INFO"
 
-# 日志 handler
-# 如不想使用默认的 logging 模块，可以自定义日志处理模块
-LOGGER_HANDLER = ""
+# # 日志 handler
+# # 如不想使用默认的 logging 模块，可以自定义日志处理模块
+# LOGGER_HANDLER = ""
 
 # 最大重试次数
 MAX_RETRY_COUNT = 0
@@ -39,15 +71,24 @@ ITEM_HANDLE_BATCH_MAX_SIZE = 1000
 # item入库时间间隔，单位：秒
 ITEM_HANDLE_INTERVAL = 2
 
-# 数据管道，支持多个数据管道，默认 BasePipeline 不做任何处理
-ITEM_PIPELINES = ["maize.BasePipeline"]
+# # 数据管道，支持多个数据管道
+# # maize.BasePipeline: 默认数据管道，不做任何处理
+# # maize.MysqlPipeline: 集成 aiomysql 的数据管道，自动入库 mysql 数据库
+# ITEM_PIPELINES = ["maize.BasePipeline"]
 
-# 隧道代理，示例：xxx.xxx:2132。注意：不包含 http:// 或 https://
-PROXY_TUNNEL = ""
+# # 隧道代理，示例：xxx.xxx:2132。注意：不包含 http:// 或 https://
+# PROXY_TUNNEL = ""
+#
+# # 隧道代理用户名
+# PROXY_TUNNEL_USERNAME = ""
+#
+# # 隧道代理密码
+# PROXY_TUNNEL_PASSWORD = ""
 
-# 隧道代理用户名
-PROXY_TUNNEL_USERNAME = ""
-
-# 隧道代理密码
-PROXY_TUNNEL_PASSWORD = ""
+# # mysql数据库配置
+# MYSQL_HOST = "localhost"
+# MYSQL_PORT = 3306
+# MYSQL_DB = ""
+# MYSQL_USER = ""
+# MYSQL_PASSWORD = ""
 ```

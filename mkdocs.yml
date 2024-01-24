@@ -31,6 +31,7 @@ nav:
       - Request: features/request.md
       - Response: features/response.md
       - Item: features/item.md
+      - Pipeline: features/pipeline.md
       - Spider 进阶: features/spider.md
       - 日志配置: features/log.md
       - 配置文件: features/settings.md

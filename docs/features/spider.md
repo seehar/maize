@@ -8,8 +8,9 @@
 ```text
 ├─example_spider
 │ └─spiders        # 存放所有爬虫
-│   ├─spider_1.py
-│   └─spider_2.py
+│   ├─spiders_1.py
+│   ├─spiders_2.py
+│   └─...
 ├─items.py         # 定义爬虫解析后的 Item
 ├─settings.py      # 项目配置文件
 └─run.py           # 启动入口，main.py 也可以
@@ -85,7 +86,7 @@
     
     
     async def run():
-        settings = get_settings("tests.test_full_process.settings")
+        settings = get_settings("settings")
         process = CrawlerProcess(settings)
         await process.crawl(BaiduSpider)
         await process.start()
@@ -94,4 +95,3 @@
     if __name__ == '__main__':
         asyncio.run(run())
     ```
-

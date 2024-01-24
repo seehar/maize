@@ -25,7 +25,7 @@ class Response:
         响应
         @param url: url
         @param headers: 响应头
-        @param request: 请求 Response
+        @param request: 请求 Request
         @param body: 响应体 bytes 类型
         @param status: 响应状态码，如 200
         """
@@ -37,8 +37,8 @@ class Response:
         self.encoding = request.encoding
 
         self._text_cache: typing.Optional[str] = None
-        self._cookies_list_cache: typing.Optional[list[dict]] = None
-        self._cookies_cache: typing.Optional[list[dict]] = None
+        self._cookie_list_cache: typing.Optional[list[dict[str, str]]] = None
+        self._cookies_cache: typing.Optional[dict[str, typing.Any]] = None
         self._selector: typing.Optional[Selector] = None
 
     @property
@@ -69,16 +69,16 @@ class Response:
         return self._text_cache
 
     @property
-    def cookies_list(self):
-        if self._cookies_list_cache:
-            return self._cookies_list_cache
+    def cookie_list(self) -> list[dict[str, str]]:
+        if self._cookie_list_cache:
+            return self._cookie_list_cache
 
         set_cookie_header = self.headers.get("Set-Cookie", "")
 
         cookie_obj = SimpleCookie()
         cookie_obj.load(set_cookie_header)
 
-        self._cookies_list_cache = [
+        self._cookie_list_cache = [
             {
                 "key": key,
                 "value": morsel.value,
@@ -91,15 +91,15 @@ class Response:
             for key, morsel in cookie_obj.items()
         ]
 
-        return self._cookies_list_cache
+        return self._cookie_list_cache
 
     @property
-    def cookies(self):
+    def cookies(self) -> dict[str, typing.Any]:
         if self._cookies_cache:
             return self._cookies_cache
 
         self._cookies_cache = {
-            cookie["key"]: cookie["value"] for cookie in self.cookies_list
+            cookie["key"]: cookie["value"] for cookie in self.cookie_list
         }
         return self._cookies_cache
 

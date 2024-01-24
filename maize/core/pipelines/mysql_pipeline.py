@@ -44,5 +44,5 @@ class MysqlPipeline(BasePipeline):
 
         item_key_str = ",".join(item_key)
         placeholder = ",".join(["%s"] * len(item_key))
-        sql = f"insert into {first_item.table_name} ({item_key_str}) values ({placeholder})"
+        sql = f"insert into {first_item.__table_name__} ({item_key_str}) values ({placeholder})"
         await self.mysql.executemany(sql, item_data_list)

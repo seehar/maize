@@ -29,7 +29,7 @@ class Request:
         @param headers: 请求头
         @param params: 请求参数
         @param data: 请求 body
-        @param cookies: 字典
+        @param cookies: 请求 cookies
         @param proxy: 代理ip
         @param proxy_username: 代理 ip 用户名
         @param proxy_password: 代理 ip 密码

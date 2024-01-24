@@ -8,6 +8,7 @@ from maize import Field, Item
 
 
 class BaiduItem(Item):
+    #  __table_name__ = "table_name"  # 表名，自动入库时必须设置
     url = Field()
     title = Field()
 ```

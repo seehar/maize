@@ -1,4 +1,4 @@
-# 相应 - Response
+# 响应 - Response
 
 ## 简介
 
@@ -7,13 +7,13 @@
 
 ## 参数详解
 
-```text
-@param url: url
-@param headers: 响应头
-@param request: 请求 Response
-@param body: 响应体 bytes 类型
-@param status: 响应状态码，如 200
-```
+| 参数名       | 类型        | 是否必须 | 默认值   | 说明            |
+|:----------|:----------|:-----|:------|:--------------|
+| `url`     | `str`     | 是    |       | 请求的 `url`     |
+| `headers` | `dict`    | 是    |       | 响应头           |
+| `request` | `Request` | 是    |       | 请求 `Request`  |
+| `body`    | `bytes`   | 否    | `b""` | 响应体           |
+| `status`  | `int`     | 否    | `200` | 响应状态码，如 `200` |
 
 ## 方法详解
 
@@ -37,3 +37,30 @@
 ### `meta`
 
 `property` 类型的方法。返回您在请求中传入的自定义数据
+
+### `cookies`
+
+返回字典类型的 `cookies`，其中
+
+- `key` 为 `cookie` 的 `name`
+- `value` 为 `cookie` 的 `value`
+
+### `cookie_list`
+
+返回列表类型的 `cookies`，因某些网站返回的 `ccokies` 中存在多个 `name` 相同的值，所以返回列表类型，方便自定义更精细的处理逻辑。
+示例：
+
+```python
+[
+    {
+        "key": "",
+        "value": "",
+        "domain": "",
+        "path": "",
+        "expires": "",
+        "secure": "",
+        "httponly": "",
+    },
+    ...
+]
+```

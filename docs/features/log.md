@@ -17,8 +17,8 @@ class InterceptHandler(logging.Handler):
         self.logger.remove()
         self.logger.add(
             sys.stdout,
-            level="DEBUG",
-            format="<green>{time:YYYY-MM-DD HH:mm:ss.SSS}</green> | "  # 颜色>时间
+            level="DEBUG",  # 请注意，此处的日志级别会覆盖配置文件中的日志级别
+            format="<green>{time:YYYY-MM-DD HH:mm:ss.SSS}</green> | "  # 时间
             "{process.name} | "  # 进程名
             "{thread.name} | "  # 进程名
             "<cyan>{module}</cyan>.<cyan>{function}</cyan>"  # 模块名.方法名

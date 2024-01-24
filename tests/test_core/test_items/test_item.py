@@ -5,7 +5,7 @@ from maize import Item
 
 
 class DemoItem(Item):
-    table_name = "demo"
+    __table_name__ = "demo"
     age = Field()
     name = Field()
 
@@ -15,18 +15,18 @@ class TestItem:
         item = DemoItem()
         item["name"] = "bob"
         item["age"] = 10
-        assert item.table_name == "demo"
+        assert item.__table_name__ == "demo"
 
     def test_item_update_table_name_key_error(self):
         item = DemoItem()
         item["name"] = "bob"
         item["age"] = 10
         with pytest.raises(KeyError):
-            item["table_name"] = "demo2"
+            item["__table_name__"] = "demo2"
 
-    def test_item_update_table_name_attribute_error(self):
+    def test_item_update_table_name(self):
         item = DemoItem()
         item["name"] = "bob"
         item["age"] = 10
-        with pytest.raises(AttributeError):
-            item.table_name = "demo2"
+        item.__table_name__ = "demo2"
+        assert item.__table_name__ == "demo2"
