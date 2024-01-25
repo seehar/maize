@@ -16,7 +16,7 @@ if TYPE_CHECKING:
 class Processor:
     def __init__(self, crawler: "Crawler"):
         self.crawler: "Crawler" = crawler
-        self.logger = get_logger(crawler, self.__class__.__name__)
+        self.logger = get_logger(crawler.settings, self.__class__.__name__)
 
         item_max_cache_count = self.crawler.settings.getint("ITEM_MAX_CACHE_COUNT")
         self.item_handle_batch_max_size = self.crawler.settings.getint(

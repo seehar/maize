@@ -71,9 +71,13 @@
 
 === "settings.py"
     ```python
-    PROJECT_NAME = "baidu_spider"
-    CONCURRENCY = 1
-    LOG_LEVEL = "DEBUG"
+    from maize import BaseSettings
+
+
+    class Settings(BaseSettings):
+        PROJECT_NAME = "baidu_spider"
+        CONCURRENCY = 1
+        LOG_LEVEL = "DEBUG"
     ```
 
 === "run.py"
@@ -81,13 +85,11 @@
     import asyncio
     
     from maize import CrawlerProcess
-    from maize.utils import get_settings
     from baidu_spider.spiders.baidu_spider import BaiduSpider
     
     
     async def run():
-        settings = get_settings("settings")
-        process = CrawlerProcess(settings)
+        process = CrawlerProcess()
         await process.crawl(BaiduSpider)
         await process.start()
     

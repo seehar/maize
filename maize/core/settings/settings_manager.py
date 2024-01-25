@@ -1,15 +1,14 @@
 import typing
 from collections.abc import MutableMapping
 from copy import deepcopy
-from importlib import import_module
 
-from maize.core.settings import default_settings
+from maize.core.settings.base_settings import BaseSettings
 
 
 class SettingsManager(MutableMapping):
     def __init__(self, values: typing.Optional[dict] = None):
         self.attributes = {}
-        self.set_settings(default_settings)
+        self.set_settings(BaseSettings)
         self.update_values(values)
 
     def __getitem__(self, item: str):
@@ -72,9 +71,12 @@ class SettingsManager(MutableMapping):
             got = got.split(",")
         return list(got)
 
-    def set_settings(self, module: str | typing.Type["default_settings"]):
+    def set_settings(self, module: str | typing.Type["BaseSettings"]):
         if isinstance(module, str):
-            module = import_module(module)
+            from maize.utils.project_util import load_class
+
+            module = load_class(module)
+
         for key in dir(module):
             if key.isupper():
                 self.set(key, getattr(module, key))

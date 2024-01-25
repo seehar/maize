@@ -1,49 +1,8 @@
-# 配置文件
-
-配置文件位于 `project/settings.py`，与 `run.py` 或 `settings.py` 同级。
-同样的，也可以在 `Spider` 中的 `custom_settings` 中进行设置，优先级高于 `settings.py`。
-
-
-```python
-from maize import Spider
+"""
+default config
+"""
 
 
-class CustomSpider(Spider):
-    custom_settings = {
-        # 并发数
-        'CONCURRENCY': 2,
-
-        # 是否验证 SSL 证书
-        'VERIFY_SSL': False,
-
-        # 请求超时时间
-        'REQUEST_TIMEOUT': 30,
-
-        # 是否使用 session
-        'USE_SESSION': False,
-        
-        # ...
-    }
-    
-    # ...
-```
-
-或者自定义 `Settings` 类
-
-```python
-from maize import BaseSettings
-
-
-class Settings(BaseSettings):
-    CONCURRENCY = 1
-    ...
-```
-
-
-默认配置如下：
-
-
-```python
 class BaseSettings:
     # 并发数
     CONCURRENCY: int = 1
@@ -103,4 +62,3 @@ class BaseSettings:
     # MYSQL_DB: str = ""
     # MYSQL_USER: str = ""
     # MYSQL_PASSWORD: str = ""
-```

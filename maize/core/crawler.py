@@ -1,8 +1,10 @@
 import asyncio
+import logging
 import typing
 
 from maize.core.engine import Engine
 from maize.exceptions.spider_exception import SpiderTypeException
+from maize.utils.log_util import get_logger
 from maize.utils.project_util import get_settings
 from maize.utils.project_util import merge_settings
 
@@ -41,10 +43,29 @@ class Crawler:
 
 
 class CrawlerProcess:
-    def __init__(self, settings: typing.Optional["SettingsManager"] = None):
+    def __init__(
+        self,
+        settings: typing.Optional["SettingsManager"] = None,
+        settings_path: typing.Optional[str] = "settings.Settings",
+    ):
         self.crawlers: typing.Final[set[Crawler]] = set()
         self._active: typing.Final[set] = set()
-        self.settings: "SettingsManager" = settings if settings else get_settings()
+        self.settings: "SettingsManager" = (
+            settings if settings else self.__get_settings(settings_path)
+        )
+
+        self.logger = get_logger(self.settings, self.__class__.__name__)
+
+    @staticmethod
+    def __get_settings(settings_path: typing.Optional[str]) -> "SettingsManager":
+        try:
+            return get_settings(settings_path)
+        except ModuleNotFoundError as e:
+            logging.warning(f"{e} use default settings")
+            return get_settings()
+        except NameError as e:
+            logging.warning(f"{e} use default settings")
+            return get_settings()
 
     async def crawl(self, spider: typing.Type["Spider"]):
         crawler: Crawler = self._create_crawler(spider)

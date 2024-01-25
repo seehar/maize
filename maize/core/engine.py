@@ -24,7 +24,7 @@ if typing.TYPE_CHECKING:
 
 class Engine:
     def __init__(self, crawler: "Crawler"):
-        self.logger = get_logger(name=self.__class__.__name__, crawler=crawler)
+        self.logger = get_logger(crawler.settings, self.__class__.__name__)
         self.crawler: "Crawler" = crawler
         self.settings: "SettingsManager" = self.crawler.settings
 

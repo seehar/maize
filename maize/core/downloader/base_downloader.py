@@ -49,7 +49,7 @@ class BaseDownloader(metaclass=DownloaderMeta):
         self._max_retry_count: int = self.crawler.settings.getint("MAX_RETRY_COUNT")
 
         self.logger = get_logger(
-            crawler, self.__class__.__name__, crawler.settings.get("LOG_LEVEL")
+            crawler.settings, self.__class__.__name__, crawler.settings.get("LOG_LEVEL")
         )
 
     @classmethod

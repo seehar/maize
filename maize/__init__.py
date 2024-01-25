@@ -8,6 +8,7 @@ from maize.core.items.field import Field
 from maize.core.items.items import Item
 from maize.core.pipelines.base_pipeline import BasePipeline
 from maize.core.pipelines.mysql_pipeline import MysqlPipeline
+from maize.core.settings.base_settings import BaseSettings
 from maize.core.spider.spider import Spider
 
 
@@ -23,4 +24,5 @@ __all__ = [
     "Item",
     "BasePipeline",
     "MysqlPipeline",
+    "BaseSettings",
 ]

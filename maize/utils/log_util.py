@@ -8,7 +8,7 @@ from maize.utils.project_util import load_class
 
 
 if typing.TYPE_CHECKING:
-    from maize.core.crawler import Crawler
+    from maize.core.settings.settings_manager import SettingsManager
 
 
 LOG_FORMAT = f"%(asctime)s [%(name)s] %(levelname)s: %(message)s"
@@ -20,7 +20,7 @@ class LoggerManager:
     @classmethod
     def get_logger(
         cls,
-        crawler: "Crawler",
+        settings_manager: "SettingsManager",
         name: str = "default",
         log_level: int | str = None,
         log_format: str = LOG_FORMAT,
@@ -28,7 +28,7 @@ class LoggerManager:
         key = (name, log_level)
 
         def get_logger_handler():
-            logger_handler_path = crawler.settings.get("LOGGER_HANDLER")
+            logger_handler_path = settings_manager.get("LOGGER_HANDLER")
             if logger_handler_path:
                 logger_handler_cls = load_class(logger_handler_path)
                 return logger_handler_cls()

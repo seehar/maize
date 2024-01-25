@@ -31,7 +31,7 @@ def _init_env():
 
 
 def get_settings(
-    settings: str = "maize.core.settings.default_settings",
+    settings: str = "maize.BaseSettings",
 ) -> SettingsManager:
     """
     获取settings配置文件
