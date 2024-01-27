@@ -48,12 +48,12 @@ class MysqlUtil:
         )
 
     async def fetchone(
-        self, sql: str, args: typing.Optional[list | set] = None
+        self, sql: str, args: typing.Optional[list | tuple] = None
     ) -> dict[str, typing.Any]:
         """
         查询单条数据
         :param sql: sql 语句
-        :param args: list 或 set 类型的参数
+        :param args: list 或 tuple 类型的参数
         :return: 单条结果
         """
         async with self.pool.acquire() as conn:
@@ -62,12 +62,12 @@ class MysqlUtil:
                 return await cur.fetchone()
 
     async def fetchall(
-        self, sql: str, args: typing.Optional[list | set] = None
+        self, sql: str, args: typing.Optional[list | tuple] = None
     ) -> list[dict[str, typing.Any]]:
         """
         查询多条数据
         :param sql: sql 语句
-        :param args: list 或 set 类型的参数
+        :param args: list 或 tuple 类型的参数
         :return: 多条结果集
         """
         async with self.pool.acquire() as conn:
@@ -75,34 +75,40 @@ class MysqlUtil:
                 await cur.execute(sql, args)
                 return await cur.fetchall()
 
-    async def execute(self, sql: str, args: typing.Optional[list | set] = None):
+    async def execute(
+        self, sql: str, args: typing.Optional[list | tuple] = None
+    ) -> int:
         """
         执行增删改操作
         :param sql: sql 语句
-        :param args: list 或 set 类型的参数
-        :return: 无返回
+        :param args: list 或 tuple 类型的参数
+        :return: 受影响的行数
         """
         async with self.pool.acquire() as conn:
             async with conn.cursor(aiomysql.DictCursor) as cur:
                 try:
-                    await cur.execute(sql, args)
+                    row = await cur.execute(sql, args)
                     await conn.commit()
+                    return row
                 except Exception as e:
                     await conn.rollback()
                     raise e
 
-    async def executemany(self, sql: str, args: typing.Optional[list | set] = None):
+    async def executemany(
+        self, sql: str, args: typing.Optional[list | tuple] = None
+    ) -> int:
         """
         批量执行增删改操作
         :param sql: sql 语句
-        :param args: ist 或 set 类型的参数
-        :return: 无返回
+        :param args: ist 或 tuple 类型的参数
+        :return: 受影响的行数
         """
         async with self.pool.acquire() as conn:
             async with conn.cursor(aiomysql.DictCursor) as cur:
                 try:
-                    await cur.executemany(sql, args)
+                    row = await cur.executemany(sql, args)
                     await conn.commit()
+                    return row
                 except Exception as e:
                     await conn.rollback()
                     raise e
