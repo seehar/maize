@@ -1,7 +1,7 @@
 import platform
 
 
-def fix_windows_aiohttp_proxy_error():
+def fix_windows_aiohttp_proxy_error():  # pragma: no cover
     """
     修复 windows 系统使用 aiohttp 的代理时的错误
     """

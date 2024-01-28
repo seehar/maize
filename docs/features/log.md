@@ -28,8 +28,8 @@ class InterceptHandler(logging.Handler):
         )
 
     def emit(self, record: logging.LogRecord):
-        logger_opt = self.logger.opt(depth=7, exception=record.exc_info)
-        logger_opt.log(record.levelno, record.getMessage())
+        logger_opt = self.logger.opt(depth=6, exception=record.exc_info)
+        logger_opt.log(record.levelname, record.getMessage())
 ```
 
 在配置文件中指定您的日志模块

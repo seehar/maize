@@ -1,11 +1,11 @@
+from examples.baidu_spider.items import BaiduItem
 from maize import Request
 from maize import Response
 from maize import Spider
-from tests.test_full_process.items import BaiduItem
 
 
 class BaiduSpider(Spider):
-    start_urls = ["http://www.baidu.com", "http://www.baidu.com"]
+    start_urls = ["http://www.baidu.com"]
 
     async def parse(self, response: Response):
         li_list = response.xpath("//li[contains(@class, 'hotsearch-item')]")

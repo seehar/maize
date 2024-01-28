@@ -24,6 +24,9 @@ class Item(MutableMapping, metaclass=ItemMeta):
     FIELDS: dict
     __table_name__: str
 
+    # 重试次数
+    __retry_count__: int = 0
+
     def __init__(self, *args, **kwargs):
         self._values = {}
         if args:
@@ -83,3 +86,6 @@ class Item(MutableMapping, metaclass=ItemMeta):
 
     def copy(self) -> "Item":
         return deepcopy(self)
+
+    def retry(self):
+        self.__retry_count__ += 1

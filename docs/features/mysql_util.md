@@ -33,12 +33,12 @@
 
 ```python
 async def fetchone(
-    self, sql: str, args: typing.Optional[list | set] = None
+    self, sql: str, args: typing.Optional[list | tuple] = None
 ) -> dict[str, typing.Any]:
     """
     查询单条数据
     :param sql: sql 语句
-    :param args: list 或 set 类型的参数
+    :param args: list 或 tuple 类型的参数
     :return: 单条结果集
     """
 ```
@@ -47,12 +47,12 @@ async def fetchone(
 
 ```python
 async def fetchall(
-    self, sql: str, args: typing.Optional[list | set] = None
+    self, sql: str, args: typing.Optional[list | tuple] = None
 ) -> list[dict[str, typing.Any]]:
     """
     查询多条数据
     :param sql: sql 语句
-    :param args: list 或 set 类型的参数
+    :param args: list 或 tuple 类型的参数
     :return: 多条结果集
     """
 ```
@@ -60,23 +60,23 @@ async def fetchall(
 ## execute
 
 ```python
-async def execute(self, sql: str, args: typing.Optional[list | set] = None):
+async def execute(self, sql: str, args: typing.Optional[list | tuple] = None) -> int:
     """
     执行增删改操作
     :param sql: sql 语句
-    :param args: list 或 set 类型的参数
-    :return: 无返回
+    :param args: list 或 tuple 类型的参数
+    :return: 受影响的行数
     """
 ```
 
 ## executemany
 
 ```python
-async def executemany(self, sql: str, args: typing.Optional[list | set] = None):
+async def executemany(self, sql: str, args: typing.Optional[list | tuple] = None) -> int:
     """
     批量执行增删改操作
     :param sql: sql 语句
-    :param args: ist 或 set 类型的参数
-    :return: 无返回
+    :param args: ist 或 tuple 类型的参数
+    :return: 受影响的行数
     """
 ```

@@ -44,6 +44,7 @@ class Settings(BaseSettings):
 
 
 ```python
+
 class BaseSettings:
     # 并发数
     CONCURRENCY: int = 1
@@ -71,7 +72,7 @@ class BaseSettings:
     # # 如不想使用默认的 logging 模块，可以自定义日志处理模块
     # LOGGER_HANDLER: str = ""
 
-    # 最大重试次数
+    # 请求最大重试次数
     MAX_RETRY_COUNT: int = 0
 
     # item在内存队列中最大缓存数量
@@ -82,6 +83,22 @@ class BaseSettings:
 
     # item入库时间间隔，单位：秒
     ITEM_HANDLE_INTERVAL: int = 2
+
+    # 入库异常的 item 最大重试次数
+    ERROR_ITEM_MAX_RETRY_COUNT: int = 5
+
+    # 入库异常的 item 在内存队列中最大缓存数量
+    ERROR_ITEM_MAX_CACHE_COUNT: int = 5000
+
+    # 入库异常的 item 重试每批处理的最大数量
+    # 批量入库可能会因为某个 item 异常，导致整批数据无法入库，建议每批处理一个 item
+    ERROR_ITEM_RETRY_BATCH_MAX_SIZE: int = 1
+
+    # 入库异常的 item 超过重试次数后，每批处理的最大数量
+    ERROR_ITEM_HANDLE_BATCH_MAX_SIZE: int = 1000
+
+    # 处理入库异常的 item 时间间隔，单位：秒
+    ERROR_ITEM_HANDLE_INTERVAL: int = 60
 
     # 数据管道，支持多个数据管道
     # maize.BasePipeline: 默认数据管道，不做任何处理
