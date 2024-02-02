@@ -19,8 +19,8 @@ class HTTPXDownloader(BaseDownloader):
         self._timeout: typing.Optional[httpx.Timeout] = None
         self.httpx_proxy: typing.Optional[Proxy] = None
 
-    def open(self):
-        super().open()
+    async def open(self):
+        await super().open()
         request_timeout = self.crawler.settings.getint("REQUEST_TIMEOUT")
 
         proxy_tunnel = self.crawler.settings.get("PROXY_TUNNEL")

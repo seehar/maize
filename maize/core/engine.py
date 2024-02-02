@@ -57,8 +57,6 @@ class Engine:
     async def start_spider(self, spider: "Spider"):
         self.running = True
         self.start_requests_running = True
-        # if self.spider.__spider_type__ == "task_spider":
-        #     self.task_requests_running = True
 
         self.logger.info(
             f"spider started. (project name: {self.settings.get('PROJECT_NAME')})"
@@ -71,7 +69,7 @@ class Engine:
         downloader_cls = load_class(self.settings.get("DOWNLOADER"))
         self.downloader = downloader_cls(self.crawler)
         if getattr(self.downloader, "open"):
-            self.downloader.open()
+            await self.downloader.open()
 
         self.processor = Processor(self.crawler)
         await self.processor.open()

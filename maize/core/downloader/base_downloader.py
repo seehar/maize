@@ -56,7 +56,7 @@ class BaseDownloader(metaclass=DownloaderMeta):
     def create_instance(cls, *args, **kwargs):
         return cls(*args, **kwargs)
 
-    def open(self):
+    async def open(self):
         self.logger.info(
             f"{self.crawler.spider} <downloader class: {type(self).__name__}> "
             f"<concurrency: {self.crawler.settings.getint('CONCURRENCY')}>"

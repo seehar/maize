@@ -8,7 +8,7 @@ from parsel import Selector
 from parsel import SelectorList
 
 from maize.core.http.request import Request
-from maize.exceptions.spider_exception import DecodeException
+from maize.exceptions.spider_exception import DecodeException, EncodeException
 
 
 class Response:
@@ -19,7 +19,9 @@ class Response:
         headers: dict,
         request: Request,
         body: bytes = b"",
+        text: str = "",
         status: int = 200,
+        cookie_list: typing.Optional[list[dict[str, str | bool]]] = None
     ):
         """
         响应
@@ -27,22 +29,42 @@ class Response:
         @param headers: 响应头
         @param request: 请求 Request
         @param body: 响应体 bytes 类型
+        @param text: 响应体 str 类型
         @param status: 响应状态码，如 200
+        @param cookie_list: cookie 列表
         """
         self.url = url
         self.request = request
         self.headers = headers
-        self.body = body
+        self._body_cache = body
         self.status = status
         self.encoding = request.encoding
 
-        self._text_cache: typing.Optional[str] = None
-        self._cookie_list_cache: typing.Optional[list[dict[str, str]]] = None
+        self._text_cache: str = text
+        self._cookie_list_cache: typing.Optional[list[dict[str, str | bool]]] = cookie_list
         self._cookies_cache: typing.Optional[dict[str, typing.Any]] = None
         self._selector: typing.Optional[Selector] = None
 
     @property
-    def text(self):
+    def body(self) -> bytes:
+        if self._body_cache:
+            return self._body_cache
+
+        try:
+            self._body_cache = self._text_cache.encode(self.encoding)
+        except UnicodeEncodeError:
+            try:
+                _encoding = self._get_encoding()
+                if _encoding:
+                    self._body_cache = self._text_cache.encode(_encoding)
+                else:
+                    raise EncodeException(f"{self.request} {self.request.encoding} error.")
+            except UnicodeEncodeError as e:
+                raise EncodeException(e.encoding, e.object, e.start, e.end, f"{self.request}")
+        return self._body_cache
+
+    @property
+    def text(self) -> str:
         if self._text_cache:
             return self._text_cache
 
@@ -50,13 +72,8 @@ class Response:
             self._text_cache = self.body.decode(self.encoding)
         except UnicodeDecodeError:
             try:
-                _encoding_re = re.compile(r"charset=([\w-]+)", flags=re.I)
-                _encoding_string = self.headers.get(
-                    "Content-Type", ""
-                ) or self.headers.get("content-type", "")
-                _encoding = _encoding_re.search(_encoding_string)
+                _encoding = self._get_encoding()
                 if _encoding:
-                    _encoding = _encoding.group(1)
                     self._text_cache = self.body.decode(_encoding)
                 else:
                     raise DecodeException(
@@ -67,6 +84,14 @@ class Response:
                     e.encoding, e.object, e.start, e.end, f"{self.request}"
                 )
         return self._text_cache
+
+    def _get_encoding(self) -> typing.Optional[str]:
+        _encoding_re = re.compile(r"charset=([\w-]+)", flags=re.I)
+        _encoding_string = self.headers.get(
+            "Content-Type", ""
+        ) or self.headers.get("content-type", "")
+        _encoding = _encoding_re.search(_encoding_string)
+        return _encoding.group(1) if _encoding else None
 
     @property
     def cookie_list(self) -> list[dict[str, str]]:
@@ -80,7 +105,7 @@ class Response:
 
         self._cookie_list_cache = [
             {
-                "key": key,
+                "name": name,
                 "value": morsel.value,
                 "domain": morsel.get("domain", ""),
                 "path": morsel.get("path", ""),
@@ -88,7 +113,7 @@ class Response:
                 "secure": morsel.get("secure", ""),
                 "httponly": morsel.get("httponly", ""),
             }
-            for key, morsel in cookie_obj.items()
+            for name, morsel in cookie_obj.items()
         ]
 
         return self._cookie_list_cache

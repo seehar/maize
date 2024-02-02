@@ -32,8 +32,8 @@ class AioHttpDownloader(BaseDownloader):
         self.proxy_tunnel: typing.Optional[str] = None
         self.proxy_auth: typing.Optional[BasicAuth] = None
 
-    def open(self):
-        super().open()
+    async def open(self):
+        await super().open()
 
         request_timeout = self.crawler.settings.getint("REQUEST_TIMEOUT")
         self._timeout = ClientTimeout(total=request_timeout)

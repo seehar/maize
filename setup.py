@@ -15,45 +15,20 @@ with open("README.md", encoding="utf8") as fh:
     long_description = fh.read()
 
 packages = setuptools.find_packages()
-# packages.extend(
-#     [
-#         "feapder",
-#         "feapder.templates",
-#         "feapder.templates.project_template",
-#         "feapder.templates.project_template.spiders",
-#         "feapder.templates.project_template.items",
-#     ]
-# )
 
-# requires = [
-#     "better-exceptions>=0.2.2",
-#     "DBUtils>=2.0",
-#     "parsel>=1.5.2",
-#     "PyMySQL>=0.9.3",
-#     "redis>=2.10.6,<4.0.0",
-#     "requests>=2.22.0",
-#     "bs4>=0.0.1",
-#     "ipython>=7.14.0",
-#     "cryptography>=3.3.2",
-#     "urllib3>=1.25.8",
-#     "loguru>=0.5.3",
-#     "influxdb>=5.3.1",
-#     "pyperclip>=1.8.2",
-#     "terminal-layout>=2.1.3",
-# ]
+requires = [
+    "parsel>=1.8.1",
+    "aiohttp>=3.9.1",
+    "httpx>=0.26.0",
+    "ujson>=5.9.0",
+    "aiomysql>=0.2.0",
+]
 
-# render_requires = [
-#     "webdriver-manager>=4.0.0",
-#     "playwright",
-#     "selenium>=3.141.0",
-# ]
+rpa_requires = [
+    "playwright",
+]
 
-# all_requires = [
-#     "bitarray>=1.5.3",
-#     "PyExecJS>=1.5.1",
-#     "pymongo>=3.10.1",
-#     "redis-py-cluster>=2.1.0",
-# ] + render_requires
+all_requires = [] + rpa_requires
 
 setuptools.setup(
     name="maize",
@@ -65,8 +40,9 @@ setuptools.setup(
     description="一个强大易用的爬虫框架",
     long_description=long_description,
     long_description_content_type="text/markdown",
-    # install_requires=requires,
+    install_requires=requires,
     # extras_require={"all": all_requires, "render": render_requires},
+    extras_require={"all": all_requires, "rpa": rpa_requires},
     entry_points={"console_scripts": ["maize = maize.commands.cmdline:execute"]},
     url="https://github.com/seehar/maize.git",
     packages=packages,

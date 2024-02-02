@@ -10,7 +10,7 @@ class BaseSettings:
     # 是否验证 SSL 证书
     VERIFY_SSL: bool = True
 
-    # 请求超时时间
+    # 请求超时时间，单位：秒
     REQUEST_TIMEOUT: int = 60
 
     # 是否使用 session
@@ -20,6 +20,7 @@ class BaseSettings:
     # 下载器
     # 基于 aiohttp 封装的下载器：maize.AioHttpDownloader
     # 基于 httpx 封装的下载器：maize.HTTPXDownloader
+    # 基于 playwright 封装的下载器: maize.core.downloader.playwright_downloader.PlaywrightDownloader
     DOWNLOADER: str = "maize.AioHttpDownloader"
 
     # 日志级别，与 logging 日志级别相同

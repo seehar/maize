@@ -24,3 +24,7 @@ class ItemAttributeException(Exception):
 
 class DecodeException(Exception):
     pass
+
+
+class EncodeException(Exception):
+    pass
