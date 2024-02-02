@@ -90,6 +90,7 @@ class BaseDownloader(metaclass=DownloaderMeta):
         self.logger.error(
             f"Max retry count reached ({self._max_retry_count}). Skipping request: {request.url}"
         )
+        await self.process_error_request(request)
         return None
 
     @staticmethod
@@ -109,3 +110,10 @@ class BaseDownloader(metaclass=DownloaderMeta):
         self.logger.info(
             f"{self.crawler.spider} <downloader class: {type(self).__name__}> closed"
         )
+
+    async def process_error_request(self, request: Request):
+        """
+        处理超过最大重试次数的请求
+        :param request:
+        :return:
+        """
