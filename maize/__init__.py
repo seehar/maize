@@ -10,19 +10,21 @@ from maize.core.pipelines.base_pipeline import BasePipeline
 from maize.core.pipelines.mysql_pipeline import MysqlPipeline
 from maize.core.settings.base_settings import BaseSettings
 from maize.core.spider.spider import Spider
+from maize.core.spider.task_spider import TaskSpider
 
 
 __all__ = [
-    "Request",
-    "Response",
-    "HTTPXDownloader",
+    "CrawlerProcess",
     "AioHttpDownloader",
     "BaseDownloader",
-    "Spider",
-    "CrawlerProcess",
+    "HTTPXDownloader",
+    "Request",
+    "Response",
     "Field",
     "Item",
     "BasePipeline",
     "MysqlPipeline",
     "BaseSettings",
+    "Spider",
+    "TaskSpider",
 ]

@@ -9,6 +9,7 @@ if typing.TYPE_CHECKING:
 
 
 class Spider:
+    __spider_type__: str = "spider"
     start_urls: list[str] = []
     start_url: typing.Optional[str] = None
 
@@ -38,9 +39,10 @@ class Spider:
         instance.crawler = crawler
         return instance
 
-    def start_requests(self) -> typing.Generator[Request, typing.Any, None]:
+    async def start_requests(self) -> typing.AsyncGenerator[Request, typing.Any]:
         if self.start_urls:
             for url in self.start_urls:
+                print("-->", url)
                 yield Request(url=url)
 
         elif self.start_url and isinstance(self.start_url, str):
