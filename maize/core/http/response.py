@@ -8,7 +8,8 @@ from parsel import Selector
 from parsel import SelectorList
 
 from maize.core.http.request import Request
-from maize.exceptions.spider_exception import DecodeException, EncodeException
+from maize.exceptions.spider_exception import DecodeException
+from maize.exceptions.spider_exception import EncodeException
 
 
 class Response:
@@ -21,7 +22,7 @@ class Response:
         body: bytes = b"",
         text: str = "",
         status: int = 200,
-        cookie_list: typing.Optional[list[dict[str, str | bool]]] = None
+        cookie_list: typing.Optional[list[dict[str, str | bool]]] = None,
     ):
         """
         响应
@@ -41,7 +42,9 @@ class Response:
         self.encoding = request.encoding
 
         self._text_cache: str = text
-        self._cookie_list_cache: typing.Optional[list[dict[str, str | bool]]] = cookie_list
+        self._cookie_list_cache: typing.Optional[
+            list[dict[str, str | bool]]
+        ] = cookie_list
         self._cookies_cache: typing.Optional[dict[str, typing.Any]] = None
         self._selector: typing.Optional[Selector] = None
 
@@ -58,9 +61,13 @@ class Response:
                 if _encoding:
                     self._body_cache = self._text_cache.encode(_encoding)
                 else:
-                    raise EncodeException(f"{self.request} {self.request.encoding} error.")
+                    raise EncodeException(
+                        f"{self.request} {self.request.encoding} error."
+                    )
             except UnicodeEncodeError as e:
-                raise EncodeException(e.encoding, e.object, e.start, e.end, f"{self.request}")
+                raise EncodeException(
+                    e.encoding, e.object, e.start, e.end, f"{self.request}"
+                )
         return self._body_cache
 
     @property
@@ -87,9 +94,9 @@ class Response:
 
     def _get_encoding(self) -> typing.Optional[str]:
         _encoding_re = re.compile(r"charset=([\w-]+)", flags=re.I)
-        _encoding_string = self.headers.get(
-            "Content-Type", ""
-        ) or self.headers.get("content-type", "")
+        _encoding_string = self.headers.get("Content-Type", "") or self.headers.get(
+            "content-type", ""
+        )
         _encoding = _encoding_re.search(_encoding_string)
         return _encoding.group(1) if _encoding else None
 

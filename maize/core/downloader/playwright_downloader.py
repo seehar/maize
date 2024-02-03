@@ -1,14 +1,22 @@
 import typing
-from playwright.async_api import async_playwright, Playwright, Browser, Page, BrowserContext, Cookie
 
-from maize import BaseDownloader, Request, Response
+from playwright.async_api import Browser
+from playwright.async_api import BrowserContext
+from playwright.async_api import Cookie
+from playwright.async_api import Page
+from playwright.async_api import Playwright
+from playwright.async_api import async_playwright
+
+from maize import BaseDownloader
+from maize import Request
+from maize import Response
+
 
 if typing.TYPE_CHECKING:
     from maize.core.crawler import Crawler
 
 
 class PlaywrightDownloader(BaseDownloader):
-
     def __init__(self, crawler: "Crawler"):
         super().__init__(crawler)
         self.playwright: typing.Optional[Playwright] = None
@@ -31,7 +39,7 @@ class PlaywrightDownloader(BaseDownloader):
             self.browser = await self.playwright.chromium.launch(timeout=self._timeout)
             self.context = await self.browser.new_context()
             self.page = await self.context.new_page()
-    
+
     async def close(self):
         if self.page:
             await self.page.close()
@@ -60,14 +68,15 @@ class PlaywrightDownloader(BaseDownloader):
                     cookies = await self.page.context.cookies()
 
         except Exception as e:
-
             self.logger.error(f"Error during request: {e}")
             return None
 
         return self.structure_response(request, response, cookies)
 
     @staticmethod
-    def structure_response(request: Request, response: str, cookies: list[Cookie]) -> Response:
+    def structure_response(
+        request: Request, response: str, cookies: list[Cookie]
+    ) -> Response:
         cookie_list = [
             {
                 "name": cookie["name"],
@@ -85,5 +94,5 @@ class PlaywrightDownloader(BaseDownloader):
             headers={},
             text=response,
             request=request,
-            cookie_list=cookie_list
+            cookie_list=cookie_list,
         )
