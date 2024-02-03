@@ -5,7 +5,7 @@ from aioredis.client import ExpiryT
 from aioredis.client import KeyT
 from aioredis.connection import EncodableT
 
-from maize.utils import SingletonType
+from .tools import SingletonType
 
 
 class RedisUtil:
