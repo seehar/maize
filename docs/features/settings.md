@@ -28,23 +28,30 @@ class CustomSpider(Spider):
     # ...
 ```
 
-或者自定义 `Settings` 类
+或者自定义 `Settings` 类。您可以继承 `BaseSettings` 或者不继承，具体请看下面的示例。
+如果您继承了 `BaseSettings`，那么您可以获得更好的代码提示。如果您不继承，那么您需要注意，不要将配置项命名写错。
 
-```python
-from maize import BaseSettings
+=== "继承 `BaseSettings`"
+    ```python
+    from maize import BaseSettings
+    
+    
+    class Settings(BaseSettings):
+        CONCURRENCY = 1
+        ...
+    ```
 
-
-class Settings(BaseSettings):
-    CONCURRENCY = 1
-    ...
-```
-
+=== "不继承 `BaseSettings`"
+    ```python
+    class Settings:
+        CONCURRENCY = 1
+        ...
+    ```
 
 默认配置如下：
 
 
 ```python
-
 class BaseSettings:
     # 并发数
     CONCURRENCY: int = 1

@@ -40,13 +40,20 @@ class RedisUtil:
         self.redis = aioredis.Redis(connection_pool=self._pool)
 
     async def open(self):
-        pass
+        """
+        可以在此处进行一些异步初始化操作
+        :return:
+        """
 
     async def close(self):
+        """
+        关闭连接
+        :return:
+        """
         await self.redis.close()
         await self._pool.disconnect()
 
-    async def set_data(
+    async def set(
         self,
         name: KeyT,
         value: EncodableT,
@@ -56,11 +63,27 @@ class RedisUtil:
         xx: bool = False,
         keepttl: bool = False,
     ):
+        """
+        将关键字 `name` 的值设置为 `value`
+        :param name:
+        :param value:
+        :param ex: 设置键 `name` 的过期标志为 `ex` 秒。
+        :param px: 设置键 `name` 的过期标志，过期时间为 `px` 毫秒。
+        :param nx: 如果设置为 True，则将键 `name` 的值设置为 `value`，前提是该值不存在。
+        :param xx: 如果设置为 True，则将键 `name` 的值设置为 `value`，前提是该值已经存在。
+        :param keepttl: 如果为 True，则保留与密钥相关的存活时间。
+        :return:
+        """
         return await self.redis.set(
             name=name, value=value, ex=ex, px=px, nx=nx, xx=xx, keepttl=keepttl
         )
 
-    async def get_data(self, name: KeyT):
+    async def get(self, name: KeyT):
+        """
+        返回键 `name` 的值，如果键不存在，则返回 None
+        :param name:
+        :return:
+        """
         return await self.redis.get(name)
 
 

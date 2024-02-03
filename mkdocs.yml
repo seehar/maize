@@ -32,8 +32,11 @@ nav:
       - Response: features/response.md
       - Item: features/item.md
       - Pipeline: features/pipeline.md
+      - Downloader: features/downloader.md
       - Spider 进阶: features/spider.md
+      - TaskSpider 任务爬虫: features/task_spider.md
       - MysqlUtil: features/mysql_util.md
+      - RedisUtil: features/redis_util.md
       - 日志配置: features/log.md
       - 配置文件: features/settings.md
 
