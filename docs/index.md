@@ -18,3 +18,24 @@
     ```shell
     poetry add maize
     ```
+
+## 爬虫示例
+
+```python
+from maize import Spider, SpiderEntry
+
+
+spider_entry = SpiderEntry()
+
+
+@spider_entry.register()
+class DecoratorSpider(Spider):
+    start_url = "http://www.baidu.com"
+
+    def parse(self, response):
+        print(response.text)
+
+
+if __name__ == "__main__":
+    spider_entry.run()
+```

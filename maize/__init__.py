@@ -1,4 +1,5 @@
 from maize.core.crawler import CrawlerProcess
+from maize.core.decorator_entry import SpiderEntry
 from maize.core.downloader.aiohttp_downloader import AioHttpDownloader
 from maize.core.downloader.base_downloader import BaseDownloader
 from maize.core.downloader.httpx_downloader import HTTPXDownloader
@@ -27,4 +28,5 @@ __all__ = [
     "BaseSettings",
     "Spider",
     "TaskSpider",
+    "SpiderEntry",
 ]
