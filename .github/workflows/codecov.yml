@@ -24,7 +24,7 @@ jobs:
           export PATH=$PATH:$HOME/.poetry/bin
 
       - name: Install project dependencies
-        run: poetry install
+        run: poetry install --no-root
 
       - name: Run tests and collect coverage
         run: poetry run pytest --cov=maize --cov-report=xml
