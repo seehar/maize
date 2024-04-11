@@ -31,6 +31,10 @@ class Crawler:
         await self.spider.close()
 
     def _create_spider(self) -> "Spider":
+        """
+        创建爬虫实例
+        :return:
+        """
         spider = self.spider_cls.create_instance(self)
         self._set_spider(spider)
         return spider
@@ -39,10 +43,19 @@ class Crawler:
         return Engine(self)
 
     def _set_spider(self, spider: "Spider"):
+        """
+        设置爬虫，合并配置
+        :param spider: Spider类
+        :return:
+        """
         merge_settings(spider=spider, settings=self.settings)
 
 
 class CrawlerProcess:
+    """
+    运行爬虫
+    """
+
     def __init__(
         self,
         settings: typing.Optional["SettingsManager"] = None,
@@ -58,6 +71,11 @@ class CrawlerProcess:
 
     @staticmethod
     def __get_settings(settings_path: typing.Optional[str]) -> "SettingsManager":
+        """
+        获取配置
+        :param settings_path:
+        :return:
+        """
         try:
             return get_settings(settings_path)
         except ModuleNotFoundError as e:
@@ -68,6 +86,11 @@ class CrawlerProcess:
             return get_settings()
 
     async def crawl(self, spider: typing.Type["Spider"]):
+        """
+        装配爬虫
+        :param spider: Spider类
+        :return:
+        """
         crawler: Crawler = self._create_crawler(spider)
         self.crawlers.add(crawler)
         task = await self._crawl(crawler)
@@ -78,6 +101,10 @@ class CrawlerProcess:
         return asyncio.create_task(crawler.crawl())
 
     async def start(self):
+        """
+        开始运行所有爬虫
+        :return:
+        """
         await asyncio.gather(*self._active)
 
     def _create_crawler(self, spider_cls: typing.Type["Spider"]) -> Crawler:

@@ -24,6 +24,10 @@ if typing.TYPE_CHECKING:
 
 
 class Engine:
+    """
+    爬虫引擎
+    """
+
     def __init__(self, crawler: "Crawler"):
         self.logger = get_logger(crawler.settings, self.__class__.__name__)
         self.crawler: "Crawler" = crawler
