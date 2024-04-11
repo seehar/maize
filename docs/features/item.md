@@ -9,8 +9,8 @@ from maize import Field, Item
 
 class BaiduItem(Item):
     #  __table_name__ = "table_name"  # 表名，自动入库时必须设置
-    url = Field()
-    title = Field()
+    url: str = Field()
+    title: str = Field(default="默认标题")
 ```
 
 在 `Spider` 的 `parse` 中
@@ -28,4 +28,27 @@ class BaiduSpider(Spider):
         item["url"] = "https://www.baidu.com"
         item["title"] = "百度一下"
         yield item
+```
+
+## 使用方式
+
+### 像字典一样使用
+
+```python
+item = BaiduItem()
+item["url"] = "https://www.baidu.com"
+item["title"] = "百度一下"
+print(item["url"])
+print(item["title"])
+```
+
+
+### 像属性一样使用
+
+```python
+item = BaiduItem()
+item.url = "https://www.baidu.com"
+item.title = "百度一下"
+print(item.url)
+print(item.title)
 ```

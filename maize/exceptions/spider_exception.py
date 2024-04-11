@@ -18,10 +18,6 @@ class ItemInitException(Exception):
     pass
 
 
-class ItemAttributeException(Exception):
-    pass
-
-
 class DecodeException(Exception):
     pass
 

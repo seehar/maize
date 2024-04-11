@@ -1,2 +1,4 @@
 class Field(dict):
-    pass
+    def __init__(self, default=None):
+        super().__init__()
+        self.default = default
