@@ -11,6 +11,12 @@ class Scheduler:
     def __init__(self):
         self.request_queue: typing.Optional[SpiderPriorityQueue] = None
 
+    def __len__(self):
+        return self.request_queue.qsize()
+
+    def idle(self) -> bool:
+        return len(self) == 0
+
     def open(self):
         self.request_queue = SpiderPriorityQueue()
 
@@ -19,9 +25,3 @@ class Scheduler:
 
     async def enqueue_request(self, request: "Request"):
         await self.request_queue.put(request)
-
-    def idle(self) -> bool:
-        return len(self) == 0
-
-    def __len__(self):
-        return self.request_queue.qsize()

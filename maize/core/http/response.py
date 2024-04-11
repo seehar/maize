@@ -48,6 +48,9 @@ class Response:
         self._cookies_cache: typing.Optional[dict[str, typing.Any]] = None
         self._selector: typing.Optional[Selector] = None
 
+    def __str__(self):
+        return f"<{self.status}> {self.url}"
+
     @property
     def body(self) -> bytes:
         if self._body_cache:
@@ -146,9 +149,6 @@ class Response:
             self._selector = Selector(self.text)
 
         return self._selector.xpath(xpath)
-
-    def __str__(self):
-        return f"<{self.status}> {self.url}"
 
     @property
     def meta(self) -> dict:

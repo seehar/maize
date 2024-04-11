@@ -21,6 +21,9 @@ class Spider:
 
         self.crawler: typing.Optional["Crawler"] = None
 
+    def __str__(self):
+        return self.__class__.__name__
+
     async def open(self):
         """
         在 Spider 启动时执行一些初始化操作
@@ -48,8 +51,5 @@ class Spider:
         elif self.start_url and isinstance(self.start_url, str):
             yield Request(url=self.start_url)
 
-    def parse(self, response: Response):
+    async def parse(self, response: Response):
         raise NotImplementedError
-
-    def __str__(self):
-        return self.__class__.__name__

@@ -24,6 +24,9 @@ class Processor:
             self.crawler.settings
         )
 
+    def __len__(self):
+        return self.queue.qsize()
+
     async def open(self):
         await self.pipeline_scheduler.open()
 
@@ -46,6 +49,3 @@ class Processor:
 
     def idle(self) -> bool:
         return len(self) == 0
-
-    def __len__(self):
-        return self.queue.qsize()

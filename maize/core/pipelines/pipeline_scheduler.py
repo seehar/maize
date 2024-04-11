@@ -46,6 +46,9 @@ class PipelineScheduler:
         # retry item
         self.retry_item_queue = Queue(maxsize=error_item_max_cache_count)
 
+    def __len__(self):
+        return self.item_queue.qsize()
+
     async def open(self):
         pipeline_path_list = self.settings.getlist("ITEM_PIPELINES")
         for pipeline_path in pipeline_path_list:
@@ -191,9 +194,6 @@ class PipelineScheduler:
 
     def idle(self):
         return len(self) == 0
-
-    def __len__(self):
-        return self.item_queue.qsize()
 
     def error_task_idle(self):
         return self.error_item_queue.qsize() == 0

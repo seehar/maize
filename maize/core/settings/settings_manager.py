@@ -22,14 +22,8 @@ class SettingsManager(MutableMapping):
     def __setitem__(self, key: str, value: typing.Any):
         self.set(key, value)
 
-    def set(self, key: str, value: typing.Any):
-        self.attributes[key] = value
-
     def __delitem__(self, key: str):
         self.delete(key)
-
-    def delete(self, key: str):
-        del self.attributes[key]
 
     def __str__(self):
         return f"<Settings values={self.attributes}>"
@@ -41,6 +35,12 @@ class SettingsManager(MutableMapping):
 
     def __len__(self):
         return len(self.attributes)
+
+    def set(self, key: str, value: typing.Any):
+        self.attributes[key] = value
+
+    def delete(self, key: str):
+        del self.attributes[key]
 
     def get(self, name: str, default: typing.Any = None) -> typing.Any:
         return self[name] if self[name] is not None else default
