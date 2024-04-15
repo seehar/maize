@@ -36,3 +36,6 @@ jobs:
         with:
           flags: unittests
           file: ./coverage.xml
+
+      - name: Multi version test
+        run: poetry run nox
