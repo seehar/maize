@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "maize"
-version = "0.2.4"
+version = "0.2.5"
 description = "一个强大易用的爬虫框架"
 authors = ["seehar <seehar@qq.com>"]
 license = "MIT"
@@ -10,7 +10,7 @@ repository = "https://github.com/seehar/maize"
 documentation = "https://seehar.github.io/maize"
 
 [tool.poetry.dependencies]
-python = ">=3.8,<=3.11"
+python = ">=3.8,<=3.12"
 parsel = "^1.8.1"
 aiohttp = "^3.9.1"
 httpx = "^0.26.0"

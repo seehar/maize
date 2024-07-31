@@ -1,15 +1,22 @@
 import asyncio
+import typing
 
 from maize import CrawlerProcess
+from maize import Request
 from maize import Spider
 
 
 class BaiduSpider(Spider):
-    start_url = "http://www.baidu.com"
+    # start_url = "http://www.baidu.com"
 
     custom_settings = {
-        "DOWNLOADER": "maize.core.downloader.playwright_downloader.PlaywrightDownloader"
+        "CONCURRENCY": 2,
+        "DOWNLOADER": "maize.core.downloader.playwright_downloader.PlaywrightDownloader",
     }
+
+    async def start_requests(self) -> typing.AsyncGenerator[Request, typing.Any]:
+        for _ in range(10):
+            yield Request("http://www.baidu.com")
 
     def parse(self, response):
         print(response.text)
