@@ -8,6 +8,7 @@
 import asyncio
 from typing import TYPE_CHECKING
 from typing import Callable
+from typing import List
 from typing import Optional
 from typing import Type
 
@@ -20,7 +21,7 @@ if TYPE_CHECKING:
 
 class SpiderEntry:
     def __init__(self):
-        self.spider_list: list[Type["Spider"]] = []
+        self.spider_list: List[Type["Spider"]] = []
 
     def register(
         self, *, settings: Optional[dict] = None
@@ -48,5 +49,5 @@ class SpiderEntry:
     def run(self):
         asyncio.run(self.run_async())
 
-    def get_spider_list(self) -> list[Type["Spider"]]:
+    def get_spider_list(self) -> List[Type["Spider"]]:
         return self.spider_list

@@ -1,4 +1,8 @@
-import typing
+from typing import Any
+from typing import Dict
+from typing import List
+from typing import Optional
+from typing import Union
 
 import aiomysql
 
@@ -29,7 +33,7 @@ class MysqlUtil:
         self.echo = echo
         self.pool_recycle = pool_recycle
 
-        self.pool: typing.Optional[aiomysql.Pool] = None
+        self.pool: Optional[aiomysql.Pool] = None
 
     async def open(self):
         if self.pool:
@@ -48,8 +52,8 @@ class MysqlUtil:
         )
 
     async def fetchone(
-        self, sql: str, args: typing.Optional[list | tuple] = None
-    ) -> dict[str, typing.Any]:
+        self, sql: str, args: Optional[Union[list, tuple]] = None
+    ) -> Dict[str, Any]:
         """
         查询单条数据
         :param sql: sql 语句
@@ -62,8 +66,8 @@ class MysqlUtil:
                 return await cur.fetchone()
 
     async def fetchall(
-        self, sql: str, args: typing.Optional[list | tuple] = None
-    ) -> list[dict[str, typing.Any]]:
+        self, sql: str, args: Optional[Union[list, tuple]] = None
+    ) -> List[Dict[str, Any]]:
         """
         查询多条数据
         :param sql: sql 语句
@@ -75,9 +79,7 @@ class MysqlUtil:
                 await cur.execute(sql, args)
                 return await cur.fetchall()
 
-    async def execute(
-        self, sql: str, args: typing.Optional[list | tuple] = None
-    ) -> int:
+    async def execute(self, sql: str, args: Optional[Union[list, tuple]] = None) -> int:
         """
         执行增删改操作
         :param sql: sql 语句
@@ -95,7 +97,7 @@ class MysqlUtil:
                     raise e
 
     async def executemany(
-        self, sql: str, args: typing.Optional[list | tuple] = None
+        self, sql: str, args: Optional[Union[list, tuple]] = None
     ) -> int:
         """
         批量执行增删改操作

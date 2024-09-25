@@ -1,8 +1,9 @@
-import typing
 from abc import ABCMeta
+from typing import TYPE_CHECKING
+from typing import List
 
 
-if typing.TYPE_CHECKING:
+if TYPE_CHECKING:
     from maize import Item
     from maize.core.settings.settings_manager import SettingsManager
 
@@ -23,7 +24,7 @@ class BasePipeline(metaclass=ABCMeta):
         @return:
         """
 
-    async def process_item(self, items: list["Item"]) -> bool:
+    async def process_item(self, items: List["Item"]) -> bool:
         """
         处理数据，需要处理数据的方法请在此实现。
         为了提高效率，请使用异步方法。
@@ -31,7 +32,7 @@ class BasePipeline(metaclass=ABCMeta):
         @return:
         """
 
-    async def process_error_item(self, items: list["Item"]):
+    async def process_error_item(self, items: List["Item"]):
         """
         处理超过重试次数的数据
         @param items:

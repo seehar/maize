@@ -1,4 +1,6 @@
-import typing
+from typing import TYPE_CHECKING
+from typing import List
+from typing import Optional
 
 from playwright.async_api import Browser
 from playwright.async_api import BrowserContext
@@ -12,20 +14,20 @@ from maize import Request
 from maize import Response
 
 
-if typing.TYPE_CHECKING:
+if TYPE_CHECKING:
     from maize.core.crawler import Crawler
 
 
 class PlaywrightDownloader(BaseDownloader):
     def __init__(self, crawler: "Crawler"):
         super().__init__(crawler)
-        self.playwright: typing.Optional[Playwright] = None
-        self.browser: typing.Optional[Browser] = None
-        self.page: typing.Optional[Page] = None
-        self.context: typing.Optional[BrowserContext] = None
+        self.playwright: Optional[Playwright] = None
+        self.browser: Optional[Browser] = None
+        self.page: Optional[Page] = None
+        self.context: Optional[BrowserContext] = None
 
-        self._timeout: typing.Optional[float] = None
-        self._use_session: typing.Optional[bool] = None
+        self._timeout: Optional[float] = None
+        self._use_session: Optional[bool] = None
 
     async def open(self):
         await super().open()
@@ -49,7 +51,7 @@ class PlaywrightDownloader(BaseDownloader):
 
         await super().close()
 
-    async def download(self, request: Request) -> typing.Optional[Response]:
+    async def download(self, request: Request) -> Optional[Response]:
         try:
             if self._use_session:
                 await self.page.goto(request.url)
@@ -75,7 +77,7 @@ class PlaywrightDownloader(BaseDownloader):
 
     @staticmethod
     def structure_response(
-        request: Request, response: str, cookies: list[Cookie]
+        request: Request, response: str, cookies: List[Cookie]
     ) -> Response:
         cookie_list = [
             {

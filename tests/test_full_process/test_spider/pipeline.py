@@ -1,3 +1,5 @@
+from typing import List
+
 from maize import BasePipeline
 from maize import Item
 
@@ -15,7 +17,7 @@ class CustomPipeline(BasePipeline):
         :return:
         """
 
-    async def process_item(self, items: list["Item"]):
+    async def process_item(self, items: List["Item"]):
         """
         处理数据，需要处理数据的方法请在此实现。
         为了提高效率，请使用异步方法。

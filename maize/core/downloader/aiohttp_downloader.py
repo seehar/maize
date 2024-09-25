@@ -56,7 +56,9 @@ class AioHttpDownloader(BaseDownloader):
                 trace_configs=[self.trace_config],
             )
 
-    async def download(self, request: Request) -> typing.Optional[Response | Request]:
+    async def download(
+        self, request: Request
+    ) -> typing.Optional[typing.Union[Response, Request]]:
         try:
             if self._use_session:
                 response = await self.send_request(self.session, request)

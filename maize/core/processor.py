@@ -1,5 +1,7 @@
 from asyncio import Queue
 from typing import TYPE_CHECKING
+from typing import List
+from typing import Union
 
 from maize.core.http.request import Request
 from maize.core.items.items import Item
@@ -18,7 +20,7 @@ class Processor:
         self.logger = get_logger(crawler.settings, self.__class__.__name__)
 
         self.queue = Queue()
-        self.item_pipelines: list["BasePipeline"] = []
+        self.item_pipelines: List["BasePipeline"] = []
 
         self.pipeline_scheduler: PipelineScheduler = PipelineScheduler(
             self.crawler.settings
@@ -43,7 +45,7 @@ class Processor:
         await self.pipeline_scheduler.close()
         self.logger.debug("processor closed")
 
-    async def enqueue(self, output: Request | Item):
+    async def enqueue(self, output: Union[Request, Item]):
         await self.queue.put(output)
         await self.process()
 

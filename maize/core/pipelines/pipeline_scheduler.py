@@ -1,6 +1,7 @@
 import time
 from asyncio import Queue
 from typing import TYPE_CHECKING
+from typing import List
 
 from maize.utils.log_util import get_logger
 from maize.utils.project_util import load_class
@@ -20,7 +21,7 @@ class PipelineScheduler:
     def __init__(self, settings: "SettingsManager"):
         self.settings = settings
         self.logger = get_logger(settings, self.__class__.__name__)
-        self.item_pipelines: list["BasePipeline"] = []
+        self.item_pipelines: List["BasePipeline"] = []
 
         # item
         item_max_cache_count = settings.getint("ITEM_MAX_CACHE_COUNT")
@@ -182,7 +183,7 @@ class PipelineScheduler:
                 await self._enqueue_retry_items(batch_items)
         return True
 
-    async def _enqueue_retry_items(self, items: list["Item"]) -> None:
+    async def _enqueue_retry_items(self, items: List["Item"]) -> None:
         for item in items:
             if item.__retry_count__ >= self.error_item_max_retry_count:
                 self.logger.warning(

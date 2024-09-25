@@ -1,13 +1,14 @@
-import typing
 from logging import INFO
 from logging import Formatter
 from logging import Logger
 from logging import StreamHandler
+from typing import TYPE_CHECKING
+from typing import Union
 
 from maize.utils.project_util import load_class
 
 
-if typing.TYPE_CHECKING:
+if TYPE_CHECKING:
     from maize.core.settings.settings_manager import SettingsManager
 
 
@@ -22,7 +23,7 @@ class LoggerManager:
         cls,
         settings_manager: "SettingsManager",
         name: str = "default",
-        log_level: int | str = None,
+        log_level: Union[int, str] = None,
         log_format: str = LOG_FORMAT,
     ) -> Logger:
         key = (name, log_level)

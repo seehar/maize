@@ -1,8 +1,14 @@
 from __future__ import annotations
 
 import asyncio
-import typing
 from inspect import iscoroutine
+from typing import TYPE_CHECKING
+from typing import Any
+from typing import AsyncGenerator
+from typing import AsyncIterator
+from typing import Callable
+from typing import Optional
+from typing import Union
 
 from maize.core.http.request import Request
 from maize.core.items.items import Item
@@ -15,7 +21,7 @@ from maize.utils.project_util import load_class
 from maize.utils.spider_util import transform
 
 
-if typing.TYPE_CHECKING:
+if TYPE_CHECKING:
     from maize.core.crawler import Crawler
     from maize.core.downloader.base_downloader import BaseDownloader
     from maize.core.settings.settings_manager import SettingsManager
@@ -33,14 +39,14 @@ class Engine:
         self.crawler: "Crawler" = crawler
         self.settings: "SettingsManager" = self.crawler.settings
 
-        self.downloader: typing.Optional["BaseDownloader"] = None
-        self.scheduler: typing.Optional[Scheduler] = None
-        self.processor: typing.Optional[Processor] = None
+        self.downloader: Optional["BaseDownloader"] = None
+        self.scheduler: Optional[Scheduler] = None
+        self.processor: Optional[Processor] = None
 
-        self.start_requests: typing.Optional[typing.AsyncGenerator] = None
-        self.task_requests: typing.Optional[typing.AsyncIterator[Request]] = None
+        self.start_requests: Optional[AsyncGenerator] = None
+        self.task_requests: Optional[AsyncIterator[Request]] = None
 
-        self.spider: typing.Optional[typing.Union["Spider", "TaskSpider"]] = None
+        self.spider: Optional[Union["Spider", "TaskSpider"]] = None
         self.task_manager: TaskManager = TaskManager(
             self.settings.getint("CONCURRENCY")
         )
@@ -91,8 +97,8 @@ class Engine:
             # 任务爬虫
             if self.spider.__spider_type__ == "task_spider":
                 self.logger.info("Task spider start get task requests")
-                spider_task_requests: typing.AsyncGenerator[
-                    Request, typing.Any
+                spider_task_requests: AsyncGenerator[
+                    Request, Any
                 ] = self.spider.task_requests()
                 if spider_task_requests:
                     self.task_requests = aiter(spider_task_requests)
@@ -150,7 +156,7 @@ class Engine:
                 await self._crawl(request)
             else:
                 try:
-                    self.task_requests: typing.AsyncIterator[Request]
+                    self.task_requests: AsyncIterator[Request]
                     task_request = await anext(self.task_requests)
                 except StopAsyncIteration:
                     self.task_requests = None
@@ -183,9 +189,9 @@ class Engine:
 
     async def _fetch(
         self, request: Request
-    ) -> typing.Optional[typing.AsyncGenerator[Request | Item, typing.Any]]:
+    ) -> Optional[AsyncGenerator[Union[Request, Item], Any]]:
         async def _success(_response):
-            callback: typing.Callable = request.callback or self.spider.parse
+            callback: Callable = request.callback or self.spider.parse
             if _output := callback(_response):
                 if iscoroutine(_output):
                     await _output
@@ -213,7 +219,7 @@ class Engine:
         return await self.scheduler.next_request()
 
     async def _handle_spider_output(
-        self, outputs: typing.AsyncGenerator[Request | Item, typing.Any]
+        self, outputs: AsyncGenerator[Union[Request, Item], Any]
     ):
         async for spider_output in outputs:
             if isinstance(spider_output, (Request, Item)):

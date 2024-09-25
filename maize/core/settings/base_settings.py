@@ -1,6 +1,7 @@
 """
 default config
 """
+from typing import List
 
 
 class BaseSettings:
@@ -62,7 +63,7 @@ class BaseSettings:
     # 数据管道，支持多个数据管道
     # maize.BasePipeline: 默认数据管道，不做任何处理
     # maize.MysqlPipeline: 集成 aiomysql 的数据管道，自动入库 mysql 数据库
-    ITEM_PIPELINES: list[str] = ["maize.BasePipeline"]
+    ITEM_PIPELINES: List[str] = ["maize.BasePipeline"]
 
     # # 隧道代理，示例：xxx.xxx:2132。注意：不包含 http:// 或 https://
     # PROXY_TUNNEL: str = ""

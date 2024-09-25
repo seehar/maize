@@ -1,12 +1,14 @@
 import os
 import sys
-import typing
 from importlib import import_module
+from typing import TYPE_CHECKING
+from typing import Callable
+from typing import Union
 
 from maize.core.settings.settings_manager import SettingsManager
 
 
-if typing.TYPE_CHECKING:
+if TYPE_CHECKING:
     from maize.core.spider.spider import Spider
 
 
@@ -58,7 +60,7 @@ def merge_settings(spider: "Spider", settings: SettingsManager):
         settings.update_values(custom_settings)
 
 
-def load_class(_path: str | typing.Callable):
+def load_class(_path: Union[str, Callable]):
     """
     动态导入类
     @param _path:

@@ -1,6 +1,10 @@
 import re
-import typing
 from http.cookies import SimpleCookie
+from typing import Any
+from typing import Dict
+from typing import List
+from typing import Optional
+from typing import Union
 from urllib.parse import urljoin as _urljoin
 
 import ujson
@@ -22,7 +26,7 @@ class Response:
         body: bytes = b"",
         text: str = "",
         status: int = 200,
-        cookie_list: typing.Optional[list[dict[str, str | bool]]] = None,
+        cookie_list: Optional[List[Dict[str, Union[str, bool]]]] = None,
     ):
         """
         响应
@@ -42,11 +46,11 @@ class Response:
         self.encoding = request.encoding
 
         self._text_cache: str = text
-        self._cookie_list_cache: typing.Optional[
-            list[dict[str, str | bool]]
+        self._cookie_list_cache: Optional[
+            List[Dict[str, Union[str, bool]]]
         ] = cookie_list
-        self._cookies_cache: typing.Optional[dict[str, typing.Any]] = None
-        self._selector: typing.Optional[Selector] = None
+        self._cookies_cache: Optional[Dict[str, Any]] = None
+        self._selector: Optional[Selector] = None
 
     def __str__(self):
         return f"<{self.status}> {self.url}"
@@ -95,7 +99,7 @@ class Response:
                 )
         return self._text_cache
 
-    def _get_encoding(self) -> typing.Optional[str]:
+    def _get_encoding(self) -> Optional[str]:
         _encoding_re = re.compile(r"charset=([\w-]+)", flags=re.I)
         _encoding_string = self.headers.get("Content-Type", "") or self.headers.get(
             "content-type", ""
@@ -104,7 +108,7 @@ class Response:
         return _encoding.group(1) if _encoding else None
 
     @property
-    def cookie_list(self) -> list[dict[str, str]]:
+    def cookie_list(self) -> List[Dict[str, str]]:
         if self._cookie_list_cache:
             return self._cookie_list_cache
 
@@ -129,7 +133,7 @@ class Response:
         return self._cookie_list_cache
 
     @property
-    def cookies(self) -> dict[str, typing.Any]:
+    def cookies(self) -> Dict[str, Any]:
         if self._cookies_cache:
             return self._cookies_cache
 

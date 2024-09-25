@@ -1,17 +1,21 @@
-import typing
+from typing import TYPE_CHECKING
+from typing import Any
+from typing import AsyncGenerator
+from typing import List
+from typing import Optional
 
 from maize.core.http.request import Request
 from maize.core.http.response import Response
 
 
-if typing.TYPE_CHECKING:
+if TYPE_CHECKING:
     from maize.core.crawler import Crawler
 
 
 class Spider:
     __spider_type__: str = "spider"
-    start_urls: list[str] = []
-    start_url: typing.Optional[str] = None
+    start_urls: List[str] = []
+    start_url: Optional[str] = None
 
     custom_settings: dict
 
@@ -19,7 +23,7 @@ class Spider:
         if not hasattr(self, "start_urls"):
             self.start_urls = []
 
-        self.crawler: typing.Optional["Crawler"] = None
+        self.crawler: Optional["Crawler"] = None
 
     def __str__(self):
         return self.__class__.__name__
@@ -42,7 +46,7 @@ class Spider:
         instance.crawler = crawler
         return instance
 
-    async def start_requests(self) -> typing.AsyncGenerator[Request, typing.Any]:
+    async def start_requests(self) -> AsyncGenerator[Request, Any]:
         if self.start_urls:
             for url in self.start_urls:
                 print("-->", url)

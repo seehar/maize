@@ -10,15 +10,15 @@ repository = "https://github.com/seehar/maize"
 documentation = "https://seehar.github.io/maize"
 
 [tool.poetry.dependencies]
-python = ">=3.8,<=3.12"
+python = ">=3.10,<3.13"
 parsel = "^1.8.1"
 aiohttp = "^3.9.1"
 httpx = "^0.26.0"
 ujson = "^5.9.0"
 aiomysql = "^0.2.0"
 playwright = {version = "^1.41.1", extras = ["rpa"]}
-aioredis = "^2.0.1"
 h11 = "^0.14.0"
+redis = "^5.0.8"
 
 
 [tool.poetry.group.dev.dependencies]
@@ -46,4 +46,4 @@ build-backend = "poetry.core.masonry.api"
 [[tool.poetry.source]]
 name = "tsinghua"
 url = "https://mirrors.tuna.tsinghua.edu.cn/pypi/web/simple/"
-priority = "default"
+priority = "primary"

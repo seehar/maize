@@ -1,20 +1,24 @@
-import typing
 from abc import ABCMeta
 from abc import abstractmethod
 from contextlib import asynccontextmanager
+from typing import TYPE_CHECKING
+from typing import Any
+from typing import Final
+from typing import Optional
+from typing import Union
 
 from maize.core.http.request import Request
 from maize.core.http.response import Response
 from maize.utils.log_util import get_logger
 
 
-if typing.TYPE_CHECKING:
+if TYPE_CHECKING:
     from maize.core.crawler import Crawler
 
 
 class ActiveRequestManager:
     def __init__(self):
-        self._active: typing.Final[set] = set()
+        self._active: Final[set] = set()
 
     def add(self, request: Request):
         self._active.add(request)
@@ -62,17 +66,17 @@ class BaseDownloader(metaclass=DownloaderMeta):
             f"<concurrency: {self.crawler.settings.getint('CONCURRENCY')}>"
         )
 
-    async def fetch(self, request: Request) -> typing.Optional[Response | Request]:
+    async def fetch(self, request: Request) -> Optional[Union[Response, Request]]:
         async with self._active(request):
             return await self.download(request)
 
     @abstractmethod
-    async def download(self, request: Request) -> typing.Optional[Response]:
+    async def download(self, request: Request) -> Optional[Response]:
         raise NotImplementedError
 
     async def _download_retry(
         self, request: Request, exception: Exception
-    ) -> typing.Optional[Request]:
+    ) -> Optional[Request]:
         """
         下载重试
         :param request: 请求
@@ -95,9 +99,7 @@ class BaseDownloader(metaclass=DownloaderMeta):
 
     @staticmethod
     @abstractmethod
-    def structure_response(
-        request: Request, response: typing.Any, body: bytes
-    ) -> Response:
+    def structure_response(request: Request, response: Any, body: bytes) -> Response:
         raise NotImplementedError
 
     def idle(self) -> bool:

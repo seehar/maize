@@ -1,11 +1,13 @@
-import typing
+from typing import TYPE_CHECKING
+from typing import List
+from typing import Optional
 
 from maize.core.pipelines.base_pipeline import BasePipeline
 from maize.utils import MysqlSingletonUtil
 from maize.utils.log_util import get_logger
 
 
-if typing.TYPE_CHECKING:
+if TYPE_CHECKING:
     from maize import Item
     from maize.core.settings.settings_manager import SettingsManager
 
@@ -13,7 +15,7 @@ if typing.TYPE_CHECKING:
 class MysqlPipeline(BasePipeline):
     def __init__(self, settings: "SettingsManager"):
         super().__init__(settings=settings)
-        self.mysql: typing.Optional[MysqlSingletonUtil] = None
+        self.mysql: Optional[MysqlSingletonUtil] = None
         self.logger = get_logger(settings, self.__class__.__name__)
 
     async def open(self):
@@ -34,7 +36,7 @@ class MysqlPipeline(BasePipeline):
     async def close(self):
         await self.mysql.close()
 
-    async def process_item(self, items: list["Item"]) -> bool:
+    async def process_item(self, items: List["Item"]) -> bool:
         """
         批量处理 item
         @param items:
@@ -50,7 +52,7 @@ class MysqlPipeline(BasePipeline):
             self.logger.error(f"Error processing item: {e}. items: {items}")
             return False
 
-    async def _process_items(self, items: list["Item"]):
+    async def _process_items(self, items: List["Item"]):
         first_item = items[0]
         item_key = first_item.to_dict().keys()
         item_data_list = []

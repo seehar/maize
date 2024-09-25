@@ -1,9 +1,9 @@
 from typing import Optional
 
-import aioredis
-from aioredis.client import ExpiryT
-from aioredis.client import KeyT
-from aioredis.connection import EncodableT
+from redis import asyncio as aioredis
+from redis.typing import EncodableT
+from redis.typing import ExpiryT
+from redis.typing import KeyT
 
 from .tools import SingletonType
 
