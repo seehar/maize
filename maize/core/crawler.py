@@ -10,8 +10,8 @@ from maize.utils.project_util import merge_settings
 
 
 if typing.TYPE_CHECKING:
-    from maize.core.settings.settings_manager import SettingsManager
-    from maize.core.spider.spider import Spider
+    from maize.settings import SettingsManager
+    from maize.spider.spider import Spider
 
 
 class Crawler:

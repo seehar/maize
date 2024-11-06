@@ -1,7 +1,7 @@
 import logging
 
-from maize.core.settings.base_settings import BaseSettings
-from maize.core.settings.settings_manager import SettingsManager
+from maize.settings import SettingsManager
+from maize.settings.base_settings import BaseSettings
 
 
 class TestSettingsManager:

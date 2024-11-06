@@ -5,11 +5,11 @@ from typing import TYPE_CHECKING
 from typing import Callable
 from typing import Union
 
-from maize.core.settings.settings_manager import SettingsManager
+from maize.settings import SettingsManager
 
 
 if TYPE_CHECKING:
-    from maize.core.spider.spider import Spider
+    from maize.spider.spider import Spider
 
 
 def _get_closest(path: str = ".") -> str:

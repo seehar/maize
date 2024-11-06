@@ -3,9 +3,9 @@ from typing import TYPE_CHECKING
 from typing import List
 from typing import Union
 
-from maize.core.http.request import Request
-from maize.core.items.items import Item
-from maize.core.pipelines.pipeline_scheduler import PipelineScheduler
+from maize.common.http.request import Request
+from maize.common.items import Item
+from maize.pipelines.pipeline_scheduler import PipelineScheduler
 from maize.utils.log_util import get_logger
 
 

@@ -10,8 +10,8 @@ from typing import Callable
 from typing import Optional
 from typing import Union
 
-from maize.core.http.request import Request
-from maize.core.items.items import Item
+from maize.common.http.request import Request
+from maize.common.items import Item
 from maize.core.processor import Processor
 from maize.core.scheduler import Scheduler
 from maize.core.task_manager import TaskManager
@@ -23,10 +23,10 @@ from maize.utils.spider_util import transform
 
 if TYPE_CHECKING:
     from maize.core.crawler import Crawler
-    from maize.core.downloader.base_downloader import BaseDownloader
-    from maize.core.settings.settings_manager import SettingsManager
-    from maize.core.spider.spider import Spider
-    from maize.core.spider.task_spider import TaskSpider
+    from maize.downloader.base_downloader import BaseDownloader
+    from maize.settings import SettingsManager
+    from maize.spider.spider import Spider
+    from maize.spider.task_spider import TaskSpider
 
 
 class Engine:

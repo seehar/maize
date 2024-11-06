@@ -9,7 +9,7 @@ from maize.utils.project_util import load_class
 
 
 if TYPE_CHECKING:
-    from maize.core.settings.settings_manager import SettingsManager
+    from maize.settings import SettingsManager
 
 
 LOG_FORMAT = f"%(asctime)s [%(name)s] %(levelname)s: %(message)s"

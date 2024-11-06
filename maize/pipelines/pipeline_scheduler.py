@@ -10,7 +10,7 @@ from maize.utils.project_util import load_class
 if TYPE_CHECKING:
     from maize import BasePipeline
     from maize import Item
-    from maize.core.settings.settings_manager import SettingsManager
+    from maize.settings.settings_manager import SettingsManager
 
 
 class PipelineScheduler:

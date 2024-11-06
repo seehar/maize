@@ -1,17 +1,17 @@
+from maize.common.http import Request
+from maize.common.http import Response
+from maize.common.items import Item
+from maize.common.items.field import Field
 from maize.core.crawler import CrawlerProcess
 from maize.core.decorator_entry import SpiderEntry
-from maize.core.downloader.aiohttp_downloader import AioHttpDownloader
-from maize.core.downloader.base_downloader import BaseDownloader
-from maize.core.downloader.httpx_downloader import HTTPXDownloader
-from maize.core.http.request import Request
-from maize.core.http.response import Response
-from maize.core.items.field import Field
-from maize.core.items.items import Item
-from maize.core.pipelines.base_pipeline import BasePipeline
-from maize.core.pipelines.mysql_pipeline import MysqlPipeline
-from maize.core.settings.base_settings import BaseSettings
-from maize.core.spider.spider import Spider
-from maize.core.spider.task_spider import TaskSpider
+from maize.downloader.aiohttp_downloader import AioHttpDownloader
+from maize.downloader.base_downloader import BaseDownloader
+from maize.downloader.httpx_downloader import HTTPXDownloader
+from maize.pipelines.base_pipeline import BasePipeline
+from maize.pipelines.mysql_pipeline import MysqlPipeline
+from maize.settings.base_settings import BaseSettings
+from maize.spider.spider import Spider
+from maize.spider.task_spider import TaskSpider
 
 
 __all__ = [
