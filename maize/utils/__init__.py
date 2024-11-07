@@ -1,3 +1,4 @@
+from .cookie_util import CookieUtil
 from .mysql_util import MysqlSingletonUtil
 from .mysql_util import MysqlUtil
 from .project_util import get_settings
@@ -8,6 +9,7 @@ from .tools import SingletonType
 
 
 __all__ = [
+    "CookieUtil",
     "get_settings",
     "fix_windows_aiohttp_proxy_error",
     "MysqlUtil",

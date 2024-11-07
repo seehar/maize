@@ -1,7 +1,11 @@
 """
 default config
 """
+from pathlib import Path
 from typing import List
+
+
+BASE_DIR = Path(__file__).parent.parent
 
 
 class BaseSettings:
@@ -64,6 +68,9 @@ class BaseSettings:
     # maize.BasePipeline: 默认数据管道，不做任何处理
     # maize.MysqlPipeline: 集成 aiomysql 的数据管道，自动入库 mysql 数据库
     ITEM_PIPELINES: List[str] = ["maize.BasePipeline"]
+
+    RPA_USE_STEALTH_JS: bool = True
+    RPA_STEALTH_JS_PATH: Path = BASE_DIR / "utils/js/stealth.min.js"
 
     # # 隧道代理，示例：xxx.xxx:2132。注意：不包含 http:// 或 https://
     # PROXY_TUNNEL: str = ""

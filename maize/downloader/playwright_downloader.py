@@ -1,3 +1,5 @@
+import asyncio
+from pathlib import Path
 from typing import TYPE_CHECKING
 from typing import List
 from typing import Optional
@@ -29,17 +31,24 @@ class PlaywrightDownloader(BaseDownloader):
         self._timeout: Optional[float] = None
         self._use_session: Optional[bool] = None
 
+        self._use_stealth_js: Optional[bool] = None
+        self._stealth_js_path: Optional[Path | str] = None
+
     async def open(self):
         await super().open()
 
         self._timeout = self.crawler.settings.getfloat("REQUEST_TIMEOUT") * 1000
         self._use_session = self.crawler.settings.getbool("USE_SESSION")
-        self._use_session = self.crawler.settings.getbool("USE_SESSION")
+
+        self._use_stealth_js = self.crawler.settings.getbool("RPA_USE_STEALTH_JS")
+        self._stealth_js_path = self.crawler.settings.get("RPA_STEALTH_JS_PATH")
 
         if self._use_session:
             self.playwright = await async_playwright().start()
             self.browser = await self.playwright.chromium.launch(timeout=self._timeout)
             self.context = await self.browser.new_context()
+            if self._use_stealth_js:
+                await self.context.add_init_script(path=self._stealth_js_path)
             self.page = await self.context.new_page()
 
     async def close(self):
@@ -67,13 +76,19 @@ class PlaywrightDownloader(BaseDownloader):
 
             else:
                 async with async_playwright() as playwright:
-                    browser = await playwright.chromium.launch(timeout=self._timeout)
+                    browser = await playwright.firefox.launch(headless=False)
                     context = await browser.new_context()
+                    if self._use_stealth_js:
+                        await context.add_init_script(path=self._stealth_js_path)
+                    if request.cookies:
+                        await context.add_cookies(request.cookies)
+
                     page = await context.new_page()
                     await page.goto(request.url)
                     await page.wait_for_load_state()
+                    await asyncio.sleep(1000)
                     response = await page.content()
-                    cookies = await self.page.context.cookies()
+                    cookies = await page.context.cookies()
 
         except Exception as e:
             self.logger.error(f"Error during request: {e}")

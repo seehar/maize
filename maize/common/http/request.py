@@ -15,7 +15,7 @@ class Request:
         headers: typing.Optional[dict] = None,
         params: typing.Optional[dict] = None,
         data: typing.Optional[dict] = None,
-        cookies: typing.Optional[dict] = None,
+        cookies: typing.Optional[dict | list[dict[str, typing.Any]]] = None,
         proxy: typing.Optional[str] = None,
         proxy_username: typing.Optional[str] = None,
         proxy_password: typing.Optional[str] = None,
