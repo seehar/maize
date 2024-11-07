@@ -94,6 +94,7 @@ class Engine:
         """主逻辑"""
         while self.running:
             await self._crawl_start_requests()
+
             # 任务爬虫
             if self.spider.__spider_type__ == "task_spider":
                 self.logger.info("Task spider start get task requests")
@@ -111,8 +112,8 @@ class Engine:
             if (
                 self.start_requests_running is False
                 and self.task_requests_running is False
+                and self.task_manager.all_done()
             ):
-                await self.processor.close()
                 self.running = False
 
         if not self.running:
@@ -126,25 +127,26 @@ class Engine:
         while self.start_requests_running:
             if request := await self._get_next_request():
                 await self._crawl(request)
+                continue
+
+            try:
+                start_request = await anext(self.start_requests)
+            except StopAsyncIteration:
+                self.start_requests = None
+            except Exception as e:
+                # 1. 发起请求的 task 全部运行完毕
+                # 2. 调度器是否空闲
+                # 3. 下载器是否空闲
+                if not await self._exit():
+                    continue
+
+                self.start_requests_running = False
+                self.logger.info("All start requests have been processed.")
+
+                if self.start_requests is not None:
+                    self.logger.info(f"Error during start_requests: {e}")
             else:
-                try:
-                    start_request = await anext(self.start_requests)
-                except StopAsyncIteration:
-                    self.start_requests = None
-                except Exception as e:
-                    # 1. 发起请求的 task 全部运行完毕
-                    # 2. 调度器是否空闲
-                    # 3. 下载器是否空闲
-                    if not await self._exit():
-                        continue
-
-                    self.start_requests_running = False
-                    self.logger.info("All start requests have been processed.")
-
-                    if self.start_requests is not None:
-                        self.logger.info(f"Error during start_requests: {e}")
-                else:
-                    await self.enqueue_request(start_request)
+                await self.enqueue_request(start_request)
 
     async def _crawl_task_requests(self):
         """
@@ -154,29 +156,30 @@ class Engine:
         while self._single_task_requests_running:
             if request := await self._get_next_request():
                 await self._crawl(request)
+                continue
+
+            try:
+                self.task_requests: AsyncIterator[Request]
+                task_request = await anext(self.task_requests)
+            except StopAsyncIteration:
+                self.task_requests = None
+            except RuntimeError:
+                self.task_requests_running = False
+            except Exception as e:
+                # 1. 发起请求的 task 全部运行完毕
+                # 2. 调度器是否空闲
+                # 3. 下载器是否空闲
+                self.task_requests = None
+                if not await self._exit():
+                    continue
+
+                self._single_task_requests_running = False
+                self.logger.info("All task requests have been processed.")
+
+                if self.task_requests is not None:
+                    self.logger.info(f"Error during start_requests: {e}")
             else:
-                try:
-                    self.task_requests: AsyncIterator[Request]
-                    task_request = await anext(self.task_requests)
-                except StopAsyncIteration:
-                    self.task_requests = None
-                except RuntimeError:
-                    self.task_requests_running = False
-                except Exception as e:
-                    # 1. 发起请求的 task 全部运行完毕
-                    # 2. 调度器是否空闲
-                    # 3. 下载器是否空闲
-                    self.task_requests = None
-                    if not await self._exit():
-                        continue
-
-                    self._single_task_requests_running = False
-                    self.logger.info("All task requests have been processed.")
-
-                    if self.task_requests is not None:
-                        self.logger.info(f"Error during start_requests: {e}")
-                else:
-                    await self.enqueue_request(task_request)
+                await self.enqueue_request(task_request)
 
     async def _crawl(self, request: Request):
         async def crawl_task():
@@ -194,7 +197,9 @@ class Engine:
             callback: Callable = request.callback or self.spider.parse
             if _output := callback(_response):
                 if iscoroutine(_output):
+                    self.logger.info("-------------parse start-------------")
                     await _output
+                    self.logger.info("-------------parse end-------------")
                 else:
                     return transform(_output)
 
@@ -230,15 +235,14 @@ class Engine:
                 )
 
     async def _exit(self) -> bool:
-        if (
+        return (
             self.scheduler.idle()
             and self.downloader.idle()
             and self.task_manager.all_done()
             and self.processor.idle()
-        ):
-            return True
-        return False
+        )
 
     async def close_spider(self):
         self.logger.info("Closing spider")
         await self.downloader.close()
+        await self.processor.close()

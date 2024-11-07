@@ -45,13 +45,19 @@ class PlaywrightDownloader(BaseDownloader):
     async def close(self):
         if self.page:
             await self.page.close()
+            self.page = None
 
         if self.browser:
             await self.browser.close()
+            self.browser = None
+
+        if self.playwright:
+            await self.playwright.stop()
+            self.playwright = None
 
         await super().close()
 
-    async def download(self, request: Request) -> Optional[Response]:
+    async def download(self, request: Request) -> Optional[Response[Page]]:
         try:
             if self._use_session:
                 await self.page.goto(request.url)
@@ -75,9 +81,8 @@ class PlaywrightDownloader(BaseDownloader):
 
         return self.structure_response(request, response, cookies)
 
-    @staticmethod
     def structure_response(
-        request: Request, response: str, cookies: List[Cookie]
+        self, request: Request, response: str, cookies: List[Cookie]
     ) -> Response:
         cookie_list = [
             {
@@ -97,4 +102,5 @@ class PlaywrightDownloader(BaseDownloader):
             text=response,
             request=request,
             cookie_list=cookie_list,
+            driver=self.page,
         )

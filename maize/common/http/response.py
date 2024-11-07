@@ -3,8 +3,10 @@ from http.cookies import SimpleCookie
 from typing import TYPE_CHECKING
 from typing import Any
 from typing import Dict
+from typing import Generic
 from typing import List
 from typing import Optional
+from typing import TypeVar
 from typing import Union
 from urllib.parse import urljoin as _urljoin
 
@@ -19,8 +21,10 @@ from maize.exceptions.spider_exception import EncodeException
 if TYPE_CHECKING:
     from maize.common.http.request import Request
 
+Driver = TypeVar("Driver")
 
-class Response:
+
+class Response(Generic[Driver]):
     def __init__(
         self,
         url: str,
@@ -31,6 +35,7 @@ class Response:
         text: str = "",
         status: int = 200,
         cookie_list: Optional[List[Dict[str, Union[str, bool]]]] = None,
+        driver: Optional[Driver] = None,
     ):
         """
         响应
@@ -41,6 +46,7 @@ class Response:
         @param text: 响应体 str 类型
         @param status: 响应状态码，如 200
         @param cookie_list: cookie 列表
+        @param driver:
         """
         self.url = url
         self.request = request
@@ -53,6 +59,8 @@ class Response:
         self._cookie_list_cache: Optional[List[Dict[str, Any]]] = cookie_list
         self._cookies_cache: Optional[Dict[str, Any]] = None
         self._selector: Optional[Selector] = None
+
+        self.driver = driver
 
     def __str__(self):
         return f"<{self.status}> {self.url}"
