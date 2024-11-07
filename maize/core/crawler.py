@@ -15,7 +15,7 @@ if typing.TYPE_CHECKING:
 
 
 class Crawler:
-    def __init__(self, spider_cls: typing.Type["Spider"], settings: "SettingsManager"):
+    def __init__(self, spider_cls: "Spider", settings: "SettingsManager"):
         self.spider_cls = spider_cls
         self.spider: typing.Optional["Spider"] = None
         self.engine: typing.Optional[Engine] = None
@@ -85,7 +85,7 @@ class CrawlerProcess:
             logging.warning(f"{e} use default settings")
             return get_settings()
 
-    async def crawl(self, spider: typing.Type["Spider"]):
+    async def crawl(self, spider: typing.Union[typing.Type["Spider"], "Spider"]):
         """
         装配爬虫
         :param spider: Spider类
@@ -107,7 +107,7 @@ class CrawlerProcess:
         """
         await asyncio.gather(*self._active)
 
-    def _create_crawler(self, spider_cls: typing.Type["Spider"]) -> Crawler:
+    def _create_crawler(self, spider_cls: "Spider") -> Crawler:
         if isinstance(spider_cls, str):
             raise SpiderTypeException(
                 f"{type(self)}.crawl args: String is not supported"

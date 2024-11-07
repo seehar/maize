@@ -10,8 +10,6 @@ class Settings(BaseSettings):
 
     LOGGER_HANDLER = "examples.baidu_spider.logger_util.InterceptHandler"
 
-    from examples.baidu_spider.pipeline import CustomPipeline
-
     ITEM_PIPELINES = ["examples.baidu_spider.pipeline.CustomPipeline"]
 
     MYSQL_HOST = "localhost"

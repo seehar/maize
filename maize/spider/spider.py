@@ -1,3 +1,4 @@
+import asyncio
 from typing import TYPE_CHECKING
 from typing import Any
 from typing import AsyncGenerator
@@ -6,6 +7,7 @@ from typing import Optional
 
 from maize.common.http import Response
 from maize.common.http.request import Request
+from maize.core.crawler import CrawlerProcess
 
 
 if TYPE_CHECKING:
@@ -57,3 +59,13 @@ class Spider:
 
     async def parse(self, response: Response):
         raise NotImplementedError
+
+    async def _async_run(self):
+        process = CrawlerProcess()
+        await process.crawl(self)
+        await process.start()
+
+    def run(self):
+        loop = asyncio.new_event_loop()
+        asyncio.set_event_loop(loop)
+        loop.run_until_complete(self._async_run())
