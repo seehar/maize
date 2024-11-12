@@ -51,7 +51,6 @@ class Spider:
     async def start_requests(self) -> AsyncGenerator[Request, Any]:
         if self.start_urls:
             for url in self.start_urls:
-                print("-->", url)
                 yield Request(url=url)
 
         elif self.start_url and isinstance(self.start_url, str):

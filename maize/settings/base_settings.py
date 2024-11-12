@@ -3,6 +3,7 @@ default config
 """
 from pathlib import Path
 from typing import List
+from typing import Optional
 
 
 BASE_DIR = Path(__file__).parent.parent
@@ -69,8 +70,27 @@ class BaseSettings:
     # maize.MysqlPipeline: 集成 aiomysql 的数据管道，自动入库 mysql 数据库
     ITEM_PIPELINES: List[str] = ["maize.BasePipeline"]
 
+    # rpa
+    # 使用使用 stealth js
     RPA_USE_STEALTH_JS: bool = True
+    # stealth js 文件路径
     RPA_STEALTH_JS_PATH: Path = BASE_DIR / "utils/js/stealth.min.js"
+
+    # 是否使用分布式爬虫，开启后，需要对 redis 进行配置
+    IS_DISTRIBUTED: bool = False
+
+    # redis
+    USE_REDIS: bool = False
+    REDIS_HOST: str = "localhost"
+    REDIS_PORT: int = 6379
+    REDIS_DB: int = 0
+    REDIS_USERNAME: Optional[str] = None
+    REDIS_PASSWORD: Optional[str] = None
+
+    REDIS_KEY_PREFIX: str = "maize"
+    REDIS_KEY_LOCK: str = "lock"
+    REDIS_KEY_RUNNING: str = "running"
+    REDIS_KEY_QUEUE: str = "queue"
 
     # # 隧道代理，示例：xxx.xxx:2132。注意：不包含 http:// 或 https://
     # PROXY_TUNNEL: str = ""

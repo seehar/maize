@@ -10,15 +10,20 @@ from typing import Callable
 from typing import Optional
 from typing import Union
 
+import ujson
+
+from maize import Response
 from maize.common.http.request import Request
 from maize.common.items import Item
 from maize.core.processor import Processor
 from maize.core.scheduler import Scheduler
 from maize.core.task_manager import TaskManager
 from maize.exceptions.spider_exception import OutputException
+from maize.utils import RedisUtil
 from maize.utils.log_util import get_logger
 from maize.utils.project_util import load_class
 from maize.utils.spider_util import transform
+from maize.utils.string_util import StringUtil
 
 
 if TYPE_CHECKING:
@@ -55,6 +60,26 @@ class Engine:
         self._single_task_requests_running = False
         self.running = False
 
+        # 分布式
+        self.is_distributed = self.settings.getbool("IS_DISTRIBUTED")
+        self.__redis_util = None
+        self.__redis_key_distributed_lock = None
+        self.__redis_key_queue = None
+        self.__redis_key_running = None
+
+    def __init_redis(self):
+        if self.is_distributed or self.settings.getbool("USE_REDIS"):
+            self.__redis_util = RedisUtil(self.settings.redis_url)
+            self.__redis_key_distributed_lock = self.__get_redis_key("REDIS_KEY_LOCK")
+            self.__redis_key_queue = self.__get_redis_key("REDIS_KEY_QUEUE")
+            self.__redis_key_running = self.__get_redis_key("REDIS_KEY_RUNNING")
+
+    def __get_redis_key(self, key: str) -> str:
+        redis_key_prefix = self.settings.get("REDIS_KEY_PREFIX")
+        redis_key = self.settings.get(key)
+        spider_name = StringUtil.camel_to_snake(self.spider.__class__.__name__)
+        return f"{redis_key_prefix}:{spider_name}:{redis_key}"
+
     def _get_downloader(self):
         downloader_cls = load_class(self.settings.get("DOWNLOADER"))
         if not issubclass(downloader_cls, BaseDownloader):
@@ -72,6 +97,7 @@ class Engine:
             f"spider started. (project name: {self.settings.get('PROJECT_NAME')})"
         )
         self.spider = spider
+        self.__init_redis()
         self.scheduler = Scheduler()
         if getattr(self.scheduler, "open"):
             self.scheduler.open()
@@ -130,7 +156,7 @@ class Engine:
                 continue
 
             try:
-                start_request = await anext(self.start_requests)
+                start_request: Request = await anext(self.start_requests)
             except StopAsyncIteration:
                 self.start_requests = None
             except Exception as e:
@@ -193,7 +219,9 @@ class Engine:
     async def _fetch(
         self, request: Request
     ) -> Optional[AsyncGenerator[Union[Request, Item], Any]]:
-        async def _success(_response):
+        async def _success(
+            _response: Response,
+        ) -> Optional[AsyncGenerator[Union[Request, Item], Any]]:
             callback: Callable = request.callback or self.spider.parse
             if _output := callback(_response):
                 if iscoroutine(_output):
@@ -202,6 +230,15 @@ class Engine:
                     self.logger.info("-------------parse end-------------")
                 else:
                     return transform(_output)
+
+            if self.__redis_util:
+                self.logger.debug(
+                    f"redis delete {self.__redis_key_running}:{request.hash}"
+                )
+                await self.__redis_util.delete(
+                    f"{self.__redis_key_running}:{request.hash}"
+                )
+            return None
 
         download_result = await self.downloader.download(request)
         if download_result is None:
@@ -214,14 +251,34 @@ class Engine:
         return await _success(download_result)
 
     async def enqueue_request(self, request: Request):
-        # TODO: 去重
+        if self.__redis_util:
+            await self.__redis_util.set(
+                f"{self.__redis_key_queue}:{request.hash}", ujson.dumps(request.json)
+            )
         await self._schedule_request(request)
 
     async def _schedule_request(self, request: Request):
         await self.scheduler.enqueue_request(request)
 
-    async def _get_next_request(self):
-        return await self.scheduler.next_request()
+    async def _get_next_request(self) -> Optional[Request]:
+        request: Optional[Request] = await self.scheduler.next_request()
+        if not request:
+            return None
+
+        if self.is_distributed:
+            nx_set_result = await self.__redis_util.nx_set(
+                self.__redis_key_distributed_lock, request.hash, 600
+            )
+            if not nx_set_result:
+                return None
+
+        if self.__redis_util:
+            await self.__redis_util.set(
+                f"{self.__redis_key_running}:{request.hash}", ujson.dumps(request.json)
+            )
+            self.logger.debug(f"redis delete {self.__redis_key_queue}:{request.hash}")
+            await self.__redis_util.delete(f"{self.__redis_key_queue}:{request.hash}")
+        return request
 
     async def _handle_spider_output(
         self, outputs: AsyncGenerator[Union[Request, Item], Any]

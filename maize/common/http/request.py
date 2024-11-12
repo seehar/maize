@@ -85,3 +85,19 @@ class Request:
         ]
         request_data_str = ":".join(request_data_list)
         return hashlib.md5(request_data_str.encode("utf-8")).hexdigest()
+
+    @property
+    def json(self):
+        return {
+            "url": self.url,
+            "method": self.method,
+            "callback": self.callback.__name__ if self.callback else None,
+            "priority": self.priority,
+            "headers": self.headers,
+            "params": self.params,
+            "data": self.data,
+            "cookies": self.cookies,
+            "proxy": self.proxy,
+            "proxy_username": self.proxy_username,
+            "proxy_password": self.proxy_password,
+        }

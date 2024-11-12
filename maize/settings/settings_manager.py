@@ -93,3 +93,11 @@ class SettingsManager(MutableMapping):
 
     def copy(self):
         return deepcopy(self)
+
+    @property
+    def redis_url(self):
+        redis_url_username_password = ""
+        if self.get("REDIS_USERNAME") or self.get("REDIS_PASSWORD"):
+            redis_url_username_password = f"{self.get('REDIS_USERNAME') or ''}:{self.get('REDIS_PASSWORD') or ''}@"
+
+        return f"redis://{redis_url_username_password}{self.get('REDIS_HOST')}:{self.get('REDIS_PORT')}/{self.get('REDIS_DB')}"

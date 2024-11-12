@@ -11,12 +11,12 @@ from .tools import SingletonType
 class RedisUtil:
     def __init__(
         self,
-        url: str = "redis://localhost",
+        url: Optional[str] = None,
         username: Optional[str] = None,
         password: Optional[str] = None,
         host: Optional[str] = None,
         port: Optional[int] = None,
-        db: Optional[str] = None,
+        db: Optional[int] = None,
     ):
         """
         redis 工具类
@@ -37,7 +37,7 @@ class RedisUtil:
             encoding="utf-8",
             decode_responses=True,
         )
-        self.redis = aioredis.Redis(connection_pool=self._pool)
+        self._redis = aioredis.Redis(connection_pool=self._pool)
 
     async def open(self):
         """
@@ -50,7 +50,7 @@ class RedisUtil:
         关闭连接
         :return:
         """
-        await self.redis.close()
+        await self._redis.close()
         await self._pool.disconnect()
 
     async def set(
@@ -74,9 +74,18 @@ class RedisUtil:
         :param keepttl: 如果为 True，则保留与密钥相关的存活时间。
         :return:
         """
-        return await self.redis.set(
+        return await self._redis.set(
             name=name, value=value, ex=ex, px=px, nx=nx, xx=xx, keepttl=keepttl
         )
+
+    async def nx_set(
+        self,
+        name: KeyT,
+        value: EncodableT,
+        ex: Optional[ExpiryT] = None,
+    ):
+        result = await self._redis.set(name=name, value=value, nx=True, ex=ex)
+        return bool(result)
 
     async def get(self, name: KeyT):
         """
@@ -84,7 +93,15 @@ class RedisUtil:
         :param name:
         :return:
         """
-        return await self.redis.get(name)
+        return await self._redis.get(name)
+
+    async def delete(self, *names: KeyT):
+        """
+        Delete one or more keys specified by ``names``
+        @param names:
+        @return:
+        """
+        return await self._redis.delete(*names)
 
 
 class RedisSingletonUtil(RedisUtil, metaclass=SingletonType):
