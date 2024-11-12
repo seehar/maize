@@ -9,14 +9,14 @@
 
 ## 参数详解
 
-| 参数名        | 类型              | 是否必须 | 默认值                 | 说明   |
-|:-----------|:----------------|:-----|:--------------------|:-----|
-| `url`      | `str`           | 是    | "redis://localhost" | 链接地址 |
-| `username` | `Optional[str]` | 否    | `None`              | 用户名  |
-| `password` | `Optional[str]` | 否    | `None`              | 密码   |
-| `host`     | `Optional[str]` | 否    | `None`              | 链接地址 |
-| `port`     | `Optional[int]` | 否    | `None`              | 端口   |
-| `db`       | `Optional[str]` | 否    | `None`              | 数据库  |
+| 参数名        | 类型              | 是否必须 | 默认值    | 说明   |
+|:-----------|:----------------|:-----|:-------|:-----|
+| `url`      | `str`           | 否    | `None` | 链接地址 |
+| `username` | `Optional[str]` | 否    | `None` | 用户名  |
+| `password` | `Optional[str]` | 否    | `None` | 密码   |
+| `host`     | `Optional[str]` | 否    | `None` | 链接地址 |
+| `port`     | `Optional[int]` | 否    | `None` | 端口   |
+| `db`       | `Optional[str]` | 否    | `None` | 数据库  |
 
 
 ## open
@@ -71,6 +71,25 @@ async def set(
 ```
 
 
+## nx_set
+
+```python
+async def nx_set(
+    self,
+    name: KeyT,
+    value: EncodableT,
+    ex: Optional[ExpiryT] = None,
+):
+    """
+    nx set
+    @param name: 
+    @param value: 
+    @param ex: 
+    @return: 
+    """
+```
+
+
 ## get
 
 ```python
@@ -79,5 +98,17 @@ async def get(self, name: KeyT):
     返回键 `name` 的值，如果键不存在，则返回 None
     :param name:
     :return:
+    """
+```
+
+
+## delete
+
+```python
+async def delete(self, *names: KeyT):
+    """
+    Delete one or more keys specified by ``names``
+    @param names:
+    @return:
     """
 ```

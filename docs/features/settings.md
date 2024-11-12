@@ -112,6 +112,52 @@ class BaseSettings:
     # maize.MysqlPipeline: 集成 aiomysql 的数据管道，自动入库 mysql 数据库
     ITEM_PIPELINES: list[str] = ["maize.BasePipeline"]
 
+    # rpa
+    # 使用使用 stealth js
+    RPA_USE_STEALTH_JS: bool = True
+    # stealth js 文件路径
+    RPA_STEALTH_JS_PATH: Path = BASE_DIR / "utils/js/stealth.min.js"
+
+    # 是否为无头浏览器
+    RPA_HEADLESS: bool = True
+
+    # chromium、firefox、webkit
+    RPA_DRIVER_TYPE: Literal["chromium", "firefox", "webkit"] = "chromium"
+
+    # 请求头
+    RPA_USER_AGENT: Optional[str] = None
+
+    # 窗口大小
+    RPA_WINDOW_SIZE: Tuple[int, int] = (1024, 800)
+
+    # 浏览器路径，默认为默认路径
+    RPA_EXECUTABLE_PATH: Optional[str] = None
+
+    # 下载文件的路径
+    RPA_DOWNLOAD_PATH: Optional[str] = None
+
+    # 渲染时长，即打开网页等待指定时间后再获取源码
+    RPA_RENDER_TIME: Optional[int] = None
+
+    # 自定义浏览器渲染参数
+    RPA_CUSTOM_ARGUMENT: List[str] = []
+
+    # 是否使用分布式爬虫，开启后，需要对 redis 进行配置
+    IS_DISTRIBUTED: bool = False
+
+    # redis
+    USE_REDIS: bool = False
+    REDIS_HOST: str = "localhost"
+    REDIS_PORT: int = 6379
+    REDIS_DB: int = 0
+    REDIS_USERNAME: Optional[str] = None
+    REDIS_PASSWORD: Optional[str] = None
+
+    REDIS_KEY_PREFIX: str = "maize"
+    REDIS_KEY_LOCK: str = "lock"
+    REDIS_KEY_RUNNING: str = "running"
+    REDIS_KEY_QUEUE: str = "queue"
+
     # # 隧道代理，示例：xxx.xxx:2132。注意：不包含 http:// 或 https://
     # PROXY_TUNNEL: str = ""
     #

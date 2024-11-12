@@ -21,6 +21,25 @@
 
 ## 爬虫示例
 
+单爬虫
+
+```python
+from maize import Spider
+
+
+class DecoratorSpider(Spider):
+    start_url = "http://www.baidu.com"
+
+    def parse(self, response):
+        print(response.text)
+
+
+if __name__ == "__main__":
+    DecoratorSpider().run()
+```
+
+装饰器启动爬虫
+
 ```python
 from maize import Spider, SpiderEntry
 

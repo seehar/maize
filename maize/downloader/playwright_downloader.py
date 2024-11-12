@@ -9,6 +9,7 @@ from playwright.async_api import BrowserContext
 from playwright.async_api import Cookie
 from playwright.async_api import Page
 from playwright.async_api import Playwright
+from playwright.async_api import ViewportSize
 from playwright.async_api import async_playwright
 
 from maize import BaseDownloader
@@ -33,6 +34,16 @@ class PlaywrightDownloader(BaseDownloader):
 
         self._use_stealth_js: Optional[bool] = None
         self._stealth_js_path: Optional[Path | str] = None
+        self.__rpa_headless = self.crawler.settings.get("RPA_HEADLESS")
+        self.__rpa_driver_type = self.crawler.settings.get("RPA_DRIVER_TYPE")
+        self.__rpa_user_agent = self.crawler.settings.get("RPA_USER_AGENT")
+        self.__rpa_timeout = self.crawler.settings.get("RPA_TIMEOUT")
+        self.__rpa_window_size = self.crawler.settings.get("RPA_WINDOW_SIZE")
+        self.__rpa_executable_path = self.crawler.settings.get("RPA_EXECUTABLE_PATH")
+        self.__rpa_download_path = self.crawler.settings.get("RPA_DOWNLOAD_PATH")
+        self.__rpa_render_time = self.crawler.settings.get("RPA_RENDER_TIME")
+        self.__rpa_custom_argument = self.crawler.settings.get("RPA_CUSTOM_ARGUMENT")
+        self.__view_size: Optional[ViewportSize] = None
 
     async def open(self):
         await super().open()
@@ -43,10 +54,27 @@ class PlaywrightDownloader(BaseDownloader):
         self._use_stealth_js = self.crawler.settings.getbool("RPA_USE_STEALTH_JS")
         self._stealth_js_path = self.crawler.settings.get("RPA_STEALTH_JS_PATH")
 
+        self.__view_size = ViewportSize(
+            width=self.__rpa_window_size[0], height=self.__rpa_window_size[1]
+        )
+
         if self._use_session:
             self.playwright = await async_playwright().start()
-            self.browser = await self.playwright.chromium.launch(timeout=self._timeout)
-            self.context = await self.browser.new_context()
+            self.browser: Browser = await getattr(
+                self.playwright, self.__rpa_driver_type
+            ).launch(
+                timeout=self._timeout,
+                headless=self.__rpa_headless,
+                args=self.__rpa_custom_argument or ["--no-sandbox"],
+                executable_path=self.__rpa_executable_path,
+                downloads_path=self.__rpa_download_path,
+            )
+
+            self.context = await self.browser.new_context(
+                user_agent=self.__rpa_user_agent,
+                screen=self.__view_size,
+                viewport=self.__view_size,
+            )
             if self._use_stealth_js:
                 await self.context.add_init_script(path=self._stealth_js_path)
             self.page = await self.context.new_page()
@@ -76,8 +104,18 @@ class PlaywrightDownloader(BaseDownloader):
 
             else:
                 async with async_playwright() as playwright:
-                    browser = await playwright.firefox.launch(headless=False)
-                    context = await browser.new_context()
+                    browser = await getattr(playwright, self.__rpa_driver_type).launch(
+                        timeout=self._timeout,
+                        headless=self.__rpa_headless,
+                        args=self.__rpa_custom_argument or ["--no-sandbox"],
+                        executable_path=self.__rpa_executable_path,
+                        downloads_path=self.__rpa_download_path,
+                    )
+                    context = await browser.new_context(
+                        user_agent=self.__rpa_user_agent,
+                        screen=self.__view_size,
+                        viewport=self.__view_size,
+                    )
                     if self._use_stealth_js:
                         await context.add_init_script(path=self._stealth_js_path)
                     if request.cookies:
@@ -86,7 +124,7 @@ class PlaywrightDownloader(BaseDownloader):
                     page = await context.new_page()
                     await page.goto(request.url)
                     await page.wait_for_load_state()
-                    await asyncio.sleep(1000)
+                    await asyncio.sleep(self.__rpa_render_time)
                     response = await page.content()
                     cookies = await page.context.cookies()
 

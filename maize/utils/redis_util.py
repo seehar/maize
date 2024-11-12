@@ -84,6 +84,13 @@ class RedisUtil:
         value: EncodableT,
         ex: Optional[ExpiryT] = None,
     ):
+        """
+        nx set
+        @param name:
+        @param value:
+        @param ex:
+        @return:
+        """
         result = await self._redis.set(name=name, value=value, nx=True, ex=ex)
         return bool(result)
 

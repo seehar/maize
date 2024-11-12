@@ -37,11 +37,5 @@ class RpaBaiduSpider(Spider):
             print("-" * 100)
 
 
-async def main():
-    process = CrawlerProcess()
-    await process.crawl(RpaBaiduSpider)
-    await process.start()
-
-
 if __name__ == "__main__":
-    asyncio.run(main())
+    asyncio.run(RpaBaiduSpider().run())
