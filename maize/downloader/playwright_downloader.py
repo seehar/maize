@@ -7,6 +7,7 @@ from typing import Optional
 from playwright.async_api import Browser
 from playwright.async_api import BrowserContext
 from playwright.async_api import Cookie
+from playwright.async_api import Download
 from playwright.async_api import Page
 from playwright.async_api import Playwright
 from playwright.async_api import ViewportSize
@@ -78,6 +79,17 @@ class PlaywrightDownloader(BaseDownloader):
             if self._use_stealth_js:
                 await self.context.add_init_script(path=self._stealth_js_path)
             self.page = await self.context.new_page()
+            self.page.on("download", self.handle_download)
+
+    @staticmethod
+    async def handle_download(download: Download):
+        download_path = await download.path()
+        suggested_filename = download.suggested_filename
+        await download.save_as(download_path.parent / suggested_filename)
+
+        original_file_path = Path(download_path)
+        if original_file_path.exists():
+            original_file_path.unlink()
 
     async def close(self):
         if self.page:
@@ -122,6 +134,8 @@ class PlaywrightDownloader(BaseDownloader):
                         await context.add_cookies(request.cookies)
 
                     page = await context.new_page()
+                    page.on("download", self.handle_download)
+
                     await page.goto(request.url)
                     await page.wait_for_load_state()
                     await asyncio.sleep(self.__rpa_render_time)
