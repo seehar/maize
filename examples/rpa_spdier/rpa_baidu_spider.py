@@ -3,7 +3,6 @@ import typing
 
 from playwright.async_api import Page
 
-from maize import CrawlerProcess
 from maize import Request
 from maize import Response
 from maize import Spider
@@ -38,4 +37,4 @@ class RpaBaiduSpider(Spider):
 
 
 if __name__ == "__main__":
-    asyncio.run(RpaBaiduSpider().run())
+    RpaBaiduSpider().run()
