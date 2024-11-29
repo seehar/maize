@@ -253,7 +253,8 @@ class Engine:
     async def enqueue_request(self, request: Request):
         if self.__redis_util:
             await self.__redis_util.set(
-                f"{self.__redis_key_queue}:{request.hash}", ujson.dumps(request.json)
+                f"{self.__redis_key_queue}:{request.hash}",
+                ujson.dumps(request.model_dump),
             )
         await self._schedule_request(request)
 
@@ -274,7 +275,8 @@ class Engine:
 
         if self.__redis_util:
             await self.__redis_util.set(
-                f"{self.__redis_key_running}:{request.hash}", ujson.dumps(request.json)
+                f"{self.__redis_key_running}:{request.hash}",
+                ujson.dumps(request.model_dump),
             )
             self.logger.debug(f"redis delete {self.__redis_key_queue}:{request.hash}")
             await self.__redis_util.delete(f"{self.__redis_key_queue}:{request.hash}")

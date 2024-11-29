@@ -108,6 +108,7 @@ class AioHttpDownloader(BaseDownloader):
             url=request.url,
             params=request.params,
             data=request.data,
+            json=request.json,
             headers=request.headers,
             cookies=request.cookies,
             proxy=request.proxy or self.proxy_tunnel,

@@ -15,6 +15,7 @@ class Request:
         headers: typing.Optional[dict] = None,
         params: typing.Optional[dict] = None,
         data: typing.Optional[dict | str] = None,
+        json: typing.Optional[dict] = None,
         cookies: typing.Optional[dict | list[dict[str, typing.Any]]] = None,
         proxy: typing.Optional[str] = None,
         proxy_username: typing.Optional[str] = None,
@@ -32,6 +33,7 @@ class Request:
         :param headers: 请求头
         :param params: 请求参数
         :param data: 请求 body
+        :param json: dict 类型的参数
         :param cookies: 请求 cookies
         :param proxy: 代理ip
         :param proxy_username: 代理 ip 用户名
@@ -46,6 +48,7 @@ class Request:
         self.headers = headers
         self.params = params
         self.data = data
+        self.json = json
         self.cookies = cookies
         self.proxy = proxy
         self.proxy_username = proxy_username
@@ -87,7 +90,7 @@ class Request:
         return hashlib.md5(request_data_str.encode("utf-8")).hexdigest()
 
     @property
-    def json(self):
+    def model_dump(self):
         return {
             "url": self.url,
             "method": self.method,

@@ -53,6 +53,7 @@ class HTTPXDownloader(BaseDownloader):
                     request.url,
                     headers=request.headers,
                     data=request.data,
+                    json=request.json,
                     params=request.params,
                 )
                 body = await response.aread()
