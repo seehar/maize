@@ -86,9 +86,9 @@ class RedisUtil:
     ):
         """
         nx set
-        @param name:
-        @param value:
-        @param ex:
+        :param name:
+        :param value:
+        :param ex:
         @return:
         """
         result = await self._redis.set(name=name, value=value, nx=True, ex=ex)
@@ -105,7 +105,7 @@ class RedisUtil:
     async def delete(self, *names: KeyT):
         """
         Delete one or more keys specified by ``names``
-        @param names:
+        :param names:
         @return:
         """
         return await self._redis.delete(*names)

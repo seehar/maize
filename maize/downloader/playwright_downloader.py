@@ -42,7 +42,7 @@ class PlaywrightDownloader(BaseDownloader):
         self.__rpa_window_size = self.crawler.settings.get("RPA_WINDOW_SIZE")
         self.__rpa_executable_path = self.crawler.settings.get("RPA_EXECUTABLE_PATH")
         self.__rpa_download_path = self.crawler.settings.get("RPA_DOWNLOAD_PATH")
-        self.__rpa_render_time = self.crawler.settings.get("RPA_RENDER_TIME")
+        self.__rpa_render_time = self.crawler.settings.get("RPA_RENDER_TIME") or 0
         self.__rpa_custom_argument = self.crawler.settings.get("RPA_CUSTOM_ARGUMENT")
         self.__view_size: Optional[ViewportSize] = None
 
@@ -110,6 +110,7 @@ class PlaywrightDownloader(BaseDownloader):
         try:
             if self._use_session:
                 await self.page.goto(request.url)
+                await asyncio.sleep(self.__rpa_render_time)
                 await self.page.wait_for_load_state()
                 response = await self.page.content()
                 cookies = await self.page.context.cookies()

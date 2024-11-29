@@ -39,14 +39,14 @@ class Response(Generic[Driver]):
     ):
         """
         响应
-        @param url: url
-        @param headers: 响应头
-        @param request: 请求 Request
-        @param body: 响应体 bytes 类型
-        @param text: 响应体 str 类型
-        @param status: 响应状态码，如 200
-        @param cookie_list: cookie 列表
-        @param driver:
+        :param url: url
+        :param headers: 响应头
+        :param request: 请求 Request
+        :param body: 响应体 bytes 类型
+        :param text: 响应体 str 类型
+        :param status: 响应状态码，如 200
+        :param cookie_list: cookie 列表
+        :param driver:
         """
         self.url = url
         self.request = request

@@ -39,7 +39,7 @@ class MysqlPipeline(BasePipeline):
     async def process_item(self, items: List["Item"]) -> bool:
         """
         批量处理 item
-        @param items:
+        :param items:
         @return: 成功 True，否则 False
         """
         if not items:

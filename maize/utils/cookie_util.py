@@ -16,13 +16,13 @@ class CookieUtil:
     ) -> List[Dict[str, Any]]:
         """
         字符串类型的 cookie 转 list
-        @param cookie_string:
-        @param domain:
-        @param path:
-        @param expires:
-        @param http_only:
-        @param secure:
-        @param same_site:
+        :param cookie_string:
+        :param domain:
+        :param path:
+        :param expires:
+        :param http_only:
+        :param secure:
+        :param same_site:
         @return:
         """
         if not cookie_string:

@@ -14,7 +14,7 @@ class Request:
         priority: int = 0,
         headers: typing.Optional[dict] = None,
         params: typing.Optional[dict] = None,
-        data: typing.Optional[dict] = None,
+        data: typing.Optional[dict | str] = None,
         cookies: typing.Optional[dict | list[dict[str, typing.Any]]] = None,
         proxy: typing.Optional[str] = None,
         proxy_username: typing.Optional[str] = None,
@@ -25,19 +25,19 @@ class Request:
         """
         请求
 
-        @param url: 待抓取的url
-        @param method: 请求方式，如 Method.GET, Method.POST, Method.PUT，默认 Method.GET
-        @param callback: 自定义的解析函数，默认为 parse
-        @param priority: 请求优先级，默认为 0
-        @param headers: 请求头
-        @param params: 请求参数
-        @param data: 请求 body
-        @param cookies: 请求 cookies
-        @param proxy: 代理ip
-        @param proxy_username: 代理 ip 用户名
-        @param proxy_password: 代理 ip 密码
-        @param encoding: 编码，默认utf-8，当无法解析时，使用响应中的编码
-        @param meta: 自定义数据
+        :param url: 待抓取的url
+        :param method: 请求方式，如 Method.GET, Method.POST, Method.PUT，默认 Method.GET
+        :param callback: 自定义的解析函数，默认为 parse
+        :param priority: 请求优先级，默认为 0
+        :param headers: 请求头
+        :param params: 请求参数
+        :param data: 请求 body
+        :param cookies: 请求 cookies
+        :param proxy: 代理ip
+        :param proxy_username: 代理 ip 用户名
+        :param proxy_password: 代理 ip 密码
+        :param encoding: 编码，默认utf-8，当无法解析时，使用响应中的编码
+        :param meta: 自定义数据
         """
         self.url = url
         self.method: str = str(method.value)

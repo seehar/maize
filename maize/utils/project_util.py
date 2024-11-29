@@ -51,8 +51,8 @@ def merge_settings(spider: "Spider", settings: SettingsManager):
     合并配置文件
 
     @type spider: Spider
-    @param spider:
-    @param settings:
+    :param spider:
+    :param settings:
     @return:
     """
     if hasattr(spider, "custom_settings"):
@@ -63,7 +63,7 @@ def merge_settings(spider: "Spider", settings: SettingsManager):
 def load_class(_path: Union[str, Callable]):
     """
     动态导入类
-    @param _path:
+    :param _path:
     @return:
     """
     if not isinstance(_path, str):
