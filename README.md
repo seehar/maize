@@ -1,6 +1,12 @@
 # maize
 
 [![codecov](https://codecov.io/gh/seehar/maize/graph/badge.svg?token=ZG5ESDLPX6)](https://codecov.io/gh/seehar/maize)
+![](https://img.shields.io/github/watchers/seehar/maize?style=social)
+![](https://img.shields.io/github/stars/seehar/maize?style=social)
+![](https://img.shields.io/github/forks/seehar/maize?style=social)
+[![Downloads](https://pepy.tech/badge/maize)](https://pepy.tech/project/maize)
+[![Downloads](https://pepy.tech/badge/maize/month)](https://pepy.tech/project/maize)
+[![Downloads](https://pepy.tech/badge/maize/week)](https://pepy.tech/project/maize)
 
 > 一个 Python 爬虫框架
 
