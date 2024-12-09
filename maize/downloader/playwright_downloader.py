@@ -109,6 +109,8 @@ class PlaywrightDownloader(BaseDownloader):
     async def download(self, request: Request) -> Optional[Response[Page]]:
         try:
             if self._use_session:
+                if request.cookies:
+                    await self.page.context.add_cookies(request.cookies)
                 await self.page.goto(request.url)
                 await asyncio.sleep(self.__rpa_render_time)
                 await self.page.wait_for_load_state()
