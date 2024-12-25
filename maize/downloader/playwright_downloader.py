@@ -44,6 +44,8 @@ class PlaywrightDownloader(BaseDownloader):
         self.__rpa_download_path = self.crawler.settings.get("RPA_DOWNLOAD_PATH")
         self.__rpa_render_time = self.crawler.settings.get("RPA_RENDER_TIME") or 0
         self.__rpa_custom_argument = self.crawler.settings.get("RPA_CUSTOM_ARGUMENT")
+        self.__rpa_endpoint_url = self.crawler.settings.get("RPA_ENDPOINT_URL")
+        self.__rpa_slow_mo = self.crawler.settings.getfloat("RPA_SLOW_MO")
         self.__view_size: Optional[ViewportSize] = None
 
     async def open(self):
@@ -61,15 +63,7 @@ class PlaywrightDownloader(BaseDownloader):
 
         if self._use_session:
             self.playwright = await async_playwright().start()
-            self.browser: Browser = await getattr(
-                self.playwright, self.__rpa_driver_type
-            ).launch(
-                timeout=self._timeout,
-                headless=self.__rpa_headless,
-                args=self.__rpa_custom_argument or ["--no-sandbox"],
-                executable_path=self.__rpa_executable_path,
-                downloads_path=self.__rpa_download_path,
-            )
+            self.browser: Browser = await self.__get_browser(self.playwright)
 
             self.context = await self.browser.new_context(
                 user_agent=self.__rpa_user_agent,
@@ -119,13 +113,7 @@ class PlaywrightDownloader(BaseDownloader):
 
             else:
                 async with async_playwright() as playwright:
-                    browser = await getattr(playwright, self.__rpa_driver_type).launch(
-                        timeout=self._timeout,
-                        headless=self.__rpa_headless,
-                        args=self.__rpa_custom_argument or ["--no-sandbox"],
-                        executable_path=self.__rpa_executable_path,
-                        downloads_path=self.__rpa_download_path,
-                    )
+                    browser = await self.__get_browser(playwright)
                     context = await browser.new_context(
                         user_agent=self.__rpa_user_agent,
                         screen=self.__view_size,
@@ -174,3 +162,29 @@ class PlaywrightDownloader(BaseDownloader):
             cookie_list=cookie_list,
             driver=self.page,
         )
+
+    async def __get_browser(self, playwright: Playwright) -> Browser:
+        """
+        获取 browser 实例
+
+        @param playwright:
+        @return:
+        """
+        if self.__rpa_endpoint_url:
+            browser = await getattr(
+                playwright, self.__rpa_driver_type
+            ).connect_over_cdp(
+                endpoint_url=self.__rpa_endpoint_url,
+                timeout=self._timeout,
+                slow_mo=self.__rpa_slow_mo,
+                headers=self.__rpa_user_agent,
+            )
+        else:
+            browser: Browser = await getattr(playwright, self.__rpa_driver_type).launch(
+                timeout=self._timeout,
+                headless=self.__rpa_headless,
+                args=self.__rpa_custom_argument or ["--no-sandbox"],
+                executable_path=self.__rpa_executable_path,
+                downloads_path=self.__rpa_download_path,
+            )
+        return browser

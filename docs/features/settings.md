@@ -142,6 +142,13 @@ class BaseSettings:
     # 自定义浏览器渲染参数
     RPA_CUSTOM_ARGUMENT: List[str] = []
 
+    # 要连接的 CDP websocket 端点或 http url。例如 `http://localhost:9222/` 或
+    # `ws://127.0.0.1:9222/devtools/browser/387adf4c-243f-4051-a181-46798f4a46f4`.
+    RPA_ENDPOINT_URL: Optional[str] = None
+
+    # 将 RPA 操作减慢指定的毫秒数。很有用，这样您就可以看到发生了什么。默认为0。
+    RPA_SLOW_MO: Optional[float] = None
+
     # 是否使用分布式爬虫，开启后，需要对 redis 进行配置
     IS_DISTRIBUTED: bool = False
 
