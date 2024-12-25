@@ -896,37 +896,44 @@
 </span><span id="__span-3-88"><a id="__codelineno-3-88" name="__codelineno-3-88" href="#__codelineno-3-88"></a>    <span class="c1"># 自定义浏览器渲染参数</span>
 </span><span id="__span-3-89"><a id="__codelineno-3-89" name="__codelineno-3-89" href="#__codelineno-3-89"></a>    <span class="n">RPA_CUSTOM_ARGUMENT</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
 </span><span id="__span-3-90"><a id="__codelineno-3-90" name="__codelineno-3-90" href="#__codelineno-3-90"></a>
-</span><span id="__span-3-91"><a id="__codelineno-3-91" name="__codelineno-3-91" href="#__codelineno-3-91"></a>    <span class="c1"># 是否使用分布式爬虫，开启后，需要对 redis 进行配置</span>
-</span><span id="__span-3-92"><a id="__codelineno-3-92" name="__codelineno-3-92" href="#__codelineno-3-92"></a>    <span class="n">IS_DISTRIBUTED</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span>
-</span><span id="__span-3-93"><a id="__codelineno-3-93" name="__codelineno-3-93" href="#__codelineno-3-93"></a>
-</span><span id="__span-3-94"><a id="__codelineno-3-94" name="__codelineno-3-94" href="#__codelineno-3-94"></a>    <span class="c1"># redis</span>
-</span><span id="__span-3-95"><a id="__codelineno-3-95" name="__codelineno-3-95" href="#__codelineno-3-95"></a>    <span class="n">USE_REDIS</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span>
-</span><span id="__span-3-96"><a id="__codelineno-3-96" name="__codelineno-3-96" href="#__codelineno-3-96"></a>    <span class="n">REDIS_HOST</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;localhost&quot;</span>
-</span><span id="__span-3-97"><a id="__codelineno-3-97" name="__codelineno-3-97" href="#__codelineno-3-97"></a>    <span class="n">REDIS_PORT</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">6379</span>
-</span><span id="__span-3-98"><a id="__codelineno-3-98" name="__codelineno-3-98" href="#__codelineno-3-98"></a>    <span class="n">REDIS_DB</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">0</span>
-</span><span id="__span-3-99"><a id="__codelineno-3-99" name="__codelineno-3-99" href="#__codelineno-3-99"></a>    <span class="n">REDIS_USERNAME</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
-</span><span id="__span-3-100"><a id="__codelineno-3-100" name="__codelineno-3-100" href="#__codelineno-3-100"></a>    <span class="n">REDIS_PASSWORD</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
-</span><span id="__span-3-101"><a id="__codelineno-3-101" name="__codelineno-3-101" href="#__codelineno-3-101"></a>
-</span><span id="__span-3-102"><a id="__codelineno-3-102" name="__codelineno-3-102" href="#__codelineno-3-102"></a>    <span class="n">REDIS_KEY_PREFIX</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;maize&quot;</span>
-</span><span id="__span-3-103"><a id="__codelineno-3-103" name="__codelineno-3-103" href="#__codelineno-3-103"></a>    <span class="n">REDIS_KEY_LOCK</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;lock&quot;</span>
-</span><span id="__span-3-104"><a id="__codelineno-3-104" name="__codelineno-3-104" href="#__codelineno-3-104"></a>    <span class="n">REDIS_KEY_RUNNING</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;running&quot;</span>
-</span><span id="__span-3-105"><a id="__codelineno-3-105" name="__codelineno-3-105" href="#__codelineno-3-105"></a>    <span class="n">REDIS_KEY_QUEUE</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;queue&quot;</span>
-</span><span id="__span-3-106"><a id="__codelineno-3-106" name="__codelineno-3-106" href="#__codelineno-3-106"></a>
-</span><span id="__span-3-107"><a id="__codelineno-3-107" name="__codelineno-3-107" href="#__codelineno-3-107"></a>    <span class="c1"># # 隧道代理，示例：xxx.xxx:2132。注意：不包含 http:// 或 https://</span>
-</span><span id="__span-3-108"><a id="__codelineno-3-108" name="__codelineno-3-108" href="#__codelineno-3-108"></a>    <span class="c1"># PROXY_TUNNEL: str = &quot;&quot;</span>
-</span><span id="__span-3-109"><a id="__codelineno-3-109" name="__codelineno-3-109" href="#__codelineno-3-109"></a>    <span class="c1">#</span>
-</span><span id="__span-3-110"><a id="__codelineno-3-110" name="__codelineno-3-110" href="#__codelineno-3-110"></a>    <span class="c1"># # 隧道代理用户名</span>
-</span><span id="__span-3-111"><a id="__codelineno-3-111" name="__codelineno-3-111" href="#__codelineno-3-111"></a>    <span class="c1"># PROXY_TUNNEL_USERNAME: str = &quot;&quot;</span>
-</span><span id="__span-3-112"><a id="__codelineno-3-112" name="__codelineno-3-112" href="#__codelineno-3-112"></a>    <span class="c1">#</span>
-</span><span id="__span-3-113"><a id="__codelineno-3-113" name="__codelineno-3-113" href="#__codelineno-3-113"></a>    <span class="c1"># # 隧道代理密码</span>
-</span><span id="__span-3-114"><a id="__codelineno-3-114" name="__codelineno-3-114" href="#__codelineno-3-114"></a>    <span class="c1"># PROXY_TUNNEL_PASSWORD: str = &quot;&quot;</span>
-</span><span id="__span-3-115"><a id="__codelineno-3-115" name="__codelineno-3-115" href="#__codelineno-3-115"></a>
-</span><span id="__span-3-116"><a id="__codelineno-3-116" name="__codelineno-3-116" href="#__codelineno-3-116"></a>    <span class="c1"># # mysql数据库配置</span>
-</span><span id="__span-3-117"><a id="__codelineno-3-117" name="__codelineno-3-117" href="#__codelineno-3-117"></a>    <span class="c1"># MYSQL_HOST: str = &quot;localhost&quot;</span>
-</span><span id="__span-3-118"><a id="__codelineno-3-118" name="__codelineno-3-118" href="#__codelineno-3-118"></a>    <span class="c1"># MYSQL_PORT: str | int = 3306</span>
-</span><span id="__span-3-119"><a id="__codelineno-3-119" name="__codelineno-3-119" href="#__codelineno-3-119"></a>    <span class="c1"># MYSQL_DB: str = &quot;&quot;</span>
-</span><span id="__span-3-120"><a id="__codelineno-3-120" name="__codelineno-3-120" href="#__codelineno-3-120"></a>    <span class="c1"># MYSQL_USER: str = &quot;&quot;</span>
-</span><span id="__span-3-121"><a id="__codelineno-3-121" name="__codelineno-3-121" href="#__codelineno-3-121"></a>    <span class="c1"># MYSQL_PASSWORD: str = &quot;&quot;</span>
+</span><span id="__span-3-91"><a id="__codelineno-3-91" name="__codelineno-3-91" href="#__codelineno-3-91"></a>    <span class="c1"># 要连接的 CDP websocket 端点或 http url。例如 `http://localhost:9222/` 或</span>
+</span><span id="__span-3-92"><a id="__codelineno-3-92" name="__codelineno-3-92" href="#__codelineno-3-92"></a>    <span class="c1"># `ws://127.0.0.1:9222/devtools/browser/387adf4c-243f-4051-a181-46798f4a46f4`.</span>
+</span><span id="__span-3-93"><a id="__codelineno-3-93" name="__codelineno-3-93" href="#__codelineno-3-93"></a>    <span class="n">RPA_ENDPOINT_URL</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
+</span><span id="__span-3-94"><a id="__codelineno-3-94" name="__codelineno-3-94" href="#__codelineno-3-94"></a>
+</span><span id="__span-3-95"><a id="__codelineno-3-95" name="__codelineno-3-95" href="#__codelineno-3-95"></a>    <span class="c1"># 将 RPA 操作减慢指定的毫秒数。很有用，这样您就可以看到发生了什么。默认为0。</span>
+</span><span id="__span-3-96"><a id="__codelineno-3-96" name="__codelineno-3-96" href="#__codelineno-3-96"></a>    <span class="n">RPA_SLOW_MO</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
+</span><span id="__span-3-97"><a id="__codelineno-3-97" name="__codelineno-3-97" href="#__codelineno-3-97"></a>
+</span><span id="__span-3-98"><a id="__codelineno-3-98" name="__codelineno-3-98" href="#__codelineno-3-98"></a>    <span class="c1"># 是否使用分布式爬虫，开启后，需要对 redis 进行配置</span>
+</span><span id="__span-3-99"><a id="__codelineno-3-99" name="__codelineno-3-99" href="#__codelineno-3-99"></a>    <span class="n">IS_DISTRIBUTED</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span>
+</span><span id="__span-3-100"><a id="__codelineno-3-100" name="__codelineno-3-100" href="#__codelineno-3-100"></a>
+</span><span id="__span-3-101"><a id="__codelineno-3-101" name="__codelineno-3-101" href="#__codelineno-3-101"></a>    <span class="c1"># redis</span>
+</span><span id="__span-3-102"><a id="__codelineno-3-102" name="__codelineno-3-102" href="#__codelineno-3-102"></a>    <span class="n">USE_REDIS</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span>
+</span><span id="__span-3-103"><a id="__codelineno-3-103" name="__codelineno-3-103" href="#__codelineno-3-103"></a>    <span class="n">REDIS_HOST</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;localhost&quot;</span>
+</span><span id="__span-3-104"><a id="__codelineno-3-104" name="__codelineno-3-104" href="#__codelineno-3-104"></a>    <span class="n">REDIS_PORT</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">6379</span>
+</span><span id="__span-3-105"><a id="__codelineno-3-105" name="__codelineno-3-105" href="#__codelineno-3-105"></a>    <span class="n">REDIS_DB</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">0</span>
+</span><span id="__span-3-106"><a id="__codelineno-3-106" name="__codelineno-3-106" href="#__codelineno-3-106"></a>    <span class="n">REDIS_USERNAME</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
+</span><span id="__span-3-107"><a id="__codelineno-3-107" name="__codelineno-3-107" href="#__codelineno-3-107"></a>    <span class="n">REDIS_PASSWORD</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
+</span><span id="__span-3-108"><a id="__codelineno-3-108" name="__codelineno-3-108" href="#__codelineno-3-108"></a>
+</span><span id="__span-3-109"><a id="__codelineno-3-109" name="__codelineno-3-109" href="#__codelineno-3-109"></a>    <span class="n">REDIS_KEY_PREFIX</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;maize&quot;</span>
+</span><span id="__span-3-110"><a id="__codelineno-3-110" name="__codelineno-3-110" href="#__codelineno-3-110"></a>    <span class="n">REDIS_KEY_LOCK</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;lock&quot;</span>
+</span><span id="__span-3-111"><a id="__codelineno-3-111" name="__codelineno-3-111" href="#__codelineno-3-111"></a>    <span class="n">REDIS_KEY_RUNNING</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;running&quot;</span>
+</span><span id="__span-3-112"><a id="__codelineno-3-112" name="__codelineno-3-112" href="#__codelineno-3-112"></a>    <span class="n">REDIS_KEY_QUEUE</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;queue&quot;</span>
+</span><span id="__span-3-113"><a id="__codelineno-3-113" name="__codelineno-3-113" href="#__codelineno-3-113"></a>
+</span><span id="__span-3-114"><a id="__codelineno-3-114" name="__codelineno-3-114" href="#__codelineno-3-114"></a>    <span class="c1"># # 隧道代理，示例：xxx.xxx:2132。注意：不包含 http:// 或 https://</span>
+</span><span id="__span-3-115"><a id="__codelineno-3-115" name="__codelineno-3-115" href="#__codelineno-3-115"></a>    <span class="c1"># PROXY_TUNNEL: str = &quot;&quot;</span>
+</span><span id="__span-3-116"><a id="__codelineno-3-116" name="__codelineno-3-116" href="#__codelineno-3-116"></a>    <span class="c1">#</span>
+</span><span id="__span-3-117"><a id="__codelineno-3-117" name="__codelineno-3-117" href="#__codelineno-3-117"></a>    <span class="c1"># # 隧道代理用户名</span>
+</span><span id="__span-3-118"><a id="__codelineno-3-118" name="__codelineno-3-118" href="#__codelineno-3-118"></a>    <span class="c1"># PROXY_TUNNEL_USERNAME: str = &quot;&quot;</span>
+</span><span id="__span-3-119"><a id="__codelineno-3-119" name="__codelineno-3-119" href="#__codelineno-3-119"></a>    <span class="c1">#</span>
+</span><span id="__span-3-120"><a id="__codelineno-3-120" name="__codelineno-3-120" href="#__codelineno-3-120"></a>    <span class="c1"># # 隧道代理密码</span>
+</span><span id="__span-3-121"><a id="__codelineno-3-121" name="__codelineno-3-121" href="#__codelineno-3-121"></a>    <span class="c1"># PROXY_TUNNEL_PASSWORD: str = &quot;&quot;</span>
+</span><span id="__span-3-122"><a id="__codelineno-3-122" name="__codelineno-3-122" href="#__codelineno-3-122"></a>
+</span><span id="__span-3-123"><a id="__codelineno-3-123" name="__codelineno-3-123" href="#__codelineno-3-123"></a>    <span class="c1"># # mysql数据库配置</span>
+</span><span id="__span-3-124"><a id="__codelineno-3-124" name="__codelineno-3-124" href="#__codelineno-3-124"></a>    <span class="c1"># MYSQL_HOST: str = &quot;localhost&quot;</span>
+</span><span id="__span-3-125"><a id="__codelineno-3-125" name="__codelineno-3-125" href="#__codelineno-3-125"></a>    <span class="c1"># MYSQL_PORT: str | int = 3306</span>
+</span><span id="__span-3-126"><a id="__codelineno-3-126" name="__codelineno-3-126" href="#__codelineno-3-126"></a>    <span class="c1"># MYSQL_DB: str = &quot;&quot;</span>
+</span><span id="__span-3-127"><a id="__codelineno-3-127" name="__codelineno-3-127" href="#__codelineno-3-127"></a>    <span class="c1"># MYSQL_USER: str = &quot;&quot;</span>
+</span><span id="__span-3-128"><a id="__codelineno-3-128" name="__codelineno-3-128" href="#__codelineno-3-128"></a>    <span class="c1"># MYSQL_PASSWORD: str = &quot;&quot;</span>
 </span></code></pre></div>
 
 
