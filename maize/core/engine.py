@@ -29,7 +29,7 @@ from maize.utils.string_util import StringUtil
 if TYPE_CHECKING:
     from maize.core.crawler import Crawler
     from maize.downloader.base_downloader import BaseDownloader
-    from maize.settings import SettingsManager
+    from maize.settings import SpiderSettings
     from maize.spider.spider import Spider
     from maize.spider.task_spider import TaskSpider
 
@@ -42,7 +42,7 @@ class Engine:
     def __init__(self, crawler: "Crawler"):
         self.logger = get_logger(crawler.settings, self.__class__.__name__)
         self.crawler: "Crawler" = crawler
-        self.settings: "SettingsManager" = self.crawler.settings
+        self.settings: "SpiderSettings" = self.crawler.settings
 
         self.downloader: Optional["BaseDownloader"] = None
         self.scheduler: Optional[Scheduler] = None
@@ -52,39 +52,40 @@ class Engine:
         self.task_requests: Optional[AsyncIterator[Request]] = None
 
         self.spider: Optional[Union["Spider", "TaskSpider"]] = None
-        self.task_manager: TaskManager = TaskManager(
-            self.settings.getint("CONCURRENCY")
-        )
+        self.task_manager: TaskManager = TaskManager(self.settings.CONCURRENCY)
         self.start_requests_running = False
         self.task_requests_running = False
         self._single_task_requests_running = False
         self.running = False
 
         # 分布式
-        self.is_distributed = self.settings.getbool("IS_DISTRIBUTED")
+        self.is_distributed = self.settings.IS_DISTRIBUTED
         self.__redis_util = None
         self.__redis_key_distributed_lock = None
         self.__redis_key_queue = None
         self.__redis_key_running = None
 
     def __init_redis(self):
-        if self.is_distributed or self.settings.getbool("USE_REDIS"):
+        if self.is_distributed or self.settings.USE_REDIS:
             self.__redis_util = RedisUtil(self.settings.redis_url)
-            self.__redis_key_distributed_lock = self.__get_redis_key("REDIS_KEY_LOCK")
-            self.__redis_key_queue = self.__get_redis_key("REDIS_KEY_QUEUE")
-            self.__redis_key_running = self.__get_redis_key("REDIS_KEY_RUNNING")
+            self.__redis_key_distributed_lock = self.__get_redis_key(
+                self.settings.REDIS_KEY_LOCK
+            )
+            self.__redis_key_queue = self.__get_redis_key(self.settings.REDIS_KEY_QUEUE)
+            self.__redis_key_running = self.__get_redis_key(
+                self.settings.REDIS_KEY_RUNNING
+            )
 
     def __get_redis_key(self, key: str) -> str:
-        redis_key_prefix = self.settings.get("REDIS_KEY_PREFIX")
-        redis_key = self.settings.get(key)
+        redis_key_prefix = self.settings.REDIS_KEY_PREFIX
         spider_name = StringUtil.camel_to_snake(self.spider.__class__.__name__)
-        return f"{redis_key_prefix}:{spider_name}:{redis_key}"
+        return f"{redis_key_prefix}:{spider_name}:{key}"
 
     def _get_downloader(self):
-        downloader_cls = load_class(self.settings.get("DOWNLOADER"))
+        downloader_cls = load_class(self.settings.DOWNLOADER)
         if not issubclass(downloader_cls, BaseDownloader):
             raise TypeError(
-                f"The downloader class ({self.settings.get('DOWNLOADER')}) "
+                f"The downloader class ({self.settings.DOWNLOADER}) "
                 f"does not fully implement required interface"
             )
         return downloader_cls
@@ -94,7 +95,7 @@ class Engine:
         self.start_requests_running = True
 
         self.logger.info(
-            f"spider started. (project name: {self.settings.get('PROJECT_NAME')})"
+            f"spider started. (project name: {self.settings.PROJECT_NAME})"
         )
         self.spider = spider
         self.__init_redis()
@@ -102,7 +103,7 @@ class Engine:
         if getattr(self.scheduler, "open"):
             self.scheduler.open()
 
-        downloader_cls = load_class(self.settings.get("DOWNLOADER"))
+        downloader_cls = load_class(self.settings.DOWNLOADER)
         self.downloader = downloader_cls(self.crawler)
         if getattr(self.downloader, "open"):
             await self.downloader.open()

@@ -35,27 +35,27 @@ class PlaywrightDownloader(BaseDownloader):
 
         self._use_stealth_js: Optional[bool] = None
         self._stealth_js_path: Optional[Path | str] = None
-        self.__rpa_headless = self.crawler.settings.get("RPA_HEADLESS")
-        self.__rpa_driver_type = self.crawler.settings.get("RPA_DRIVER_TYPE")
-        self.__rpa_user_agent = self.crawler.settings.get("RPA_USER_AGENT")
-        self.__rpa_timeout = self.crawler.settings.get("RPA_TIMEOUT")
-        self.__rpa_window_size = self.crawler.settings.get("RPA_WINDOW_SIZE")
-        self.__rpa_executable_path = self.crawler.settings.get("RPA_EXECUTABLE_PATH")
-        self.__rpa_download_path = self.crawler.settings.get("RPA_DOWNLOAD_PATH")
-        self.__rpa_render_time = self.crawler.settings.get("RPA_RENDER_TIME") or 0
-        self.__rpa_custom_argument = self.crawler.settings.get("RPA_CUSTOM_ARGUMENT")
-        self.__rpa_endpoint_url = self.crawler.settings.get("RPA_ENDPOINT_URL")
-        self.__rpa_slow_mo = self.crawler.settings.getfloat("RPA_SLOW_MO")
+        self.__rpa_headless = self.crawler.settings.RPA_HEADLESS
+        self.__rpa_driver_type = self.crawler.settings.RPA_DRIVER_TYPE
+        self.__rpa_user_agent = self.crawler.settings.RPA_USER_AGENT
+        self.__rpa_timeout = self.crawler.settings.REQUEST_TIMEOUT
+        self.__rpa_window_size = self.crawler.settings.RPA_WINDOW_SIZE
+        self.__rpa_executable_path = self.crawler.settings.RPA_EXECUTABLE_PATH
+        self.__rpa_download_path = self.crawler.settings.RPA_DOWNLOAD_PATH
+        self.__rpa_render_time = self.crawler.settings.RPA_RENDER_TIME or 0
+        self.__rpa_custom_argument = self.crawler.settings.RPA_CUSTOM_ARGUMENT
+        self.__rpa_endpoint_url = self.crawler.settings.RPA_ENDPOINT_URL
+        self.__rpa_slow_mo = self.crawler.settings.RPA_SLOW_MO
         self.__view_size: Optional[ViewportSize] = None
 
     async def open(self):
         await super().open()
 
-        self._timeout = self.crawler.settings.getfloat("REQUEST_TIMEOUT") * 1000
-        self._use_session = self.crawler.settings.getbool("USE_SESSION")
+        self._timeout = self.crawler.settings.REQUEST_TIMEOUT * 1000
+        self._use_session = self.crawler.settings.USE_SESSION
 
-        self._use_stealth_js = self.crawler.settings.getbool("RPA_USE_STEALTH_JS")
-        self._stealth_js_path = self.crawler.settings.get("RPA_STEALTH_JS_PATH")
+        self._use_stealth_js = self.crawler.settings.RPA_USE_STEALTH_JS
+        self._stealth_js_path = self.crawler.settings.RPA_STEALTH_JS_PATH
 
         self.__view_size = ViewportSize(
             width=self.__rpa_window_size[0], height=self.__rpa_window_size[1]

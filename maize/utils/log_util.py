@@ -9,7 +9,7 @@ from maize.utils.project_util import load_class
 
 
 if TYPE_CHECKING:
-    from maize.settings import SettingsManager
+    from maize.settings import SpiderSettings
 
 
 LOG_FORMAT = f"%(asctime)s [%(name)s] %(levelname)s: %(message)s"
@@ -21,7 +21,7 @@ class LoggerManager:
     @classmethod
     def get_logger(
         cls,
-        settings_manager: "SettingsManager",
+        spider_settings: "SpiderSettings",
         name: str = "default",
         log_level: Union[int, str] = None,
         log_format: str = LOG_FORMAT,
@@ -29,7 +29,7 @@ class LoggerManager:
         key = (name, log_level)
 
         def get_logger_handler():
-            logger_handler_path = settings_manager.get("LOGGER_HANDLER")
+            logger_handler_path = spider_settings.LOGGER_HANDLER
             if logger_handler_path:
                 logger_handler_cls = load_class(logger_handler_path)
                 return logger_handler_cls()

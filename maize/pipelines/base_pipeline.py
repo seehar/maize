@@ -5,11 +5,11 @@ from typing import List
 
 if TYPE_CHECKING:
     from maize import Item
-    from maize.settings.settings_manager import SettingsManager
+    from maize.settings.settings_manager import SpiderSettings
 
 
 class BasePipeline(metaclass=ABCMeta):
-    def __init__(self, settings: "SettingsManager"):
+    def __init__(self, settings: "SpiderSettings"):
         self.settings = settings
 
     async def open(self):

@@ -5,13 +5,13 @@ from typing import Optional
 from typing import Type
 from typing import Union
 
-from maize.settings.base_settings import BaseSettings
+from maize.settings.spider_settings import SpiderSettings
 
 
 class SettingsManager(MutableMapping):
     def __init__(self, values: Optional[dict] = None):
         self.attributes = {}
-        self.set_settings(BaseSettings)
+        self.set_settings(SpiderSettings)
         self.update_values(values)
 
     def __getitem__(self, item: str):
@@ -74,7 +74,7 @@ class SettingsManager(MutableMapping):
             got = got.split(",")
         return list(got)
 
-    def set_settings(self, module: Union[str, Type["BaseSettings"]]):
+    def set_settings(self, module: Union[str, Type["SpiderSettings"]]):
         if isinstance(module, str):
             from maize.utils.project_util import load_class
 

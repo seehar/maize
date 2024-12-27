@@ -9,7 +9,7 @@ from maize.downloader.base_downloader import BaseDownloader
 from maize.downloader.httpx_downloader import HTTPXDownloader
 from maize.pipelines.base_pipeline import BasePipeline
 from maize.pipelines.mysql_pipeline import MysqlPipeline
-from maize.settings.base_settings import BaseSettings
+from maize.settings.spider_settings import SpiderSettings
 from maize.spider.spider import Spider
 from maize.spider.task_spider import TaskSpider
 
@@ -25,7 +25,7 @@ __all__ = [
     "Item",
     "BasePipeline",
     "MysqlPipeline",
-    "BaseSettings",
+    "SpiderSettings",
     "Spider",
     "TaskSpider",
     "SpiderEntry",

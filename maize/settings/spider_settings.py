@@ -1,17 +1,24 @@
 """
 default config
 """
+from dataclasses import dataclass
+from dataclasses import field
 from pathlib import Path
 from typing import List
 from typing import Literal
 from typing import Optional
 from typing import Tuple
 
+from maize.common.model.base_model import BaseModel
+
 
 BASE_DIR = Path(__file__).parent.parent
 
 
-class BaseSettings:
+@dataclass
+class SpiderSettings(BaseModel):
+    PROJECT_NAME: str = "project name"
+
     # 并发数
     CONCURRENCY: int = 1
 
@@ -35,9 +42,9 @@ class BaseSettings:
     # 如果您使用自定义日志处理模块，此选项无效，请您在自定义日志处理模块中设置日志级别
     LOG_LEVEL: str = "INFO"
 
-    # # 日志 handler
-    # # 如不想使用默认的 logging 模块，可以自定义日志处理模块
-    # LOGGER_HANDLER: str = ""
+    # 日志 handler
+    # 如不想使用默认的 logging 模块，可以自定义日志处理模块
+    LOGGER_HANDLER: str = ""
 
     # 请求最大重试次数
     MAX_RETRY_COUNT: int = 0
@@ -70,7 +77,7 @@ class BaseSettings:
     # 数据管道，支持多个数据管道
     # maize.BasePipeline: 默认数据管道，不做任何处理
     # maize.MysqlPipeline: 集成 aiomysql 的数据管道，自动入库 mysql 数据库
-    ITEM_PIPELINES: List[str] = ["maize.BasePipeline"]
+    ITEM_PIPELINES: List[str] = field(default_factory=lambda: ["maize.BasePipeline"])
 
     # rpa
     # 使用使用 stealth js
@@ -85,29 +92,29 @@ class BaseSettings:
     RPA_DRIVER_TYPE: Literal["chromium", "firefox", "webkit"] = "chromium"
 
     # 请求头
-    RPA_USER_AGENT: Optional[str] = None
+    RPA_USER_AGENT: Optional[str] = field(default_factory=lambda: None)
 
-    # 窗口大小
-    RPA_WINDOW_SIZE: Tuple[int, int] = (1024, 800)
+    # # 窗口大小
+    RPA_WINDOW_SIZE: Tuple[int, int] = field(default_factory=lambda: (1024, 800))
 
     # 浏览器路径，默认为默认路径
-    RPA_EXECUTABLE_PATH: Optional[str] = None
+    RPA_EXECUTABLE_PATH: Optional[str] = field(default_factory=lambda: None)
 
     # 下载文件的路径
-    RPA_DOWNLOAD_PATH: Optional[str] = None
+    RPA_DOWNLOAD_PATH: Optional[str] = field(default_factory=lambda: None)
 
     # 渲染时长，即打开网页等待指定时间后再获取源码
-    RPA_RENDER_TIME: Optional[int] = None
+    RPA_RENDER_TIME: Optional[int] = field(default_factory=lambda: None)
 
     # 自定义浏览器渲染参数
-    RPA_CUSTOM_ARGUMENT: List[str] = []
+    RPA_CUSTOM_ARGUMENT: List[str] = field(default_factory=lambda: [])
 
     # 要连接的 CDP websocket 端点或 http url。例如 `http://localhost:9222/` 或
     # `ws://127.0.0.1:9222/devtools/browser/387adf4c-243f-4051-a181-46798f4a46f4`.
-    RPA_ENDPOINT_URL: Optional[str] = None
+    RPA_ENDPOINT_URL: Optional[str] = field(default_factory=lambda: None)
 
     # 将 RPA 操作减慢指定的毫秒数。很有用，这样您就可以看到发生了什么。默认为0。
-    RPA_SLOW_MO: Optional[float] = None
+    RPA_SLOW_MO: Optional[float] = field(default_factory=lambda: None)
 
     # 是否使用分布式爬虫，开启后，需要对 redis 进行配置
     IS_DISTRIBUTED: bool = False
@@ -117,26 +124,36 @@ class BaseSettings:
     REDIS_HOST: str = "localhost"
     REDIS_PORT: int = 6379
     REDIS_DB: int = 0
-    REDIS_USERNAME: Optional[str] = None
-    REDIS_PASSWORD: Optional[str] = None
+    REDIS_USERNAME: Optional[str] = field(default_factory=lambda: None)
+    REDIS_PASSWORD: Optional[str] = field(default_factory=lambda: None)
 
     REDIS_KEY_PREFIX: str = "maize"
     REDIS_KEY_LOCK: str = "lock"
     REDIS_KEY_RUNNING: str = "running"
     REDIS_KEY_QUEUE: str = "queue"
 
-    # # 隧道代理，示例：xxx.xxx:2132。注意：不包含 http:// 或 https://
-    # PROXY_TUNNEL: str = ""
-    #
-    # # 隧道代理用户名
-    # PROXY_TUNNEL_USERNAME: str = ""
-    #
-    # # 隧道代理密码
-    # PROXY_TUNNEL_PASSWORD: str = ""
+    # 隧道代理，示例：xxx.xxx:2132。注意：不包含 http:// 或 https://
+    PROXY_TUNNEL: str = ""
 
-    # # mysql数据库配置
-    # MYSQL_HOST: str = "localhost"
-    # MYSQL_PORT: str | int = 3306
-    # MYSQL_DB: str = ""
-    # MYSQL_USER: str = ""
-    # MYSQL_PASSWORD: str = ""
+    # 隧道代理用户名
+    PROXY_TUNNEL_USERNAME: str = ""
+
+    # 隧道代理密码
+    PROXY_TUNNEL_PASSWORD: str = ""
+
+    # mysql数据库配置
+    MYSQL_HOST: str = "localhost"
+    MYSQL_PORT: str | int = 3306
+    MYSQL_DB: str = ""
+    MYSQL_USER: str = ""
+    MYSQL_PASSWORD: str = ""
+
+    @property
+    def redis_url(self):
+        redis_url_username_password = ""
+        if self.REDIS_USERNAME or self.REDIS_PASSWORD:
+            redis_url_username_password = (
+                f"{self.REDIS_USERNAME or ''}:{self.REDIS_PASSWORD or ''}@"
+            )
+
+        return f"redis://{redis_url_username_password}{self.REDIS_HOST}:{self.REDIS_PORT}/{self.REDIS_DB}"

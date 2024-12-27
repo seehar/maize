@@ -5,11 +5,9 @@ from typing import TYPE_CHECKING
 from typing import Callable
 from typing import Union
 
-from maize.settings import SettingsManager
-
 
 if TYPE_CHECKING:
-    from maize.spider.spider import Spider
+    from maize.settings import SpiderSettings
 
 
 def _get_closest(path: str = ".") -> str:
@@ -33,31 +31,15 @@ def _init_env():
 
 
 def get_settings(
-    settings: str = "maize.BaseSettings",
-) -> SettingsManager:
+    settings: str = "maize.SpiderSettings",
+) -> "SpiderSettings":
     """
     获取settings配置文件
     :param settings:
     :return:
     """
-    _settings = SettingsManager()
     _init_env()
-    _settings.set_settings(settings)
-    return _settings
-
-
-def merge_settings(spider: "Spider", settings: SettingsManager):
-    """
-    合并配置文件
-
-    @type spider: Spider
-    :param spider:
-    :param settings:
-    @return:
-    """
-    if hasattr(spider, "custom_settings"):
-        custom_settings = getattr(spider, "custom_settings")
-        settings.update_values(custom_settings)
+    return load_class(settings)()
 
 
 def load_class(_path: Union[str, Callable]):

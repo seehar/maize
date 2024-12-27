@@ -50,10 +50,10 @@ class BaseDownloader(metaclass=DownloaderMeta):
     def __init__(self, crawler: "Crawler"):
         self.crawler = crawler
         self._active = ActiveRequestManager()
-        self._max_retry_count: int = self.crawler.settings.getint("MAX_RETRY_COUNT")
+        self._max_retry_count: int = self.crawler.settings.MAX_RETRY_COUNT
 
         self.logger = get_logger(
-            crawler.settings, self.__class__.__name__, crawler.settings.get("LOG_LEVEL")
+            crawler.settings, self.__class__.__name__, crawler.settings.LOG_LEVEL
         )
 
     @classmethod
@@ -63,7 +63,7 @@ class BaseDownloader(metaclass=DownloaderMeta):
     async def open(self):
         self.logger.info(
             f"{self.crawler.spider} <downloader class: {type(self).__name__}> "
-            f"<concurrency: {self.crawler.settings.getint('CONCURRENCY')}>"
+            f"<concurrency: {self.crawler.settings.CONCURRENCY}>"
         )
 
     async def fetch(self, request: Request) -> Optional[Union[Response, Request]]:

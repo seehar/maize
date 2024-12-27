@@ -4,6 +4,7 @@ from maize import Spider
 class BaiduSpider(Spider):
     start_url = "http://www.baidu.com"
     custom_settings = {
+        "PROJECT_NAME": "百度爬虫",
         "USE_REDIS": True,
         "REDIS_HOST": "192.168.137.219",
         "REDIS_PORT": 6379,

@@ -6,20 +6,20 @@ from maize.core.engine import Engine
 from maize.exceptions.spider_exception import SpiderTypeException
 from maize.utils.log_util import get_logger
 from maize.utils.project_util import get_settings
-from maize.utils.project_util import merge_settings
 
 
 if typing.TYPE_CHECKING:
-    from maize.settings import SettingsManager
+    from maize.settings import SpiderSettings
     from maize.spider.spider import Spider
 
 
 class Crawler:
-    def __init__(self, spider_cls: "Spider", settings: "SettingsManager"):
+    def __init__(self, spider_cls: "Spider", settings: "SpiderSettings"):
         self.spider_cls = spider_cls
         self.spider: typing.Optional["Spider"] = None
         self.engine: typing.Optional[Engine] = None
-        self.settings: "SettingsManager" = settings.copy()
+        # self.settings: "SpiderSettings" = settings.copy()
+        self.settings: "SpiderSettings" = settings
 
     async def crawl(self):
         self.spider = self._create_spider()
@@ -48,7 +48,13 @@ class Crawler:
         :param spider: Spider类
         :return:
         """
-        merge_settings(spider=spider, settings=self.settings)
+        try:
+            custom_settings = getattr(spider, "custom_settings")
+        except AttributeError:
+            custom_settings = None
+
+        if custom_settings:
+            self.settings.update_from_dict(custom_settings)
 
 
 class CrawlerProcess:
@@ -58,19 +64,19 @@ class CrawlerProcess:
 
     def __init__(
         self,
-        settings: typing.Optional["SettingsManager"] = None,
+        settings: typing.Optional["SpiderSettings"] = None,
         settings_path: typing.Optional[str] = "settings.Settings",
     ):
         self.crawlers: typing.Final[set[Crawler]] = set()
         self._active: typing.Final[set] = set()
-        self.settings: "SettingsManager" = (
+        self.settings: "SpiderSettings" = (
             settings if settings else self.__get_settings(settings_path)
         )
 
         self.logger = get_logger(self.settings, self.__class__.__name__)
 
     @staticmethod
-    def __get_settings(settings_path: typing.Optional[str]) -> "SettingsManager":
+    def __get_settings(settings_path: typing.Optional[str]) -> "SpiderSettings":
         """
         获取配置
         :param settings_path:

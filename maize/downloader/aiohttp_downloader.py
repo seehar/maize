@@ -35,14 +35,14 @@ class AioHttpDownloader(BaseDownloader):
     async def open(self):
         await super().open()
 
-        request_timeout = self.crawler.settings.getint("REQUEST_TIMEOUT")
+        request_timeout = self.crawler.settings.REQUEST_TIMEOUT
         self._timeout = ClientTimeout(total=request_timeout)
-        self._verify_ssl = self.crawler.settings.getbool("VERIFY_SSL")
-        self._use_session = self.crawler.settings.getbool("USE_SESSION")
+        self._verify_ssl = self.crawler.settings.VERIFY_SSL
+        self._use_session = self.crawler.settings.USE_SESSION
 
-        self.proxy_tunnel = self.crawler.settings.get("PROXY_TUNNEL")
-        proxy_tunnel_username = self.crawler.settings.get("PROXY_TUNNEL_USERNAME")
-        proxy_tunnel_password = self.crawler.settings.get("PROXY_TUNNEL_PASSWORD")
+        self.proxy_tunnel = self.crawler.settings.PROXY_TUNNEL
+        proxy_tunnel_username = self.crawler.settings.PROXY_TUNNEL_USERNAME
+        proxy_tunnel_password = self.crawler.settings.PROXY_TUNNEL_PASSWORD
         if proxy_tunnel_username and proxy_tunnel_password:
             self.proxy_auth = BasicAuth(proxy_tunnel_username, proxy_tunnel_password)
 

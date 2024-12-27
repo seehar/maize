@@ -71,10 +71,10 @@
 
 === "settings.py"
     ```python
-    from maize import BaseSettings
+    from maize import SpiderSettings
 
 
-    class Settings(BaseSettings):
+    class Settings(SpiderSettings):
         PROJECT_NAME = "baidu_spider"
         CONCURRENCY = 1
         LOG_LEVEL = "DEBUG"

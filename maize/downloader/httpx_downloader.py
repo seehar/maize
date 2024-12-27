@@ -21,11 +21,11 @@ class HTTPXDownloader(BaseDownloader):
 
     async def open(self):
         await super().open()
-        request_timeout = self.crawler.settings.getint("REQUEST_TIMEOUT")
+        request_timeout = self.crawler.settings.REQUEST_TIMEOUT
 
-        proxy_tunnel = self.crawler.settings.get("PROXY_TUNNEL")
-        proxy_tunnel_username = self.crawler.settings.get("PROXY_TUNNEL_USERNAME")
-        proxy_tunnel_password = self.crawler.settings.get("PROXY_TUNNEL_PASSWORD")
+        proxy_tunnel = self.crawler.settings.PROXY_TUNNEL
+        proxy_tunnel_username = self.crawler.settings.PROXY_TUNNEL_USERNAME
+        proxy_tunnel_password = self.crawler.settings.PROXY_TUNNEL_PASSWORD
         if proxy_tunnel and proxy_tunnel_username and proxy_tunnel_password:
             proxy_url = f"http://{proxy_tunnel_username}:{proxy_tunnel_password}@{proxy_tunnel}/"
             self.httpx_proxy = Proxy(url=proxy_url)
@@ -43,7 +43,7 @@ class HTTPXDownloader(BaseDownloader):
         try:
             proxies = self._get_proxy(request)
             async with httpx.AsyncClient(
-                timeout=self._timeout, proxies=proxies
+                timeout=self._timeout, proxy=proxies
             ) as client:
                 self.logger.debug(
                     rf"request downloading: {request.url}, method: {request.method}"
