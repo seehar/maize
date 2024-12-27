@@ -1,19 +1,17 @@
-import asyncio
 import typing
 
 from playwright.async_api import Page
 
-from maize import CrawlerProcess
 from maize import Request
 from maize import Response
 from maize import Spider
-from maize.utils import CookieUtil
 
 
 class RpaJdSpider(Spider):
     custom_settings = {
         "CONCURRENCY": 1,
         "DOWNLOADER": "maize.downloader.playwright_downloader.PlaywrightDownloader",
+        # .\chrome.exe --remote-debugging-port=9222
         "RPA_ENDPOINT_URL": "http://localhost:9222",
         "USE_SESSION": False,
         "RPA_DRIVER_TYPE": "chromium",
@@ -28,11 +26,5 @@ class RpaJdSpider(Spider):
         print(response.text)
 
 
-async def main():
-    process = CrawlerProcess()
-    await process.crawl(RpaJdSpider)
-    await process.start()
-
-
 if __name__ == "__main__":
-    asyncio.run(main())
+    RpaJdSpider().run()
