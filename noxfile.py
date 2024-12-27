@@ -6,5 +6,5 @@ def pytest(session):
     session.log(f"My python is {session.python}")
     session.install("poetry")
     session.run_always("poetry", "install", "--no-root", external=True)
-    session.run("poetry", "install", "--no-root")
+    session.run("poetry", "install", "--all-extras", "--no-root")
     session.run("poetry", "run", "pytest", "-s")
