@@ -2,7 +2,7 @@ import asyncio
 import logging
 import typing
 
-from maize.core.engine import Engine
+from maize.core.async_engine import AsyncEngine
 from maize.exceptions.spider_exception import SpiderTypeException
 from maize.utils.log_util import get_logger
 from maize.utils.project_util import get_settings
@@ -17,7 +17,7 @@ class Crawler:
     def __init__(self, spider_cls: "Spider", settings: "SpiderSettings"):
         self.spider_cls = spider_cls
         self.spider: typing.Optional["Spider"] = None
-        self.engine: typing.Optional[Engine] = None
+        self.engine: typing.Optional[AsyncEngine] = None
         # self.settings: "SpiderSettings" = settings.copy()
         self.settings: "SpiderSettings" = settings
 
@@ -40,7 +40,7 @@ class Crawler:
         return spider
 
     def _create_engine(self):
-        return Engine(self)
+        return AsyncEngine(self)
 
     def _set_spider(self, spider: "Spider"):
         """
