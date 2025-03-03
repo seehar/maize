@@ -18,7 +18,6 @@ class Crawler:
         self.spider_cls = spider_cls
         self.spider: typing.Optional["Spider"] = None
         self.engine: typing.Optional[Engine] = None
-        # self.settings: "SpiderSettings" = settings.copy()
         self.settings: "SpiderSettings" = settings
 
     async def crawl(self):

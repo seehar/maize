@@ -1,7 +1,7 @@
 from typing import TYPE_CHECKING
 from typing import List
 
-from maize import MysqlPipeline
+from maize.pipelines.mysql_pipeline import MysqlPipeline
 
 
 if TYPE_CHECKING:

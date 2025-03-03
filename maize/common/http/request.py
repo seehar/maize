@@ -110,5 +110,4 @@ class Request:
         }
 
     async def get_headers(self) -> dict:
-        print("------------------")
         return await self.headers_func() if self.headers_func else self.headers

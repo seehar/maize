@@ -6,6 +6,9 @@ from maize import Spider
 
 class BaiduSpider(Spider):
     start_urls = ["http://www.baidu.com"]
+    custom_settings = {
+        "LOGGER_HANDLER": "examples.baidu_spider.logger_util.InterceptHandler"
+    }
 
     async def parse(self, response: Response):
         li_list = response.xpath("//li[contains(@class, 'hotsearch-item')]")

@@ -1,4 +1,5 @@
 import asyncio
+import typing
 from typing import TYPE_CHECKING
 from typing import Any
 from typing import AsyncGenerator
@@ -12,6 +13,7 @@ from maize.core.crawler import CrawlerProcess
 
 if TYPE_CHECKING:
     from maize.core.crawler import Crawler
+    from maize.settings import SpiderSettings
 
 
 class Spider:
@@ -59,12 +61,29 @@ class Spider:
     async def parse(self, response: Response):
         raise NotImplementedError
 
-    async def _async_run(self):
-        process = CrawlerProcess()
+    async def _async_run(
+        self,
+        settings: typing.Optional["SpiderSettings"] = None,
+        settings_path: typing.Optional[str] = "settings.Settings",
+    ):
+        process = CrawlerProcess(settings=settings, settings_path=settings_path)
         await process.crawl(self)
         await process.start()
 
-    def run(self):
+    def run(
+        self,
+        settings: typing.Optional["SpiderSettings"] = None,
+        settings_path: typing.Optional[str] = "settings.Settings",
+    ):
+        """
+        启动爬虫
+
+        @param settings: 配置文件实例，需要继承 SpiderSettings，也就是需要传入一个 SpiderSettings 实例。优先级高于 settings_path
+        @param settings_path: 配置文件路径，需要写到类名，默认：settings.Settings
+        @return:
+        """
         loop = asyncio.new_event_loop()
         asyncio.set_event_loop(loop)
-        loop.run_until_complete(self._async_run())
+        loop.run_until_complete(
+            self._async_run(settings=settings, settings_path=settings_path)
+        )
