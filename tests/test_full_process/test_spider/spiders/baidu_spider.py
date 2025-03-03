@@ -18,11 +18,21 @@ class BaiduSpider(Spider):
     async def close(self):
         print("custom close")
 
+    @staticmethod
+    async def get_headers():
+        return {
+            "Accept": "*/*",
+            "Connection": "close",
+            "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/127.0.0.0 Safari/537.36",
+        }
+
     async def parse(self, response: "Response"):
         print(f"parse: {response}")
         for i in range(1):
             url = "http://www.baidu.com"
-            yield Request(url=url, callback=self.parse_page)
+            yield Request(
+                url=url, callback=self.parse_page, headers_func=self.get_headers
+            )
 
     @staticmethod
     async def parse_page(response: "Response"):

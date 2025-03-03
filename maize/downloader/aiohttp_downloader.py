@@ -103,13 +103,14 @@ class AioHttpDownloader(BaseDownloader):
         else:
             proxy_auth = self.proxy_auth
 
+        headers = await request.get_headers()
         return await session.request(
             method=request.method,
             url=request.url,
             params=request.params,
             data=request.data,
             json=request.json,
-            headers=request.headers,
+            headers=headers,
             cookies=request.cookies,
             proxy=request.proxy or self.proxy_tunnel,
             proxy_auth=proxy_auth,

@@ -13,6 +13,9 @@ class Request:
         callback: typing.Optional[typing.Callable] = None,
         priority: int = 0,
         headers: typing.Optional[dict] = None,
+        headers_func: typing.Optional[
+            typing.Callable[[], typing.Awaitable[dict]]
+        ] = None,
         params: typing.Optional[dict] = None,
         data: typing.Optional[dict | str] = None,
         json: typing.Optional[dict] = None,
@@ -46,6 +49,7 @@ class Request:
         self.callback = callback
         self.priority = priority
         self.headers = headers
+        self.headers_func = headers_func
         self.params = params
         self.data = data
         self.json = json
@@ -104,3 +108,7 @@ class Request:
             "proxy_username": self.proxy_username,
             "proxy_password": self.proxy_password,
         }
+
+    async def get_headers(self) -> dict:
+        print("------------------")
+        return await self.headers_func() if self.headers_func else self.headers

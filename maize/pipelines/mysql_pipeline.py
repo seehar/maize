@@ -3,8 +3,8 @@ from typing import List
 from typing import Optional
 
 from maize.pipelines.base_pipeline import BasePipeline
-from maize.utils import MysqlSingletonUtil
 from maize.utils.log_util import get_logger
+from maize.utils.mysql_util import MysqlSingletonUtil
 
 
 if TYPE_CHECKING:

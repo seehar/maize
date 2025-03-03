@@ -19,7 +19,12 @@ from maize.core.processor import Processor
 from maize.core.scheduler import Scheduler
 from maize.core.task_manager import TaskManager
 from maize.exceptions.spider_exception import OutputException
-from maize.utils import RedisUtil
+
+
+try:
+    from maize.utils.redis_util import RedisUtil
+except Exception:
+    pass
 from maize.utils.log_util import get_logger
 from maize.utils.project_util import load_class
 from maize.utils.spider_util import transform

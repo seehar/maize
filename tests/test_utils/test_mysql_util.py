@@ -1,6 +1,6 @@
 import pytest
 
-from maize.utils import MysqlUtil
+from maize.utils.mysql_util import MysqlUtil
 
 
 @pytest.skip(reason="mysql test", allow_module_level=True)

@@ -1,6 +1,6 @@
 import pytest
 
-from maize.utils import RedisUtil
+from maize.utils.redis_util import RedisUtil
 
 
 @pytest.skip(reason="redis test", allow_module_level=True)

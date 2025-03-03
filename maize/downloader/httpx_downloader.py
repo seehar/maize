@@ -48,10 +48,11 @@ class HTTPXDownloader(BaseDownloader):
                 self.logger.debug(
                     rf"request downloading: {request.url}, method: {request.method}"
                 )
+                headers = await request.get_headers()
                 response = await client.request(
                     request.method,
                     request.url,
-                    headers=request.headers,
+                    headers=headers,
                     data=request.data,
                     json=request.json,
                     params=request.params,
