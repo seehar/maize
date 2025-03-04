@@ -58,7 +58,7 @@ class AioHttpDownloader(BaseDownloader):
 
     async def download(
         self, request: Request
-    ) -> typing.Optional[typing.Union[Response, Request]]:
+    ) -> typing.Optional[typing.Union[Response[None, ClientResponse], Request]]:
         try:
             if self._use_session:
                 response = await self.send_request(self.session, request)
@@ -86,13 +86,14 @@ class AioHttpDownloader(BaseDownloader):
     @staticmethod
     def structure_response(
         request: Request, response: ClientResponse, body: bytes
-    ) -> Response:
-        return Response(
+    ) -> Response[None, ClientResponse]:
+        return Response[None, ClientResponse](
             url=request.url,
             headers=dict(response.headers),
             status=response.status,
             body=body,
             request=request,
+            source_response=response,
         )
 
     async def send_request(

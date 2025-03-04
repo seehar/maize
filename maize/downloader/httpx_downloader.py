@@ -79,11 +79,12 @@ class HTTPXDownloader(BaseDownloader):
     @staticmethod
     def structure_response(
         request: Request, response: httpx.Response, body: bytes
-    ) -> Response:
-        return Response(
+    ) -> Response[None, httpx.Response]:
+        return Response[None, httpx.Response](
             url=request.url,
             headers=dict(response.headers),
             status=response.status_code,
             body=body,
             request=request,
+            source_response=response,
         )

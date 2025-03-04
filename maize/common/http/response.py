@@ -22,9 +22,10 @@ if TYPE_CHECKING:
     from maize.common.http.request import Request
 
 Driver = TypeVar("Driver")
+R = TypeVar("R")
 
 
-class Response(Generic[Driver]):
+class Response(Generic[Driver, R]):
     def __init__(
         self,
         url: str,
@@ -36,9 +37,11 @@ class Response(Generic[Driver]):
         status: int = 200,
         cookie_list: Optional[List[Dict[str, Union[str, bool]]]] = None,
         driver: Optional[Driver] = None,
+        source_response: Optional[R] = None,
     ):
         """
         响应
+
         :param url: url
         :param headers: 响应头
         :param request: 请求 Request
@@ -47,6 +50,7 @@ class Response(Generic[Driver]):
         :param status: 响应状态码，如 200
         :param cookie_list: cookie 列表
         :param driver:
+        :param source_response: 原始响应，如下载器是 httpx，则为 httpx.Response 类型的实例。rpa 爬虫时，该字段为 None
         """
         self.url = url
         self.request = request
@@ -61,6 +65,7 @@ class Response(Generic[Driver]):
         self._selector: Optional[Selector] = None
 
         self.driver = driver
+        self.source_response = source_response
 
     def __str__(self):
         return f"<{self.status}> {self.url}"
