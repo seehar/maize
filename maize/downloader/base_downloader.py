@@ -1,3 +1,4 @@
+import asyncio
 from abc import ABCMeta
 from abc import abstractmethod
 from contextlib import asynccontextmanager
@@ -119,3 +120,11 @@ class BaseDownloader(metaclass=DownloaderMeta):
         :param request:
         :return:
         """
+
+    async def random_wait(self):
+        """
+        随机等待
+
+        :return:
+        """
+        await asyncio.sleep(*self.crawler.settings.RANDOM_WAIT_TIME)

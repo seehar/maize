@@ -28,6 +28,9 @@ class SpiderSettings(BaseModel):
     # 请求超时时间，单位：秒
     REQUEST_TIMEOUT: int = 60
 
+    # 随机等待时间，单位：秒
+    RANDOM_WAIT_TIME: Tuple[int, int] = (0, 0)
+
     # 是否使用 session
     # 注意：基于 httpx 的下载器（HTTPXDownloader）不支持 session，所以此选项无效
     USE_SESSION: bool = True

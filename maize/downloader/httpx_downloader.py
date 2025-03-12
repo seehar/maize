@@ -40,6 +40,7 @@ class HTTPXDownloader(BaseDownloader):
             return await self.download(request)
 
     async def download(self, request: Request) -> typing.Optional[Response]:
+        await self.random_wait()
         try:
             proxies = self._get_proxy(request)
             async with httpx.AsyncClient(

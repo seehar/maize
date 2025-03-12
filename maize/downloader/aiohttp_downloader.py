@@ -59,6 +59,7 @@ class AioHttpDownloader(BaseDownloader):
     async def download(
         self, request: Request
     ) -> typing.Optional[typing.Union[Response[None, ClientResponse], Request]]:
+        await self.random_wait()
         try:
             if self._use_session:
                 response = await self.send_request(self.session, request)
