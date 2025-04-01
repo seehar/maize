@@ -43,12 +43,8 @@ class HTTPXDownloader(BaseDownloader):
         await self.random_wait()
         try:
             proxies = self._get_proxy(request)
-            async with httpx.AsyncClient(
-                timeout=self._timeout, proxy=proxies
-            ) as client:
-                self.logger.debug(
-                    rf"request downloading: {request.url}, method: {request.method}"
-                )
+            async with httpx.AsyncClient(timeout=self._timeout, proxy=proxies) as client:
+                self.logger.debug(rf"request downloading: {request.url}, method: {request.method}")
                 headers = await request.get_headers()
                 response = await client.request(
                     request.method,
@@ -78,9 +74,7 @@ class HTTPXDownloader(BaseDownloader):
         return Proxy(url=proxy_url)
 
     @staticmethod
-    def structure_response(
-        request: Request, response: httpx.Response, body: bytes
-    ) -> Response[None, httpx.Response]:
+    def structure_response(request: Request, response: httpx.Response, body: bytes) -> Response[None, httpx.Response]:
         return Response[None, httpx.Response](
             url=request.url,
             headers=dict(response.headers),

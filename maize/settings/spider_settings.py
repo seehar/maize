@@ -122,6 +122,12 @@ class SpiderSettings(BaseModel):
     # 是否使用分布式爬虫，开启后，需要对 redis 进行配置
     IS_DISTRIBUTED: bool = False
 
+    # 拦截 xhr 接口，支持正则，数组类型
+    RPA_URL_REGEXES: List[str] = field(default_factory=lambda: [])
+
+    # 是否保存所有拦截的接口, 配合 url_regexes 使用，为 False 时只保存最后一次拦截的接口
+    RPA_URL_REGEXES_SAVE_ALL: bool = False
+
     # redis
     USE_REDIS: bool = False
     REDIS_HOST: str = "localhost"
@@ -155,8 +161,6 @@ class SpiderSettings(BaseModel):
     def redis_url(self):
         redis_url_username_password = ""
         if self.REDIS_USERNAME or self.REDIS_PASSWORD:
-            redis_url_username_password = (
-                f"{self.REDIS_USERNAME or ''}:{self.REDIS_PASSWORD or ''}@"
-            )
+            redis_url_username_password = f"{self.REDIS_USERNAME or ''}:{self.REDIS_PASSWORD or ''}@"
 
         return f"redis://{redis_url_username_password}{self.REDIS_HOST}:{self.REDIS_PORT}/{self.REDIS_DB}"

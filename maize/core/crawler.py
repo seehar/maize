@@ -68,9 +68,7 @@ class CrawlerProcess:
     ):
         self.crawlers: typing.Final[set[Crawler]] = set()
         self._active: typing.Final[set] = set()
-        self.settings: "SpiderSettings" = (
-            settings if settings else self.__get_settings(settings_path)
-        )
+        self.settings: "SpiderSettings" = settings if settings else self.__get_settings(settings_path)
 
         self.logger = get_logger(self.settings, self.__class__.__name__)
 
@@ -114,8 +112,6 @@ class CrawlerProcess:
 
     def _create_crawler(self, spider_cls: "Spider") -> Crawler:
         if isinstance(spider_cls, str):
-            raise SpiderTypeException(
-                f"{type(self)}.crawl args: String is not supported"
-            )
+            raise SpiderTypeException(f"{type(self)}.crawl args: String is not supported")
 
         return Crawler(spider_cls, self.settings)

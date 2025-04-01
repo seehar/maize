@@ -85,9 +85,7 @@ class AioHttpDownloader(BaseDownloader):
         return self.structure_response(request, response, body)
 
     @staticmethod
-    def structure_response(
-        request: Request, response: ClientResponse, body: bytes
-    ) -> Response[None, ClientResponse]:
+    def structure_response(request: Request, response: ClientResponse, body: bytes) -> Response[None, ClientResponse]:
         return Response[None, ClientResponse](
             url=request.url,
             headers=dict(response.headers),
@@ -97,9 +95,7 @@ class AioHttpDownloader(BaseDownloader):
             source_response=response,
         )
 
-    async def send_request(
-        self, session: ClientSession, request: Request
-    ) -> ClientResponse:
+    async def send_request(self, session: ClientSession, request: Request) -> ClientResponse:
         if request.proxy_username and request.proxy_password:
             proxy_auth = BasicAuth(request.proxy_username, request.proxy_password)
         else:
@@ -118,12 +114,8 @@ class AioHttpDownloader(BaseDownloader):
             proxy_auth=proxy_auth,
         )
 
-    async def request_start(
-        self, _session, _trace_config_ctx, params: TraceRequestStartParams
-    ):
-        self.logger.debug(
-            rf"request downloading: {params.url}, method: {params.method}"
-        )
+    async def request_start(self, _session, _trace_config_ctx, params: TraceRequestStartParams):
+        self.logger.debug(rf"request downloading: {params.url}, method: {params.method}")
 
     async def close(self):
         await super().close()

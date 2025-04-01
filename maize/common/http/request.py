@@ -13,9 +13,7 @@ class Request:
         callback: typing.Optional[typing.Callable] = None,
         priority: int = 0,
         headers: typing.Optional[dict] = None,
-        headers_func: typing.Optional[
-            typing.Callable[[], typing.Awaitable[dict]]
-        ] = None,
+        headers_func: typing.Optional[typing.Callable[[], typing.Awaitable[dict]]] = None,
         params: typing.Optional[dict] = None,
         data: typing.Optional[dict | str] = None,
         json: typing.Optional[dict] = None,

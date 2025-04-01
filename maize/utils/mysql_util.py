@@ -51,9 +51,7 @@ class MysqlUtil:
             pool_recycle=self.pool_recycle,
         )
 
-    async def fetchone(
-        self, sql: str, args: Optional[Union[list, tuple]] = None
-    ) -> Dict[str, Any]:
+    async def fetchone(self, sql: str, args: Optional[Union[list, tuple]] = None) -> Dict[str, Any]:
         """
         查询单条数据
         :param sql: sql 语句
@@ -65,9 +63,7 @@ class MysqlUtil:
                 await cur.execute(sql, args)
                 return await cur.fetchone()
 
-    async def fetchall(
-        self, sql: str, args: Optional[Union[list, tuple]] = None
-    ) -> List[Dict[str, Any]]:
+    async def fetchall(self, sql: str, args: Optional[Union[list, tuple]] = None) -> List[Dict[str, Any]]:
         """
         查询多条数据
         :param sql: sql 语句
@@ -96,9 +92,7 @@ class MysqlUtil:
                     await conn.rollback()
                     raise e
 
-    async def executemany(
-        self, sql: str, args: Optional[Union[list, tuple]] = None
-    ) -> int:
+    async def executemany(self, sql: str, args: Optional[Union[list, tuple]] = None) -> int:
         """
         批量执行增删改操作
         :param sql: sql 语句

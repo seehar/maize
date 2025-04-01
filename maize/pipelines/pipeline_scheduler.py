@@ -35,9 +35,7 @@ class PipelineScheduler:
         self.error_item_max_retry_count = settings.ERROR_ITEM_MAX_RETRY_COUNT
         error_item_max_cache_count = settings.ERROR_ITEM_MAX_CACHE_COUNT
         self.error_item_retry_batch_max_size = settings.ERROR_ITEM_RETRY_BATCH_MAX_SIZE
-        self.error_item_handle_batch_max_size = (
-            settings.ERROR_ITEM_HANDLE_BATCH_MAX_SIZE
-        )
+        self.error_item_handle_batch_max_size = settings.ERROR_ITEM_HANDLE_BATCH_MAX_SIZE
         self.error_item_handle_interval = settings.ERROR_ITEM_HANDLE_INTERVAL
         self.error_item_queue = Queue(maxsize=error_item_max_cache_count)
         self._error_last_handle_item_time = 0
@@ -83,9 +81,7 @@ class PipelineScheduler:
     async def process(self, item: "Item"):
         await self.item_queue.put(item)
         current_time = int(time.time())
-        if (
-            (current_time - self.item_handle_interval) > self._last_handle_item_time
-        ) or self.item_queue.full():
+        if ((current_time - self.item_handle_interval) > self._last_handle_item_time) or self.item_queue.full():
             self._last_handle_item_time = current_time
             await self._process_item()
             await self.process_retry_items()
@@ -184,9 +180,7 @@ class PipelineScheduler:
     async def _enqueue_retry_items(self, items: List["Item"]) -> None:
         for item in items:
             if item.__retry_count__ >= self.error_item_max_retry_count:
-                self.logger.warning(
-                    f"超过重试次数({item.__retry_count__}/{self.error_item_max_retry_count}) item: {item}"
-                )
+                self.logger.warning(f"超过重试次数({item.__retry_count__}/{self.error_item_max_retry_count}) item: {item}")
                 await self.error_item_queue.put(item)
             else:
                 await self.retry_item_queue.put(item)

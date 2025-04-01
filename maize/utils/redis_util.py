@@ -74,9 +74,7 @@ class RedisUtil:
         :param keepttl: 如果为 True，则保留与密钥相关的存活时间。
         :return:
         """
-        return await self._redis.set(
-            name=name, value=value, ex=ex, px=px, nx=nx, xx=xx, keepttl=keepttl
-        )
+        return await self._redis.set(name=name, value=value, ex=ex, px=px, nx=nx, xx=xx, keepttl=keepttl)
 
     async def nx_set(
         self,

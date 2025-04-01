@@ -24,9 +24,7 @@ class TestSpiderSettings:
         class CustomSpiderSettings(SpiderSettings):
             CONCURRENCY: int = 5
             DOWNLOADER: str = "custom.Downloader"
-            ITEM_PIPELINES: list = field(
-                default_factory=lambda: ["custom.Pipeline1", "custom.Pipeline2"]
-            )
+            ITEM_PIPELINES: list = field(default_factory=lambda: ["custom.Pipeline1", "custom.Pipeline2"])
 
         custom_spider_settings = CustomSpiderSettings()
         assert custom_spider_settings.CONCURRENCY == 5
@@ -36,9 +34,7 @@ class TestSpiderSettings:
         class CustomSpiderSettings(SpiderSettings):
             CONCURRENCY: int = 5
             DOWNLOADER: str = "custom.Downloader"
-            ITEM_PIPELINES: list = field(
-                default_factory=lambda: ["custom.Pipeline1", "custom.Pipeline2"]
-            )
+            ITEM_PIPELINES: list = field(default_factory=lambda: ["custom.Pipeline1", "custom.Pipeline2"])
 
         custom_spider_settings = CustomSpiderSettings()
         assert custom_spider_settings.CONCURRENCY == 5

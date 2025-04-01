@@ -73,13 +73,9 @@ class Engine:
     def __init_redis(self):
         if self.is_distributed or self.settings.USE_REDIS:
             self.__redis_util = RedisUtil(self.settings.redis_url)
-            self.__redis_key_distributed_lock = self.__get_redis_key(
-                self.settings.REDIS_KEY_LOCK
-            )
+            self.__redis_key_distributed_lock = self.__get_redis_key(self.settings.REDIS_KEY_LOCK)
             self.__redis_key_queue = self.__get_redis_key(self.settings.REDIS_KEY_QUEUE)
-            self.__redis_key_running = self.__get_redis_key(
-                self.settings.REDIS_KEY_RUNNING
-            )
+            self.__redis_key_running = self.__get_redis_key(self.settings.REDIS_KEY_RUNNING)
 
     def __get_redis_key(self, key: str) -> str:
         redis_key_prefix = self.settings.REDIS_KEY_PREFIX
@@ -90,8 +86,7 @@ class Engine:
         downloader_cls = load_class(self.settings.DOWNLOADER)
         if not issubclass(downloader_cls, BaseDownloader):
             raise TypeError(
-                f"The downloader class ({self.settings.DOWNLOADER}) "
-                f"does not fully implement required interface"
+                f"The downloader class ({self.settings.DOWNLOADER}) " f"does not fully implement required interface"
             )
         return downloader_cls
 
@@ -99,9 +94,7 @@ class Engine:
         self.running = True
         self.start_requests_running = True
 
-        self.logger.info(
-            f"spider started. (project name: {self.settings.PROJECT_NAME})"
-        )
+        self.logger.info(f"spider started. (project name: {self.settings.PROJECT_NAME})")
         self.spider = spider
         self.__init_redis()
         self.scheduler = Scheduler()
@@ -130,9 +123,7 @@ class Engine:
             # 任务爬虫
             if self.spider.__spider_type__ == "task_spider":
                 self.logger.info("Task spider start get task requests")
-                spider_task_requests: AsyncGenerator[
-                    Request, Any
-                ] = self.spider.task_requests()
+                spider_task_requests: AsyncGenerator[Request, Any] = self.spider.task_requests()
                 if spider_task_requests:
                     self.task_requests = aiter(spider_task_requests)
                     self.task_requests_running = True
@@ -222,28 +213,20 @@ class Engine:
         await self.task_manager.semaphore.acquire()
         self.task_manager.create_task(crawl_task())
 
-    async def _fetch(
-        self, request: Request
-    ) -> Optional[AsyncGenerator[Union[Request, Item], Any]]:
+    async def _fetch(self, request: Request) -> Optional[AsyncGenerator[Union[Request, Item], Any]]:
         async def _success(
             _response: Response,
         ) -> Optional[AsyncGenerator[Union[Request, Item], Any]]:
             callback: Callable = request.callback or self.spider.parse
             if _output := callback(_response):
                 if iscoroutine(_output):
-                    self.logger.info("-------------parse start-------------")
                     await _output
-                    self.logger.info("-------------parse end-------------")
                 else:
                     return transform(_output)
 
             if self.__redis_util:
-                self.logger.debug(
-                    f"redis delete {self.__redis_key_running}:{request.hash}"
-                )
-                await self.__redis_util.delete(
-                    f"{self.__redis_key_running}:{request.hash}"
-                )
+                self.logger.debug(f"redis delete {self.__redis_key_running}:{request.hash}")
+                await self.__redis_util.delete(f"{self.__redis_key_running}:{request.hash}")
             return None
 
         download_result = await self.downloader.download(request)
@@ -273,9 +256,7 @@ class Engine:
             return None
 
         if self.is_distributed:
-            nx_set_result = await self.__redis_util.nx_set(
-                self.__redis_key_distributed_lock, request.hash, 600
-            )
+            nx_set_result = await self.__redis_util.nx_set(self.__redis_key_distributed_lock, request.hash, 600)
             if not nx_set_result:
                 return None
 
@@ -288,23 +269,16 @@ class Engine:
             await self.__redis_util.delete(f"{self.__redis_key_queue}:{request.hash}")
         return request
 
-    async def _handle_spider_output(
-        self, outputs: AsyncGenerator[Union[Request, Item], Any]
-    ):
+    async def _handle_spider_output(self, outputs: AsyncGenerator[Union[Request, Item], Any]):
         async for spider_output in outputs:
             if isinstance(spider_output, (Request, Item)):
                 await self.processor.enqueue(spider_output)
             else:
-                raise OutputException(
-                    f"{type(spider_output)} must return `Request` or `Item`"
-                )
+                raise OutputException(f"{type(spider_output)} must return `Request` or `Item`")
 
     async def _exit(self) -> bool:
         return (
-            self.scheduler.idle()
-            and self.downloader.idle()
-            and self.task_manager.all_done()
-            and self.processor.idle()
+            self.scheduler.idle() and self.downloader.idle() and self.task_manager.all_done() and self.processor.idle()
         )
 
     async def close_spider(self):

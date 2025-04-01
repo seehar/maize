@@ -28,9 +28,7 @@ class MysqlPipeline(BasePipeline):
         if not host or not db or not user or not password:
             raise ValueError("Mysql settings not found")
 
-        self.mysql = MysqlSingletonUtil(
-            host=host, port=port, db=db, user=user, password=password
-        )
+        self.mysql = MysqlSingletonUtil(host=host, port=port, db=db, user=user, password=password)
         await self.mysql.open()
 
     async def close(self):

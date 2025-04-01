@@ -6,17 +6,13 @@ from maize import Spider
 
 class BaiduSpider(Spider):
     start_urls = ["http://www.baidu.com"]
-    custom_settings = {
-        "LOGGER_HANDLER": "examples.baidu_spider.logger_util.InterceptHandler"
-    }
+    custom_settings = {"LOGGER_HANDLER": "examples.baidu_spider.logger_util.InterceptHandler"}
 
     async def parse(self, response: Response):
         li_list = response.xpath("//li[contains(@class, 'hotsearch-item')]")
         for li in li_list:
             item = BaiduItem()
-            item["title"] = li.xpath(
-                ".//span[@class='title-content-title']/text()"
-            ).get()
+            item["title"] = li.xpath(".//span[@class='title-content-title']/text()").get()
             item["url"] = li.xpath("./a/@href").get()
             yield item
 
@@ -29,8 +25,6 @@ class BaiduSpider(Spider):
         li_list = response.xpath("//li[contains(@class, 'hotsearch-item')]")
         for li in li_list:
             item = BaiduItem()
-            item["title"] = li.xpath(
-                ".//span[@class='title-content-title']/text()"
-            ).get()
+            item["title"] = li.xpath(".//span[@class='title-content-title']/text()").get()
             item["url"] = li.xpath("./a/@href").get()
             yield item

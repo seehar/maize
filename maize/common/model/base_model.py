@@ -19,10 +19,7 @@ class BaseModel:
         在初始化后自动填充未提供的字段的默认值。
         """
         for field_ in fields(self):
-            if (
-                getattr(self, field_.name) is None
-                and field_.default_factory is not None
-            ):
+            if getattr(self, field_.name) is None and field_.default_factory is not None:
                 setattr(self, field_.name, field_.default_factory())
 
     def get_dict(self) -> Dict[str, Any]:
@@ -79,15 +76,11 @@ class BaseModel:
                     except (ValueError, TypeError):
                         raise ValueError(f"Invalid value for {key}: {value}")
             elif origin is tuple and isinstance(value, (list, tuple)):
-                if len(args) == len(value) and all(
-                    isinstance(item, arg) for item, arg in zip(value, args)
-                ):
+                if len(args) == len(value) and all(isinstance(item, arg) for item, arg in zip(value, args)):
                     validated_data[key] = tuple(value)
                 else:
                     try:
-                        validated_data[key] = tuple(
-                            arg(item) for item, arg in zip(value, args)
-                        )
+                        validated_data[key] = tuple(arg(item) for item, arg in zip(value, args))
                     except (ValueError, TypeError):
                         raise ValueError(f"Invalid value for {key}: {value}")
             elif origin is Union and type(None) in args:
@@ -102,16 +95,12 @@ class BaseModel:
                         except (ValueError, TypeError):
                             raise ValueError(f"Invalid value for {key}: {value}")
                 else:
-                    raise NotImplementedError(
-                        "Union types with more than one non-None type are not supported yet."
-                    )
+                    raise NotImplementedError("Union types with more than one non-None type are not supported yet.")
             elif origin is Literal:
                 if value in args:
                     validated_data[key] = value
                 else:
-                    raise ValueError(
-                        f"Invalid value for {key}: expected one of {args}, got {value}"
-                    )
+                    raise ValueError(f"Invalid value for {key}: expected one of {args}, got {value}")
             elif origin is None and isinstance(value, expected_type):
                 validated_data[key] = value
             elif expected_type == int and isinstance(value, (int, float)):
@@ -121,9 +110,7 @@ class BaseModel:
             elif expected_type == Path and isinstance(value, (str, Path)):
                 validated_data[key] = Path(value)
             else:
-                raise TypeError(
-                    f"Invalid type for {key}: expected {expected_type}, got {type(value)}: {value}"
-                )
+                raise TypeError(f"Invalid type for {key}: expected {expected_type}, got {type(value)}: {value}")
 
         # 创建并返回 SpiderSettings 实例
         instance = cls()
@@ -156,9 +143,7 @@ class BaseModel:
                     if value in args:
                         setattr(self, key, value)
                     else:
-                        raise ValueError(
-                            f"Invalid value for {key}: expected one of {args}, got {value}"
-                        )
+                        raise ValueError(f"Invalid value for {key}: expected one of {args}, got {value}")
                 elif origin is list and isinstance(value, list):
                     if all(isinstance(item, args[0]) for item in value):
                         setattr(self, key, value)
@@ -168,9 +153,7 @@ class BaseModel:
                         except (ValueError, TypeError):
                             raise ValueError(f"Invalid value for {key}: {value}")
                 elif origin is tuple and isinstance(value, (list, tuple)):
-                    if len(args) == len(value) and all(
-                        isinstance(item, arg) for item, arg in zip(value, args)
-                    ):
+                    if len(args) == len(value) and all(isinstance(item, arg) for item, arg in zip(value, args)):
                         setattr(self, key, tuple(value))
                     else:
                         try:
@@ -193,9 +176,7 @@ class BaseModel:
                             except (ValueError, TypeError):
                                 raise ValueError(f"Invalid value for {key}: {value}")
                     else:
-                        raise NotImplementedError(
-                            "Union types with more than one non-None type are not supported yet."
-                        )
+                        raise NotImplementedError("Union types with more than one non-None type are not supported yet.")
                 elif origin is None and isinstance(value, expected_type):
                     setattr(self, key, value)
                 elif expected_type == int and isinstance(value, (int, float)):
@@ -205,9 +186,7 @@ class BaseModel:
                 elif expected_type == Path and isinstance(value, (str, Path)):
                     setattr(self, key, Path(value))
                 else:
-                    raise TypeError(
-                        f"Invalid type for {key}: expected {expected_type}, got {type(value)}: {value}"
-                    )
+                    raise TypeError(f"Invalid type for {key}: expected {expected_type}, got {type(value)}: {value}")
 
     @classmethod
     def from_base_model(cls, base_model: "BaseModel") -> "BaseModel":

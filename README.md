@@ -1,3 +1,7 @@
+<div align="center">
+  <img src="docs/assets/logo.svg" alt="Logo" width="200" height="200">
+</div>
+
 # maize
 
 [![codecov](https://codecov.io/gh/seehar/maize/graph/badge.svg?token=ZG5ESDLPX6)](https://codecov.io/gh/seehar/maize)
