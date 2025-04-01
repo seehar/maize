@@ -10,9 +10,7 @@ from maize.exceptions.spider_exception import ItemInitException
 class ItemMeta(ABCMeta):
     def __new__(mcs, name, bases, attrs):
         cls_instance = super().__new__(mcs, name, bases, attrs)
-        cls_instance.FIELDS = {
-            key: value for key, value in attrs.items() if isinstance(value, Field)
-        }
+        cls_instance.FIELDS = {key: value for key, value in attrs.items() if isinstance(value, Field)}
         return cls_instance
 
 
@@ -24,9 +22,7 @@ class Item(MutableMapping, metaclass=ItemMeta):
     def __init__(self, *args, **kwargs):
         self._values = {}
         if args:
-            raise ItemInitException(
-                f"Positional arguments are not supported, use keyword arguments."
-            )
+            raise ItemInitException(f"Positional arguments are not supported, use keyword arguments.")
         for key, value in self.FIELDS.items():
             if key not in kwargs:
                 kwargs[key] = value.default
@@ -46,9 +42,7 @@ class Item(MutableMapping, metaclass=ItemMeta):
     def __setattr__(self, key, value):
         if not key.startswith("_"):
             if key not in self.FIELDS:
-                raise AttributeError(
-                    f"{self.__class__.__name__} does not support field: {key}"
-                )
+                raise AttributeError(f"{self.__class__.__name__} does not support field: {key}")
             self._values[key] = value
         else:
             super().__setattr__(key, value)

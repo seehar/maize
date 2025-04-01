@@ -54,3 +54,7 @@ build-backend = "poetry.core.masonry.api"
 name = "tsinghua"
 url = "https://mirrors.tuna.tsinghua.edu.cn/pypi/web/simple/"
 priority = "primary"
+
+
+[tool.black]
+line-length = 120

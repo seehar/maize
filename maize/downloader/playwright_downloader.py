@@ -59,9 +59,7 @@ class PlaywrightDownloader(BaseDownloader):
         self._cache_data: Dict[str, List[InterceptResponse]] = {}
 
         if self.__rpa_url_regexes_save_all and self.__rpa_url_regexes:
-            self.logger.warning(
-                "获取完拦截的数据后, 请主动调用PlaywrightDriver的clear_cache()方法清空拦截的数据，否则数据会一直累加，导致内存溢出"
-            )
+            self.logger.warning("获取完拦截的数据后, 请主动调用PlaywrightDriver的clear_cache()方法清空拦截的数据，否则数据会一直累加，导致内存溢出")
 
     async def open(self):
         await super().open()
@@ -72,9 +70,7 @@ class PlaywrightDownloader(BaseDownloader):
         self._use_stealth_js = self.crawler.settings.RPA_USE_STEALTH_JS
         self._stealth_js_path = self.crawler.settings.RPA_STEALTH_JS_PATH
 
-        self.__view_size = ViewportSize(
-            width=self.__rpa_window_size[0], height=self.__rpa_window_size[1]
-        )
+        self.__view_size = ViewportSize(width=self.__rpa_window_size[0], height=self.__rpa_window_size[1])
 
         if self._use_session:
             self.playwright = await async_playwright().start()
@@ -140,9 +136,7 @@ class PlaywrightDownloader(BaseDownloader):
 
         await super().close()
 
-    async def download(
-        self, request: Request
-    ) -> Optional[Response["PlaywrightDownloader", Page]]:
+    async def download(self, request: Request) -> Optional[Response["PlaywrightDownloader", Page]]:
         try:
             if self._use_session:
                 if request.cookies:
@@ -214,9 +208,7 @@ class PlaywrightDownloader(BaseDownloader):
         @return:
         """
         if self.__rpa_endpoint_url:
-            browser = await getattr(
-                playwright, self.__rpa_driver_type
-            ).connect_over_cdp(
+            browser = await getattr(playwright, self.__rpa_driver_type).connect_over_cdp(
                 endpoint_url=self.__rpa_endpoint_url,
                 timeout=self._timeout,
                 slow_mo=self.__rpa_slow_mo,
@@ -240,16 +232,10 @@ class PlaywrightDownloader(BaseDownloader):
         return self._cache_data.get(url_regex, [])
 
     def get_text(self, url_regex: str) -> Optional[str]:
-        return (
-            self.get_response(url_regex).content.decode()
-            if self.get_response(url_regex)
-            else None
-        )
+        return self.get_response(url_regex).content.decode() if self.get_response(url_regex) else None
 
     def get_all_text(self, url_regex: str) -> List[str]:
-        return [
-            response.content.decode() for response in self.get_all_response(url_regex)
-        ]
+        return [response.content.decode() for response in self.get_all_response(url_regex)]
 
     def get_json(self, url_regex: str) -> Optional[dict]:
         text = self.get_text(url_regex)

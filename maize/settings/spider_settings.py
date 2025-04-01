@@ -161,8 +161,6 @@ class SpiderSettings(BaseModel):
     def redis_url(self):
         redis_url_username_password = ""
         if self.REDIS_USERNAME or self.REDIS_PASSWORD:
-            redis_url_username_password = (
-                f"{self.REDIS_USERNAME or ''}:{self.REDIS_PASSWORD or ''}@"
-            )
+            redis_url_username_password = f"{self.REDIS_USERNAME or ''}:{self.REDIS_PASSWORD or ''}@"
 
         return f"redis://{redis_url_username_password}{self.REDIS_HOST}:{self.REDIS_PORT}/{self.REDIS_DB}"

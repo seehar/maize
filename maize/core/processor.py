@@ -22,9 +22,7 @@ class Processor:
         self.queue = Queue()
         self.item_pipelines: List["BasePipeline"] = []
 
-        self.pipeline_scheduler: PipelineScheduler = PipelineScheduler(
-            self.crawler.settings
-        )
+        self.pipeline_scheduler: PipelineScheduler = PipelineScheduler(self.crawler.settings)
 
     def __len__(self):
         return self.queue.qsize()

@@ -23,9 +23,7 @@ class SpiderEntry:
     def __init__(self):
         self.spider_list: List[Type["Spider"]] = []
 
-    def register(
-        self, *, settings: Optional[dict] = None
-    ) -> Callable[[Type["Spider"]], Type["Spider"]]:
+    def register(self, *, settings: Optional[dict] = None) -> Callable[[Type["Spider"]], Type["Spider"]]:
         def wrapper(spider: Type["Spider"]) -> Type["Spider"]:
             if settings:
                 if hasattr(spider, "custom_settings"):

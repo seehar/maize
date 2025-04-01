@@ -42,8 +42,7 @@ class DownloaderMeta(ABCMeta):
     def __subclasscheck__(self, subclass):
         required_method = ("fetch", "download", "create_instance", "close", "idle")
         return all(
-            hasattr(subclass, method) and callable(getattr(subclass, method, None))
-            for method in required_method
+            hasattr(subclass, method) and callable(getattr(subclass, method, None)) for method in required_method
         )
 
 
@@ -53,9 +52,7 @@ class BaseDownloader(metaclass=DownloaderMeta):
         self._active = ActiveRequestManager()
         self._max_retry_count: int = self.crawler.settings.MAX_RETRY_COUNT
 
-        self.logger = get_logger(
-            crawler.settings, self.__class__.__name__, crawler.settings.LOG_LEVEL
-        )
+        self.logger = get_logger(crawler.settings, self.__class__.__name__, crawler.settings.LOG_LEVEL)
 
     @classmethod
     def create_instance(cls, *args, **kwargs):
@@ -75,9 +72,7 @@ class BaseDownloader(metaclass=DownloaderMeta):
     async def download(self, request: Request) -> Optional[Response]:
         raise NotImplementedError
 
-    async def _download_retry(
-        self, request: Request, exception: Exception
-    ) -> Optional[Request]:
+    async def _download_retry(self, request: Request, exception: Exception) -> Optional[Request]:
         """
         下载重试
         :param request: 请求
@@ -92,9 +87,7 @@ class BaseDownloader(metaclass=DownloaderMeta):
             request.retry()
             return request
 
-        self.logger.error(
-            f"Max retry count reached ({self._max_retry_count}). Skipping request: {request.url}"
-        )
+        self.logger.error(f"Max retry count reached ({self._max_retry_count}). Skipping request: {request.url}")
         await self.process_error_request(request)
         return None
 
@@ -110,9 +103,7 @@ class BaseDownloader(metaclass=DownloaderMeta):
         return len(self._active)
 
     async def close(self):
-        self.logger.info(
-            f"{self.crawler.spider} <downloader class: {type(self).__name__}> closed"
-        )
+        self.logger.info(f"{self.crawler.spider} <downloader class: {type(self).__name__}> closed")
 
     async def process_error_request(self, request: Request):
         """
