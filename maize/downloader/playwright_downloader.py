@@ -1,21 +1,28 @@
 import asyncio
+import re
+from collections import defaultdict
 from pathlib import Path
 from typing import TYPE_CHECKING
+from typing import Dict
 from typing import List
 from typing import Optional
 
+import ujson
 from playwright.async_api import Browser
 from playwright.async_api import BrowserContext
 from playwright.async_api import Cookie
 from playwright.async_api import Download
 from playwright.async_api import Page
 from playwright.async_api import Playwright
+from playwright.async_api import Response as PlaywrightResponse
 from playwright.async_api import ViewportSize
 from playwright.async_api import async_playwright
 
 from maize import BaseDownloader
 from maize import Request
 from maize import Response
+from maize.common.model.rpa_model import InterceptRequest
+from maize.common.model.rpa_model import InterceptResponse
 
 
 if TYPE_CHECKING:
@@ -46,7 +53,15 @@ class PlaywrightDownloader(BaseDownloader):
         self.__rpa_custom_argument = self.crawler.settings.RPA_CUSTOM_ARGUMENT
         self.__rpa_endpoint_url = self.crawler.settings.RPA_ENDPOINT_URL
         self.__rpa_slow_mo = self.crawler.settings.RPA_SLOW_MO
+        self.__rpa_url_regexes = self.crawler.settings.RPA_URL_REGEXES
+        self.__rpa_url_regexes_save_all = self.crawler.settings.RPA_URL_REGEXES_SAVE_ALL
         self.__view_size: Optional[ViewportSize] = None
+        self._cache_data: Dict[str, List[InterceptResponse]] = {}
+
+        if self.__rpa_url_regexes_save_all and self.__rpa_url_regexes:
+            self.logger.warning(
+                "获取完拦截的数据后, 请主动调用PlaywrightDriver的clear_cache()方法清空拦截的数据，否则数据会一直累加，导致内存溢出"
+            )
 
     async def open(self):
         await super().open()
@@ -75,6 +90,31 @@ class PlaywrightDownloader(BaseDownloader):
             self.page = await self.context.new_page()
             self.page.on("download", self.handle_download)
 
+        if self.__rpa_url_regexes:
+            self.page.on("response", self.on_response)
+
+    async def on_response(self, response: PlaywrightResponse):
+        for regex in self.__rpa_url_regexes:
+            if re.search(regex, response.request.url):
+                intercept_request = InterceptRequest(
+                    url=response.request.url,
+                    headers=response.request.headers,
+                    data=response.request.post_data,
+                )
+
+                body = await response.body()
+                intercept_response = InterceptResponse(
+                    request=intercept_request,
+                    url=response.url,
+                    headers=response.headers,
+                    content=body,
+                    status_code=response.status,
+                )
+                if self.__rpa_url_regexes_save_all and regex in self._cache_data:
+                    self._cache_data[regex].append(intercept_response)
+                else:
+                    self._cache_data[regex] = [intercept_response]
+
     @staticmethod
     async def handle_download(download: Download):
         download_path = await download.path()
@@ -100,7 +140,9 @@ class PlaywrightDownloader(BaseDownloader):
 
         await super().close()
 
-    async def download(self, request: Request) -> Optional[Response[Page]]:
+    async def download(
+        self, request: Request
+    ) -> Optional[Response["PlaywrightDownloader", Page]]:
         try:
             if self._use_session:
                 if request.cookies:
@@ -141,7 +183,7 @@ class PlaywrightDownloader(BaseDownloader):
 
     def structure_response(
         self, request: Request, response: str, cookies: List[Cookie]
-    ) -> Response:
+    ) -> Response["PlaywrightDownloader", Page]:
         cookie_list = [
             {
                 "name": cookie["name"],
@@ -154,13 +196,14 @@ class PlaywrightDownloader(BaseDownloader):
             }
             for cookie in cookies
         ]
-        return Response(
+        return Response["PlaywrightDownloader", Page](
             url=request.url,
             headers={},
             text=response,
             request=request,
             cookie_list=cookie_list,
-            driver=self.page,
+            driver=self,
+            source_response=self.page,
         )
 
     async def __get_browser(self, playwright: Playwright) -> Browser:
@@ -188,3 +231,32 @@ class PlaywrightDownloader(BaseDownloader):
                 downloads_path=self.__rpa_download_path,
             )
         return browser
+
+    def get_response(self, url_regex: str) -> Optional[InterceptResponse]:
+        response_list = self._cache_data.get(url_regex)
+        return response_list[0] if response_list else None
+
+    def get_all_response(self, url_regex) -> List[InterceptResponse]:
+        return self._cache_data.get(url_regex, [])
+
+    def get_text(self, url_regex: str) -> Optional[str]:
+        return (
+            self.get_response(url_regex).content.decode()
+            if self.get_response(url_regex)
+            else None
+        )
+
+    def get_all_text(self, url_regex: str) -> List[str]:
+        return [
+            response.content.decode() for response in self.get_all_response(url_regex)
+        ]
+
+    def get_json(self, url_regex: str) -> Optional[dict]:
+        text = self.get_text(url_regex)
+        return ujson.loads(text) if text else None
+
+    def get_all_json(self, url_regex: str) -> List[dict]:
+        return [ujson.loads(text) for text in self.get_all_text(url_regex)]
+
+    def clear_cache(self):
+        self._cache_data = defaultdict(list)

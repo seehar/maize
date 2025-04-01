@@ -22,7 +22,7 @@ class RpaJdSpider(Spider):
         # cookies = CookieUtil.str_cookies_to_list(cookie_str, ".jd.com")
         yield Request("https://item.jd.com/10075424349847.html")
 
-    async def parse(self, response: Response[Page]):
+    async def parse(self, response: Response[None, Page]):
         print(response.text)
 
 

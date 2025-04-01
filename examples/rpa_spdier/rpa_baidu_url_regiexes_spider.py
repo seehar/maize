@@ -1,4 +1,3 @@
-import asyncio
 import typing
 
 from playwright.async_api import Page
@@ -6,6 +5,7 @@ from playwright.async_api import Page
 from maize import Request
 from maize import Response
 from maize import Spider
+from maize.downloader.playwright_downloader import PlaywrightDownloader
 
 
 class RpaBaiduSpider(Spider):
@@ -13,27 +13,20 @@ class RpaBaiduSpider(Spider):
         "CONCURRENCY": 1,
         "DOWNLOADER": "maize.downloader.playwright_downloader.PlaywrightDownloader",
         "USE_SESSION": True,
+        "RPA_URL_REGEXES": ["https://www.baidu.com/sugrec"],
     }
 
     async def start_requests(self) -> typing.AsyncGenerator[Request, typing.Any]:
         for _ in range(2):
             yield Request("https://www.baidu.com", cookies={})
 
-    async def parse(self, response: Response[None, Page]):
+    async def parse(self, response: Response[PlaywrightDownloader, Page]):
         print(response.url)
 
         print("-" * 100)
-        try:
-            driver = response.driver
-            await driver.goto("https://www.baidu.com/")
-            await driver.wait_for_load_state()
-            await asyncio.sleep(1)
-
-            print("success:", driver.url)
-        except Exception as e:
-            print(e)
-        finally:
-            print("-" * 100)
+        text = response.driver.get_text("https://www.baidu.com/sugrec")
+        print(text)
+        print("-" * 100)
 
 
 if __name__ == "__main__":

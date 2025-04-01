@@ -20,7 +20,7 @@ class RpaDownloadSpider(Spider):
     async def start_requests(self) -> typing.AsyncGenerator[Request, typing.Any]:
         yield Request("https://image.baidu.com/")
 
-    async def parse(self, response: Response[Page]):
+    async def parse(self, response: Response[None, Page]):
         driver = response.driver
         await driver.wait_for_load_state()
         await asyncio.sleep(1)

@@ -231,9 +231,7 @@ class Engine:
             callback: Callable = request.callback or self.spider.parse
             if _output := callback(_response):
                 if iscoroutine(_output):
-                    self.logger.info("-------------parse start-------------")
                     await _output
-                    self.logger.info("-------------parse end-------------")
                 else:
                     return transform(_output)
 
