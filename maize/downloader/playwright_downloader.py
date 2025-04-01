@@ -95,7 +95,7 @@ class PlaywrightDownloader(BaseDownloader):
                 intercept_request = InterceptRequest(
                     url=response.request.url,
                     headers=response.request.headers,
-                    data=response.request.post_data,
+                    data=response.request.post_data_buffer,
                 )
 
                 body = await response.body()

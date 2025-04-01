@@ -4,7 +4,7 @@ from typing import Optional
 
 
 class InterceptRequest:
-    def __init__(self, url: str, data: Optional[str], headers: Dict[str, Any]):
+    def __init__(self, url: str, data: Optional[bytes], headers: Dict[str, Any]):
         self.url = url
         self.data = data
         self.headers = headers
