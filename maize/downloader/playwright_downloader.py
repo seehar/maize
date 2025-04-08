@@ -218,7 +218,7 @@ class PlaywrightDownloader(BaseDownloader):
             browser: Browser = await getattr(playwright, self.__rpa_driver_type).launch(
                 timeout=self._timeout,
                 headless=self.__rpa_headless,
-                args=self.__rpa_custom_argument or ["--no-sandbox"],
+                args=self.__rpa_custom_argument,
                 executable_path=self.__rpa_executable_path,
                 downloads_path=self.__rpa_download_path,
             )

@@ -53,6 +53,7 @@ class HTTPXDownloader(BaseDownloader):
                     data=request.data,
                     json=request.json,
                     params=request.params,
+                    cookies=request.cookies,
                 )
                 body = await response.aread()
         except Exception as e:

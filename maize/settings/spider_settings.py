@@ -110,7 +110,9 @@ class SpiderSettings(BaseModel):
     RPA_RENDER_TIME: Optional[int] = field(default_factory=lambda: None)
 
     # 自定义浏览器渲染参数
-    RPA_CUSTOM_ARGUMENT: List[str] = field(default_factory=lambda: [])
+    RPA_CUSTOM_ARGUMENT: List[str] = field(
+        default_factory=lambda: ["--no-sandbox", "--disable-blink-features=AutomationControlled"]
+    )
 
     # 要连接的 CDP websocket 端点或 http url。例如 `http://localhost:9222/` 或
     # `ws://127.0.0.1:9222/devtools/browser/387adf4c-243f-4051-a181-46798f4a46f4`.
