@@ -1,4 +1,5 @@
 import asyncio
+import sys
 import typing
 from typing import TYPE_CHECKING
 from typing import Any
@@ -82,6 +83,9 @@ class Spider:
         @param settings_path: 配置文件路径，需要写到类名，默认：settings.Settings
         @return:
         """
+        if sys.platform == "win32":
+            asyncio.set_event_loop_policy(asyncio.WindowsSelectorEventLoopPolicy())
+
         loop = asyncio.new_event_loop()
         asyncio.set_event_loop(loop)
         loop.run_until_complete(self._async_run(settings=settings, settings_path=settings_path))
