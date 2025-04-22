@@ -108,9 +108,16 @@ class Response(Generic[Driver, R]):
 
     def _get_encoding(self) -> Optional[str]:
         _encoding_re = re.compile(r"charset=([\w-]+)", flags=re.I)
-        _encoding_string = self.headers.get("Content-Type", "") or self.headers.get("content-type", "")
-        _encoding = _encoding_re.search(_encoding_string)
-        return _encoding.group(1) if _encoding else None
+
+        _headers_encoding_string = self.headers.get("Content-Type", "") or self.headers.get("content-type", "")
+        _encoding = _encoding_re.search(_headers_encoding_string)
+        if _encoding:
+            return _encoding.group(1)
+
+        _encoding = _encoding_re.search(self.body.decode("utf-8", errors="ignore"))
+        if _encoding:
+            return _encoding.group(1)
+        return None
 
     @property
     def cookie_list(self) -> List[Dict[str, str]]:

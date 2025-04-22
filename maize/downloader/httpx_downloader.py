@@ -54,6 +54,7 @@ class HTTPXDownloader(BaseDownloader):
                     json=request.json,
                     params=request.params,
                     cookies=request.cookies,
+                    follow_redirects=request.follow_redirects,
                 )
                 body = await response.aread()
         except Exception as e:

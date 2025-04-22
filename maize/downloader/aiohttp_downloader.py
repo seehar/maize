@@ -112,6 +112,7 @@ class AioHttpDownloader(BaseDownloader):
             cookies=request.cookies,
             proxy=request.proxy or self.proxy_tunnel,
             proxy_auth=proxy_auth,
+            allow_redirects=request.follow_redirects,
         )
 
     async def request_start(self, _session, _trace_config_ctx, params: TraceRequestStartParams):

@@ -23,6 +23,7 @@ class Request:
         proxy_password: typing.Optional[str] = None,
         encoding: typing.Optional[str] = "utf-8",
         meta: typing.Optional[dict] = None,
+        follow_redirects: bool = True,
     ):
         """
         请求
@@ -41,6 +42,7 @@ class Request:
         :param proxy_password: 代理 ip 密码
         :param encoding: 编码，默认utf-8，当无法解析时，使用响应中的编码
         :param meta: 自定义数据
+        :param follow_redirects: 是否允许重定向
         """
         self.url = url
         self.method: str = str(method.value)
@@ -55,6 +57,8 @@ class Request:
         self.proxy = proxy
         self.proxy_username = proxy_username
         self.proxy_password = proxy_password
+
+        self.follow_redirects = follow_redirects
 
         # 当前重试次数
         self._current_retry_count: int = 0

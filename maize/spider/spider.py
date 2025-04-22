@@ -60,6 +60,12 @@ class Spider:
             yield Request(url=self.start_url)
 
     async def parse(self, response: Response):
+        """
+        自定义解析方法
+
+        :param response: 封装后的响应实例
+        :return:
+        """
         raise NotImplementedError
 
     async def _async_run(
