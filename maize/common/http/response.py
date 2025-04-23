@@ -99,7 +99,7 @@ class Response(Generic[Driver, R]):
             try:
                 _encoding = self._get_encoding()
                 if _encoding:
-                    self._text_cache = self.body.decode(_encoding)
+                    self._text_cache = self.body.decode(_encoding, errors="ignore")
                 else:
                     raise DecodeException(f"{self.request} {self.request.encoding} error.")
             except UnicodeDecodeError as e:

@@ -24,6 +24,7 @@ class Request:
         encoding: typing.Optional[str] = "utf-8",
         meta: typing.Optional[dict] = None,
         follow_redirects: bool = True,
+        max_redirects: int = 20,
     ):
         """
         请求
@@ -43,6 +44,7 @@ class Request:
         :param encoding: 编码，默认utf-8，当无法解析时，使用响应中的编码
         :param meta: 自定义数据
         :param follow_redirects: 是否允许重定向
+        :param max_redirects: 最大重定向次数，默认为 20
         """
         self.url = url
         self.method: str = str(method.value)
@@ -59,6 +61,7 @@ class Request:
         self.proxy_password = proxy_password
 
         self.follow_redirects = follow_redirects
+        self.max_redirects = max_redirects
 
         # 当前重试次数
         self._current_retry_count: int = 0

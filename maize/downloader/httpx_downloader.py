@@ -43,7 +43,9 @@ class HTTPXDownloader(BaseDownloader):
         await self.random_wait()
         try:
             proxies = self._get_proxy(request)
-            async with httpx.AsyncClient(timeout=self._timeout, proxy=proxies) as client:
+            async with httpx.AsyncClient(
+                timeout=self._timeout, proxy=proxies, max_redirects=request.max_redirects
+            ) as client:
                 self.logger.debug(rf"request downloading: {request.url}, method: {request.method}")
                 headers = await request.get_headers()
                 response = await client.request(

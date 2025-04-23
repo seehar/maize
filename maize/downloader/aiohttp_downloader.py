@@ -64,6 +64,7 @@ class AioHttpDownloader(BaseDownloader):
             if self._use_session:
                 response = await self.send_request(self.session, request)
                 body = await response.content.read()
+                return self.structure_response(request, response, body)
 
             else:
                 connector = TCPConnector(verify_ssl=self._verify_ssl)
@@ -74,6 +75,7 @@ class AioHttpDownloader(BaseDownloader):
                 ) as session:
                     response = await self.send_request(session, request)
                     body = await response.content.read()
+                return self.structure_response(request, response, body)
 
         except Exception as e:
             if new_request := await self._download_retry(request, e):
@@ -81,8 +83,6 @@ class AioHttpDownloader(BaseDownloader):
 
             self.logger.error(f"Error during request: {e}")
             return None
-
-        return self.structure_response(request, response, body)
 
     @staticmethod
     def structure_response(request: Request, response: ClientResponse, body: bytes) -> Response[None, ClientResponse]:
@@ -113,6 +113,7 @@ class AioHttpDownloader(BaseDownloader):
             proxy=request.proxy or self.proxy_tunnel,
             proxy_auth=proxy_auth,
             allow_redirects=request.follow_redirects,
+            max_redirects=request.max_redirects,
         )
 
     async def request_start(self, _session, _trace_config_ctx, params: TraceRequestStartParams):
