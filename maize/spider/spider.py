@@ -10,6 +10,7 @@ from typing import Optional
 from maize.common.http import Response
 from maize.common.http.request import Request
 from maize.core.crawler import CrawlerProcess
+from maize.core.stats_collector import StatsCollector
 
 
 if TYPE_CHECKING:
@@ -18,17 +19,18 @@ if TYPE_CHECKING:
 
 
 class Spider:
-    __spider_type__: str = "spider"
-    start_urls: List[str] = []
-    start_url: Optional[str] = None
-
     custom_settings: dict
 
     def __init__(self):
+        self.__spider_type__: str = "spider"
+        self.start_urls: List[str] = []
+        self.start_url: Optional[str] = None
+
         if not hasattr(self, "start_urls"):
             self.start_urls = []
 
         self.crawler: Optional["Crawler"] = None
+        self.stats_collector: StatsCollector = StatsCollector()
 
     def __str__(self):
         return self.__class__.__name__
@@ -36,14 +38,18 @@ class Spider:
     async def open(self):
         """
         在 Spider 启动时执行一些初始化操作
+
         :return:
         """
+        await self.stats_collector.open()
 
     async def close(self):
         """
         在 Spider 关闭时执行一些清理操作
+
         :return:
         """
+        await self.stats_collector.close()
 
     @classmethod
     def create_instance(cls, crawler: "Crawler"):

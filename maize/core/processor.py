@@ -37,10 +37,14 @@ class Processor:
                 await self.crawler.engine.enqueue_request(result)
             else:
                 assert isinstance(result, Item)
-                await self.pipeline_scheduler.process(result)
+                process_result = await self.pipeline_scheduler.process(result)
+                await self.crawler.spider.stats_collector.record_pipeline_success(process_result.success_count)
+                await self.crawler.spider.stats_collector.record_pipeline_fail(process_result.fail_count)
 
     async def close(self):
-        await self.pipeline_scheduler.close()
+        close_process_result = await self.pipeline_scheduler.close()
+        await self.crawler.spider.stats_collector.record_pipeline_success(close_process_result.success_count)
+        await self.crawler.spider.stats_collector.record_pipeline_fail(close_process_result.fail_count)
         self.logger.debug("processor closed")
 
     async def enqueue(self, output: Union[Request, Item]):

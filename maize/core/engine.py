@@ -214,15 +214,20 @@ class Engine:
         self.task_manager.create_task(crawl_task())
 
     async def _fetch(self, request: Request) -> Optional[AsyncGenerator[Union[Request, Item], Any]]:
-        async def _success(
-            _response: Response,
-        ) -> Optional[AsyncGenerator[Union[Request, Item], Any]]:
+        async def _success(_response: Response) -> Optional[AsyncGenerator[Union[Request, Item], Any]]:
             callback: Callable = request.callback or self.spider.parse
             if _output := callback(_response):
-                if iscoroutine(_output):
-                    await _output
-                else:
-                    return transform(_output)
+                try:
+                    if iscoroutine(_output):
+                        await _output
+                        await self.spider.stats_collector.record_parse_success()
+                    else:
+                        transform_output = transform(_output)
+                        await self.spider.stats_collector.record_parse_success()
+                        return transform_output
+                except Exception as e:
+                    self.logger.error(f"Error during callback: {e}")
+                    await self.spider.stats_collector.record_parse_fail()
 
             if self.__redis_util:
                 self.logger.debug(f"redis delete {self.__redis_key_running}:{request.hash}")
@@ -231,8 +236,12 @@ class Engine:
 
         download_result = await self.downloader.download(request)
         if download_result is None:
+            # 下载失败
+            await self.spider.stats_collector.record_download_fail()
             return None
 
+        # 下载成功
+        await self.spider.stats_collector.record_download_success()
         if isinstance(download_result, Request):
             await self.enqueue_request(download_result)
             return None

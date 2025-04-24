@@ -13,9 +13,11 @@ class BaiduSpider(Spider):
     start_urls = ["http://www.baidu.com", "http://www.baidu.com"]
 
     async def open(self):
+        await super().open()
         print("custom open")
 
     async def close(self):
+        await super().close()
         print("custom close")
 
     @staticmethod

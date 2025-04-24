@@ -70,6 +70,12 @@ class BaseDownloader(metaclass=DownloaderMeta):
 
     @abstractmethod
     async def download(self, request: Request) -> Optional[Response]:
+        """
+        下载
+
+        :param request: 请求实例
+        :return: 下载成功返回 Response 实例，否则为 None
+        """
         raise NotImplementedError
 
     async def _download_retry(self, request: Request, exception: Exception) -> Optional[Request]:
