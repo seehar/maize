@@ -112,9 +112,17 @@ class Response(Generic[Driver, R]):
         _headers_encoding_string = self.headers.get("Content-Type", "") or self.headers.get("content-type", "")
         _encoding = _encoding_re.search(_headers_encoding_string)
         if _encoding:
-            return _encoding.group(1)
+            _encoding_str = _encoding.group(1)
+            if (
+                "text" not in _encoding_str
+                and "html" not in _encoding_str
+                and "gzip" not in _encoding_str
+                and "/" not in _encoding_str
+            ):
+                return _encoding_str
 
-        _encoding = _encoding_re.search(self.body.decode("utf-8", errors="ignore"))
+        _body_encoding_re = re.compile(r'charset="([\w-]+)"', flags=re.I)
+        _encoding = _body_encoding_re.search(self.body.decode("utf-8", errors="ignore"))
         if _encoding:
             return _encoding.group(1)
         return None
