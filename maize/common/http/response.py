@@ -121,6 +121,10 @@ class Response(Generic[Driver, R]):
             ):
                 return _encoding_str
 
+        _encoding = _encoding_re.search(self.body.decode("utf-8", errors="ignore"))
+        if _encoding:
+            return _encoding.group(1)
+
         _body_encoding_re = re.compile(r'charset="([\w-]+)"', flags=re.I)
         _encoding = _body_encoding_re.search(self.body.decode("utf-8", errors="ignore"))
         if _encoding:
