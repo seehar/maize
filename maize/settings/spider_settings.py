@@ -159,6 +159,9 @@ class SpiderSettings(BaseModel):
     MYSQL_USER: str = ""
     MYSQL_PASSWORD: str = ""
 
+    # maize-cob 配置
+    MAIZE_COB_API: str = ""
+
     @property
     def redis_url(self):
         redis_url_username_password = ""

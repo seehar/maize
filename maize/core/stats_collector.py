@@ -1,17 +1,26 @@
 import asyncio
 import datetime
+import os
 from contextlib import asynccontextmanager
+from dataclasses import asdict
 from typing import Any
 from typing import AsyncGenerator
 from typing import Optional
 
+import httpx
+
 from maize.common.model.statistics_model import SpiderStatistics
+from maize.common.model.upload_model import MaizeUploadModel
+from maize.core.task_manager import TaskManager
 from maize.settings import SpiderSettings
 from maize.utils.log_util import get_logger
 
 
 class StatsCollector:
-    def __init__(self, settings: SpiderSettings):
+    def __init__(self, settings: SpiderSettings, spider_name: str):
+        self._settings = settings
+        self._spider_name = spider_name
+
         self._lock = asyncio.Lock()
         self._stats: dict[str, SpiderStatistics] = {}
         self._start_time: Optional[datetime.datetime] = None
@@ -19,31 +28,40 @@ class StatsCollector:
 
         self._logger = get_logger(settings, self.__class__.__name__)
 
+        self._task_manager = TaskManager()
+        self._last_upload_key: str = ""
+
     async def open(self):
         self._start_time = datetime.datetime.now()
 
     async def close(self):
         self._end_time = datetime.datetime.now()
 
+        if self._stats:
+            key_list = list(self._stats.keys())
+            for key in key_list:
+                await self._upload_stat(key)
+
         self._logger.info("-" * 100)
         self._logger.info(f"爬虫运行时间: {self._start_time} ~ {self._end_time}")
         self._logger.info(f"耗时: {(self._end_time - self._start_time).total_seconds()}s")
-        await self.show_all()
         self._logger.info("-" * 100)
 
     @staticmethod
-    def _get_minute_key(dt: Optional[datetime.datetime] = None) -> str:
-        dt = dt or datetime.datetime.now()
-        return dt.strftime("%Y-%m-%d %H:%M")
+    def _get_minute_key() -> tuple[str, str]:
+        now = datetime.datetime.now()
+        pre_minute = now - datetime.timedelta(minutes=1)
+        return now.strftime("%Y-%m-%d %H:%M"), pre_minute.strftime("%Y-%m-%d %H:%M")
 
     @asynccontextmanager
     async def _increment(self) -> AsyncGenerator[SpiderStatistics, Any]:
-        minute_key = self._get_minute_key()
+        minute_key, pre_minute_key = self._get_minute_key()
         async with self._lock:
             if minute_key not in self._stats:
                 self._stats[minute_key] = SpiderStatistics()
 
             yield self._stats[minute_key]
+            await self._upload_stat(pre_minute_key)
 
     async def record_download_success(self, status_code: int):
         async with self._increment() as stats:
@@ -98,7 +116,35 @@ class StatsCollector:
                 del self._stats[minute_key]
             return stats
 
-    async def show_all(self):
-        async with self._lock:
-            for key, value in self._stats.items():
-                self._logger.info(f"{key}: {value.get_dict()}")
+    async def _upload_stat(self, pre_minute_key: str):
+        if self._last_upload_key == pre_minute_key or pre_minute_key not in self._stats:
+            return
+
+        if not self._last_upload_key and len(self._stats) == 1:
+            return
+
+        pre_minute_stat = self._stats[pre_minute_key]
+        maize_upload_model = MaizeUploadModel()
+        maize_upload_model.pid = os.getpid()
+        maize_upload_model.now = pre_minute_key
+        maize_upload_model.spider_name = self._spider_name
+        maize_upload_model.project_name = self._settings.PROJECT_NAME
+        maize_upload_model.stat = pre_minute_stat
+
+        if not self._settings.MAIZE_COB_API:
+            self._logger.info(f"stat: {asdict(maize_upload_model)}")
+            del self._stats[pre_minute_key]
+            self._last_upload_key = pre_minute_key
+            return
+
+        async def upload_stat() -> None:
+            async with httpx.AsyncClient() as client:
+                await client.post(self._settings.MAIZE_COB_API, json=asdict(maize_upload_model))
+            del self._stats[pre_minute_key]
+            self._last_upload_key = pre_minute_key
+
+        await self._task_manager.semaphore.acquire()
+        self._task_manager.create_task(upload_stat())
+
+    def idle(self) -> bool:
+        return self._task_manager.all_done()

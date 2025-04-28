@@ -2,6 +2,7 @@ import typing
 
 from maize import Request
 from maize import Spider
+from maize import SpiderSettings
 from tests.test_full_process.test_spider.items import BaiduItem
 
 
@@ -12,8 +13,8 @@ if typing.TYPE_CHECKING:
 class BaiduSpider(Spider):
     start_urls = ["http://www.baidu.com", "http://www.baidu.com"]
 
-    async def open(self):
-        await super().open()
+    async def open(self, settings: "SpiderSettings"):
+        await super().open(settings)
         print("custom open")
 
     async def close(self):

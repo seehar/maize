@@ -55,6 +55,9 @@ class Crawler:
         if custom_settings:
             self.settings.update_from_dict(custom_settings)
 
+    def idle(self) -> bool:
+        return self.spider.idle()
+
 
 class CrawlerProcess:
     """

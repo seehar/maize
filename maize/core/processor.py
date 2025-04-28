@@ -52,4 +52,4 @@ class Processor:
         await self.process()
 
     def idle(self) -> bool:
-        return len(self) == 0
+        return len(self) == 0 and self.crawler.idle()

@@ -48,7 +48,7 @@ class Spider:
         """
         self.logger = get_logger(settings, self.__class__.__name__)
 
-        self.stats_collector = StatsCollector(settings)
+        self.stats_collector = StatsCollector(settings, self.__class__.__name__)
         await self.stats_collector.open()
 
     async def close(self):
@@ -81,6 +81,9 @@ class Spider:
         :return:
         """
         raise NotImplementedError
+
+    def idle(self) -> bool:
+        return self.stats_collector.idle()
 
     async def _async_run(
         self,
