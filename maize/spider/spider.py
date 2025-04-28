@@ -11,9 +11,12 @@ from maize.common.http import Response
 from maize.common.http.request import Request
 from maize.core.crawler import CrawlerProcess
 from maize.core.stats_collector import StatsCollector
+from maize.utils.log_util import get_logger
 
 
 if TYPE_CHECKING:
+    from logging import Logger
+
     from maize.core.crawler import Crawler
     from maize.settings import SpiderSettings
 
@@ -30,17 +33,22 @@ class Spider:
             self.start_urls = []
 
         self.crawler: Optional["Crawler"] = None
-        self.stats_collector: StatsCollector = StatsCollector()
+        self.stats_collector: Optional["StatsCollector"] = None
+        self.logger: Optional["Logger"] = None
 
     def __str__(self):
         return self.__class__.__name__
 
-    async def open(self):
+    async def open(self, settings: "SpiderSettings"):
         """
         在 Spider 启动时执行一些初始化操作
 
+        :param settings: 处理后的爬虫配置。将自定义的配置与默认配置合并
         :return:
         """
+        self.logger = get_logger(settings, self.__class__.__name__)
+
+        self.stats_collector = StatsCollector(settings)
         await self.stats_collector.open()
 
     async def close(self):

@@ -8,7 +8,10 @@ from maize import Spider
 
 
 class BaiduSpider(Spider):
-    custom_settings = {"LOGGER_HANDLER": "examples.baidu_spider.logger_util.InterceptHandler"}
+    custom_settings = {
+        "LOGGER_HANDLER": "examples.baidu_spider.logger_util.InterceptHandler",
+        "RANDOM_WAIT_TIME": (10, 15),
+    }
 
     async def start_requests(self) -> AsyncGenerator[Request, Any]:
         yield Request(url="http://www.baidu.com")
@@ -22,7 +25,7 @@ class BaiduSpider(Spider):
             yield item
 
         for i in range(10):
-            url = "http://www.baidu.com"
+            url = "http://www.baidu111.com"
             yield Request(url=url, callback=self.parse_detail)
 
     @staticmethod

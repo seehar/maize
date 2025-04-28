@@ -6,6 +6,7 @@ from httpx import Proxy
 from maize import BaseDownloader
 from maize.common.http import Response
 from maize.common.http.request import Request
+from maize.common.model.download_response_model import DownloadResponse
 
 
 if typing.TYPE_CHECKING:
@@ -35,11 +36,7 @@ class HTTPXDownloader(BaseDownloader):
 
         self._timeout = httpx.Timeout(timeout=request_timeout)
 
-    async def fetch(self, request: Request) -> typing.Optional[Response]:
-        async with self._active(request):
-            return await self.download(request)
-
-    async def download(self, request: Request) -> typing.Optional[Response]:
+    async def download(self, request: Request) -> typing.Union[DownloadResponse, Request]:
         await self.random_wait()
         try:
             proxies = self._get_proxy(request)
@@ -64,8 +61,9 @@ class HTTPXDownloader(BaseDownloader):
                 return new_request
 
             self.logger.error(f"Error during request: {e}")
-            return None
-        return self.structure_response(request, response, body)
+            return DownloadResponse(reason=str(e))
+        structure_response = self.structure_response(request, response, body)
+        return DownloadResponse(response=structure_response)
 
     def _get_proxy(self, request: Request) -> typing.Optional[Proxy]:
         if not request.proxy:

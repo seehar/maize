@@ -15,6 +15,9 @@ class SpiderStatistics(BaseModel):
     # 下载失败量
     download_fail_count: int = 0
 
+    # 下载失败原因统计
+    download_fail_reason: dict[str, int] = field(default_factory=lambda: {})
+
     # 下载状态码统计
     download_status: dict[int, int] = field(default_factory=lambda: {})
 

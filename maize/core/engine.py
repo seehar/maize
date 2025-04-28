@@ -160,7 +160,7 @@ class Engine:
                 # 1. 发起请求的 task 全部运行完毕
                 # 2. 调度器是否空闲
                 # 3. 下载器是否空闲
-                if not await self._exit():
+                if not await self._exist():
                     continue
 
                 self.start_requests_running = False
@@ -193,7 +193,7 @@ class Engine:
                 # 2. 调度器是否空闲
                 # 3. 下载器是否空闲
                 self.task_requests = None
-                if not await self._exit():
+                if not await self._exist():
                     continue
 
                 self._single_task_requests_running = False
@@ -234,19 +234,19 @@ class Engine:
                 await self.__redis_util.delete(f"{self.__redis_key_running}:{request.hash}")
             return None
 
-        download_result = await self.downloader.download(request)
-        if download_result is None:
-            # 下载失败
-            await self.spider.stats_collector.record_download_fail()
-            return None
-
-        # 下载成功
-        await self.spider.stats_collector.record_download_success()
+        download_result = await self.downloader.fetch(request)
         if isinstance(download_result, Request):
             await self.enqueue_request(download_result)
             return None
 
-        return await _success(download_result)
+        if download_result.response is None:
+            # 下载失败
+            await self.spider.stats_collector.record_download_fail(download_result.reason)
+            return None
+
+        # 下载成功
+        await self.spider.stats_collector.record_download_success(download_result.response.status)
+        return await _success(download_result.response)
 
     async def enqueue_request(self, request: Request):
         if self.__redis_util:
@@ -285,7 +285,7 @@ class Engine:
             else:
                 raise OutputException(f"{type(spider_output)} must return `Request` or `Item`")
 
-    async def _exit(self) -> bool:
+    async def _exist(self) -> bool:
         return (
             self.scheduler.idle() and self.downloader.idle() and self.task_manager.all_done() and self.processor.idle()
         )

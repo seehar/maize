@@ -6,14 +6,18 @@ from typing import AsyncGenerator
 from typing import Optional
 
 from maize.common.model.statistics_model import SpiderStatistics
+from maize.settings import SpiderSettings
+from maize.utils.log_util import get_logger
 
 
 class StatsCollector:
-    def __init__(self):
+    def __init__(self, settings: SpiderSettings):
         self._lock = asyncio.Lock()
         self._stats: dict[str, SpiderStatistics] = {}
         self._start_time: Optional[datetime.datetime] = None
         self._end_time: Optional[datetime.datetime] = None
+
+        self._logger = get_logger(settings, self.__class__.__name__)
 
     async def open(self):
         self._start_time = datetime.datetime.now()
@@ -21,11 +25,11 @@ class StatsCollector:
     async def close(self):
         self._end_time = datetime.datetime.now()
 
-        print("-" * 100)
-        print(f"爬虫运行时间: {self._start_time} ~ {self._end_time}")
-        print(f"耗时: {(self._end_time - self._start_time).total_seconds()}s")
+        self._logger.info("-" * 100)
+        self._logger.info(f"爬虫运行时间: {self._start_time} ~ {self._end_time}")
+        self._logger.info(f"耗时: {(self._end_time - self._start_time).total_seconds()}s")
         await self.show_all()
-        print("-" * 100)
+        self._logger.info("-" * 100)
 
     @staticmethod
     def _get_minute_key(dt: Optional[datetime.datetime] = None) -> str:
@@ -41,15 +45,29 @@ class StatsCollector:
 
             yield self._stats[minute_key]
 
-    async def record_download_success(self):
+    async def record_download_success(self, status_code: int):
         async with self._increment() as stats:
             stats.download_success_count += 1
             stats.download_total += 1
 
-    async def record_download_fail(self):
+            if status_code not in stats.download_status:
+                stats.download_status[status_code] = 0
+            stats.download_status[status_code] += 1
+
+    async def record_download_fail(self, reason: str):
+        """
+        记录下载失败的数据
+
+        :param reason: 失败原因
+        :return:
+        """
         async with self._increment() as stats:
             stats.download_fail_count += 1
             stats.download_total += 1
+
+            if reason not in stats.download_fail_reason:
+                stats.download_fail_reason[reason] = 0
+            stats.download_fail_reason[reason] += 1
 
     async def record_parse_success(self):
         async with self._increment() as stats:
@@ -83,4 +101,4 @@ class StatsCollector:
     async def show_all(self):
         async with self._lock:
             for key, value in self._stats.items():
-                print(f"{key}: {value.get_dict()}")
+                self._logger.info(f"{key}: {value.get_dict()}")

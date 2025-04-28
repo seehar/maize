@@ -10,6 +10,7 @@ from typing import Union
 
 from maize.common.http import Response
 from maize.common.http.request import Request
+from maize.common.model.download_response_model import DownloadResponse
 from maize.utils.log_util import get_logger
 
 
@@ -64,17 +65,17 @@ class BaseDownloader(metaclass=DownloaderMeta):
             f"<concurrency: {self.crawler.settings.CONCURRENCY}>"
         )
 
-    async def fetch(self, request: Request) -> Optional[Union[Response, Request]]:
+    async def fetch(self, request: Request) -> Union[DownloadResponse, Request]:
         async with self._active(request):
             return await self.download(request)
 
     @abstractmethod
-    async def download(self, request: Request) -> Optional[Response]:
+    async def download(self, request: Request) -> Union[DownloadResponse, Request]:
         """
         下载
 
         :param request: 请求实例
-        :return: 下载成功返回 Response 实例，否则为 None
+        :return: 返回 DownloadResponse 实例或 Request 实例
         """
         raise NotImplementedError
 

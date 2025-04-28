@@ -22,7 +22,7 @@ class Crawler:
 
     async def crawl(self):
         self.spider = self._create_spider()
-        await self.spider.open()
+        await self.spider.open(self.settings)
 
         self.engine = self._create_engine()
         await self.engine.start_spider(self.spider)

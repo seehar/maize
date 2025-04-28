@@ -11,6 +11,7 @@ from aiohttp import TraceRequestStartParams
 
 from maize.common.http import Response
 from maize.common.http.request import Request
+from maize.common.model.download_response_model import DownloadResponse
 from maize.downloader.base_downloader import BaseDownloader
 
 
@@ -56,15 +57,14 @@ class AioHttpDownloader(BaseDownloader):
                 trace_configs=[self.trace_config],
             )
 
-    async def download(
-        self, request: Request
-    ) -> typing.Optional[typing.Union[Response[None, ClientResponse], Request]]:
+    async def download(self, request: Request) -> typing.Union[DownloadResponse, Request]:
         await self.random_wait()
         try:
             if self._use_session:
                 response = await self.send_request(self.session, request)
                 body = await response.content.read()
-                return self.structure_response(request, response, body)
+                structure_response = self.structure_response(request, response, body)
+                return DownloadResponse(response=structure_response)
 
             else:
                 connector = TCPConnector(verify_ssl=self._verify_ssl)
@@ -75,14 +75,15 @@ class AioHttpDownloader(BaseDownloader):
                 ) as session:
                     response = await self.send_request(session, request)
                     body = await response.content.read()
-                return self.structure_response(request, response, body)
+                structure_response = self.structure_response(request, response, body)
+                return DownloadResponse(response=structure_response)
 
         except Exception as e:
             if new_request := await self._download_retry(request, e):
                 return new_request
 
             self.logger.error(f"Error during request: {e}")
-            return None
+            return DownloadResponse(reason=str(e))
 
     @staticmethod
     def structure_response(request: Request, response: ClientResponse, body: bytes) -> Response[None, ClientResponse]:
