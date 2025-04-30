@@ -19,7 +19,7 @@ class SpiderStatistics(BaseModel):
     download_fail_reason: dict[str, int] = field(default_factory=lambda: {})
 
     # 下载状态码统计
-    download_status: dict[int, int] = field(default_factory=lambda: {})
+    download_status: dict[str, int] = field(default_factory=lambda: {})
 
     # 解析成功量
     parse_success_count: int = 0

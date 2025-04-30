@@ -24,3 +24,5 @@ class Settings(SpiderSettings):
     REDIS_DB: int = 0
     REDIS_USERNAME = None
     REDIS_PASSWORD = "123456"
+
+    # MAIZE_COB_API = "http://192.168.5.129:8001/api/v1/spider/stat"

@@ -14,6 +14,7 @@ from maize.common.model.upload_model import MaizeUploadModel
 from maize.core.task_manager import TaskManager
 from maize.settings import SpiderSettings
 from maize.utils.log_util import get_logger
+from maize.utils.system_util import get_container_id
 
 
 class StatsCollector:
@@ -30,8 +31,12 @@ class StatsCollector:
 
         self._task_manager = TaskManager()
         self._last_upload_key: str = ""
+        self._container_id: str = ""
 
     async def open(self):
+        if container_id := get_container_id():
+            self._container_id = container_id
+
         self._start_time = datetime.datetime.now()
 
     async def close(self):
@@ -64,13 +69,14 @@ class StatsCollector:
             await self._upload_stat(pre_minute_key)
 
     async def record_download_success(self, status_code: int):
+        status_code_str = str(status_code)
         async with self._increment() as stats:
             stats.download_success_count += 1
             stats.download_total += 1
 
-            if status_code not in stats.download_status:
-                stats.download_status[status_code] = 0
-            stats.download_status[status_code] += 1
+            if status_code_str not in stats.download_status:
+                stats.download_status[status_code_str] = 0
+            stats.download_status[status_code_str] += 1
 
     async def record_download_fail(self, reason: str):
         """
@@ -126,20 +132,24 @@ class StatsCollector:
         pre_minute_stat = self._stats[pre_minute_key]
         maize_upload_model = MaizeUploadModel()
         maize_upload_model.pid = os.getpid()
-        maize_upload_model.now = pre_minute_key
+        maize_upload_model.stat_time = pre_minute_key
         maize_upload_model.spider_name = self._spider_name
         maize_upload_model.project_name = self._settings.PROJECT_NAME
-        maize_upload_model.stat = pre_minute_stat
+        maize_upload_model.container_id = self._container_id
+
+        maize_upload_model_dict = asdict(maize_upload_model)
+        maize_upload_model_dict.update(asdict(pre_minute_stat))
+        self._logger.info(f"stat: {maize_upload_model_dict}")
 
         if not self._settings.MAIZE_COB_API:
-            self._logger.info(f"stat: {asdict(maize_upload_model)}")
             del self._stats[pre_minute_key]
             self._last_upload_key = pre_minute_key
             return
 
         async def upload_stat() -> None:
             async with httpx.AsyncClient() as client:
-                await client.post(self._settings.MAIZE_COB_API, json=asdict(maize_upload_model))
+                response = await client.post(self._settings.MAIZE_COB_API, json=maize_upload_model_dict)
+                self._logger.info(f"upload stat: <{response.status_code}> {response.text}")
             del self._stats[pre_minute_key]
             self._last_upload_key = pre_minute_key
 
