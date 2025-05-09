@@ -26,8 +26,9 @@ def get_container_id() -> Optional[str]:
 
     with open("/proc/self/mountinfo", "r", encoding="utf-8") as f:
         for line in f.readlines():
-            if "/var/lib/docker/containers" not in line:
+            if "/resolv.conf" not in line:
                 continue
-            if container_id := line.split("/var/lib/docker/containers/")[-1].split("/")[0]:
+            if container_id := line.split("/resolv.conf")[0].split("/")[-1]:
+                print(container_id)
                 return container_id
     return None
