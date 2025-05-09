@@ -147,11 +147,16 @@ class StatsCollector:
             return
 
         async def upload_stat() -> None:
-            async with httpx.AsyncClient() as client:
-                response = await client.post(self._settings.MAIZE_COB_API, json=maize_upload_model_dict)
-                self._logger.info(f"upload stat: <{response.status_code}> {response.text}")
-            del self._stats[pre_minute_key]
-            self._last_upload_key = pre_minute_key
+            for _ in range(3):
+                try:
+                    async with httpx.AsyncClient() as client:
+                        response = await client.post(self._settings.MAIZE_COB_API, json=maize_upload_model_dict)
+                        self._logger.info(f"upload stat: <{response.status_code}> {response.text}")
+                    del self._stats[pre_minute_key]
+                    self._last_upload_key = pre_minute_key
+                    break
+                except Exception as e:
+                    self._logger.warning(f"upload stat error: {e}，准备第 {_ + 1} 次重试")
 
         await self._task_manager.semaphore.acquire()
         self._task_manager.create_task(upload_stat())
