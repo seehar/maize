@@ -25,6 +25,7 @@ class Spider:
     custom_settings: dict
 
     def __init__(self):
+        self._lock = asyncio.Lock()
         self.__spider_type__: str = "spider"
         self.start_urls: List[str] = []
         self.start_url: Optional[str] = None
@@ -35,6 +36,8 @@ class Spider:
         self.crawler: Optional["Crawler"] = None
         self.stats_collector: Optional["StatsCollector"] = None
         self.logger: Optional["Logger"] = None
+
+        self.gte_priority: Optional[int] = None
 
     def __str__(self):
         return self.__class__.__name__
@@ -82,8 +85,48 @@ class Spider:
         """
         raise NotImplementedError
 
+    async def pause_spider(self, lte_priority: Optional[int] = None):
+        """
+        暂停爬虫
+
+        :param lte_priority: 请求优先级，默认为 None。为 None 时暂停采集所有的请求，否则只暂停采集小于 priority 的请求
+        :return:
+        """
+        async with self._lock:
+            if self.gte_priority is not None:
+                self.logger.warning("爬虫已暂停，请勿重复暂停")
+                return
+
+            if lte_priority is None:
+                self.gte_priority = 0
+                return
+
+            self.gte_priority = lte_priority + 1
+
+    async def proceed_spider(self, gte_priority: Optional[int] = None):
+        """
+        继续爬虫
+
+        :param gte_priority: 请求优先级，默认为 None。为 None 时继续采集所有的请求，否则只继续采集大于等于 priority 的请求
+        :return:
+        """
+        async with self._lock:
+            if gte_priority is None:
+                self.gte_priority = None
+                return
+
+            self.gte_priority = gte_priority
+
     def idle(self) -> bool:
-        return self.stats_collector.idle()
+        return self.stats_collector.idle() and not self.is_pause()
+
+    def is_pause(self):
+        """
+        爬虫是否暂停
+
+        :return: 暂停 True，否则 False
+        """
+        return self.gte_priority is not None
 
     async def _async_run(
         self,

@@ -11,6 +11,7 @@ class Request:
         *,
         method: typing.Optional[Method] = Method.GET,
         callback: typing.Optional[typing.Callable] = None,
+        error_callback: typing.Optional[typing.Callable] = None,
         priority: int = 0,
         headers: typing.Optional[dict] = None,
         headers_func: typing.Optional[typing.Callable[[], typing.Awaitable[dict]]] = None,
@@ -32,6 +33,7 @@ class Request:
         :param url: 待抓取的url
         :param method: 请求方式，如 Method.GET, Method.POST, Method.PUT，默认 Method.GET
         :param callback: 自定义的解析函数，默认为 parse
+        :param error_callback: 自定义的错误回调函数
         :param priority: 请求优先级，默认为 0
         :param headers: 请求头
         :param params: 请求参数
@@ -49,6 +51,7 @@ class Request:
         self.url = url
         self.method: str = str(method.value)
         self.callback = callback
+        self.error_callback = error_callback
         self.priority = priority
         self.headers = headers
         self.headers_func = headers_func

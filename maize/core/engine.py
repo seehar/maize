@@ -161,6 +161,7 @@ class Engine:
                 # 2. 调度器是否空闲
                 # 3. 下载器是否空闲
                 if not await self._exist():
+                    await asyncio.sleep(0.1)
                     continue
 
                 self.start_requests_running = False
@@ -194,6 +195,7 @@ class Engine:
                 # 3. 下载器是否空闲
                 self.task_requests = None
                 if not await self._exist():
+                    await asyncio.sleep(0.1)
                     continue
 
                 self._single_task_requests_running = False
@@ -234,6 +236,28 @@ class Engine:
                 await self.__redis_util.delete(f"{self.__redis_key_running}:{request.hash}")
             return None
 
+        async def _error(_request: Request) -> Optional[AsyncGenerator[Union[Request, Item], Any]]:
+            error_callback: Callable = request.error_callback
+            if not error_callback:
+                return None
+
+            if _error_output := error_callback(_request):
+                try:
+                    if iscoroutine(_error_output):
+                        await _error_output
+                        await self.spider.stats_collector.record_parse_fail()
+                    else:
+                        transform_output = transform(_error_output)
+                        await self.spider.stats_collector.record_parse_fail()
+                        return transform_output
+                except Exception as e:
+                    self.logger.error(f"Error during error_callback: {e}")
+
+            if self.__redis_util:
+                self.logger.debug(f"redis delete {self.__redis_key_running}:{request.hash}")
+                await self.__redis_util.delete(f"{self.__redis_key_running}:{request.hash}")
+            return None
+
         download_result = await self.downloader.fetch(request)
         if isinstance(download_result, Request):
             await self.enqueue_request(download_result)
@@ -242,7 +266,7 @@ class Engine:
         if download_result.response is None:
             # 下载失败
             await self.spider.stats_collector.record_download_fail(download_result.reason)
-            return None
+            return await _error(request)
 
         # 下载成功
         await self.spider.stats_collector.record_download_success(download_result.response.status)
@@ -260,7 +284,7 @@ class Engine:
         await self.scheduler.enqueue_request(request)
 
     async def _get_next_request(self) -> Optional[Request]:
-        request: Optional[Request] = await self.scheduler.next_request()
+        request: Optional[Request] = await self.scheduler.next_request(self.crawler.spider.gte_priority)
         if not request:
             return None
 
@@ -287,7 +311,11 @@ class Engine:
 
     async def _exist(self) -> bool:
         return (
-            self.scheduler.idle() and self.downloader.idle() and self.task_manager.all_done() and self.processor.idle()
+            self.scheduler.idle()
+            and self.downloader.idle()
+            and self.task_manager.all_done()
+            and self.processor.idle()
+            and self.crawler.idle()
         )
 
     async def close_spider(self):
