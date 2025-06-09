@@ -8,15 +8,15 @@ from typing import List
 from typing import Optional
 
 import ujson
-from playwright.async_api import Browser
-from playwright.async_api import BrowserContext
-from playwright.async_api import Cookie
-from playwright.async_api import Download
-from playwright.async_api import Page
-from playwright.async_api import Playwright
-from playwright.async_api import Response as PlaywrightResponse
-from playwright.async_api import ViewportSize
-from playwright.async_api import async_playwright
+from patchright.async_api import Browser
+from patchright.async_api import BrowserContext
+from patchright.async_api import Cookie
+from patchright.async_api import Download
+from patchright.async_api import Page
+from patchright.async_api import Playwright
+from patchright.async_api import Response as PlaywrightResponse
+from patchright.async_api import ViewportSize
+from patchright.async_api import async_playwright
 
 from maize import BaseDownloader
 from maize import Request
@@ -29,7 +29,7 @@ if TYPE_CHECKING:
     from maize.core.crawler import Crawler
 
 
-class PlaywrightDownloader(BaseDownloader):
+class PatchrightDownloader(BaseDownloader):
     def __init__(self, crawler: "Crawler"):
         super().__init__(crawler)
         self.playwright: Optional[Playwright] = None
@@ -136,7 +136,7 @@ class PlaywrightDownloader(BaseDownloader):
 
         await super().close()
 
-    async def download(self, request: Request) -> Optional[Response["PlaywrightDownloader", Page]]:
+    async def download(self, request: Request) -> Optional[Response["PatchrightDownloader", Page]]:
         response = ""
         cookies = []
         try:
@@ -179,7 +179,7 @@ class PlaywrightDownloader(BaseDownloader):
 
     def structure_response(
         self, request: Request, response: str, cookies: List[Cookie]
-    ) -> Response["PlaywrightDownloader", Page]:
+    ) -> Response["PatchrightDownloader", Page]:
         cookie_list = [
             {
                 "name": cookie["name"],
@@ -192,7 +192,7 @@ class PlaywrightDownloader(BaseDownloader):
             }
             for cookie in cookies
         ]
-        return Response["PlaywrightDownloader", Page](
+        return Response["PatchrightDownloader", Page](
             url=request.url,
             headers={},
             text=response,
