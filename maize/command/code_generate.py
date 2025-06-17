@@ -1,4 +1,5 @@
 from pathlib import Path
+from typing import Optional
 
 import click
 
@@ -13,7 +14,7 @@ class CodeGenerate:
     def __init__(self):
         self._code_template_path = Path(__file__).parent / "code_template"
 
-    def generate(self, spider_name: str):
+    def generate(self, spider_name: str, url: Optional[str] = None):
         """生成爬虫代码结构"""
 
         base_path = Path(spider_name)
@@ -23,7 +24,7 @@ class CodeGenerate:
 
         files = {
             base_path / "__init__.py": "",
-            base_path / f"{spider_name}.py": self.get_spider_template(spider_name),
+            base_path / f"{spider_name}.py": self.get_spider_template(spider_name, url),
             base_path / f"{spider_name}_item.py": self.get_item_template(spider_name),
         }
 
@@ -34,8 +35,10 @@ class CodeGenerate:
 
         click.echo(f"✅ 项目 {spider_name} 创建成功！")
 
-    def get_spider_template(self, spider_name: str) -> str:
-        url = input("目标网站：")
+    def get_spider_template(self, spider_name: str, url: Optional[str] = None) -> str:
+        if not url:
+            url = input("目标网站：")
+
         if not url.startswith("http"):
             url = f"https://{url}"
 

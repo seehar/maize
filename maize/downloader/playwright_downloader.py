@@ -21,6 +21,7 @@ from playwright.async_api import async_playwright
 from maize import BaseDownloader
 from maize import Request
 from maize import Response
+from maize.common.model.download_response_model import DownloadResponse
 from maize.common.model.rpa_model import InterceptRequest
 from maize.common.model.rpa_model import InterceptResponse
 
@@ -136,7 +137,7 @@ class PlaywrightDownloader(BaseDownloader):
 
         await super().close()
 
-    async def download(self, request: Request) -> Optional[Response["PlaywrightDownloader", Page]]:
+    async def download(self, request: Request) -> Optional[DownloadResponse["PlaywrightDownloader", Page]]:
         response = ""
         cookies = []
         try:
@@ -179,7 +180,7 @@ class PlaywrightDownloader(BaseDownloader):
 
     def structure_response(
         self, request: Request, response: str, cookies: List[Cookie]
-    ) -> Response["PlaywrightDownloader", Page]:
+    ) -> DownloadResponse["PlaywrightDownloader", Page]:
         cookie_list = [
             {
                 "name": cookie["name"],
@@ -192,7 +193,7 @@ class PlaywrightDownloader(BaseDownloader):
             }
             for cookie in cookies
         ]
-        return Response["PlaywrightDownloader", Page](
+        response_instance = Response["PlaywrightDownloader", Page](
             url=request.url,
             headers={},
             text=response,
@@ -201,6 +202,9 @@ class PlaywrightDownloader(BaseDownloader):
             driver=self,
             source_response=self.page,
         )
+        download_response = DownloadResponse()
+        download_response.response = response_instance
+        return download_response
 
     async def __get_browser(self, playwright: Playwright) -> Browser:
         """

@@ -6,6 +6,7 @@ from playwright.async_api import Page
 from maize import Request
 from maize import Response
 from maize import Spider
+from maize.downloader.playwright_downloader import PlaywrightDownloader
 
 
 class RpaDownloadSpider(Spider):
@@ -20,8 +21,8 @@ class RpaDownloadSpider(Spider):
     async def start_requests(self) -> typing.AsyncGenerator[Request, typing.Any]:
         yield Request("https://image.baidu.com/")
 
-    async def parse(self, response: Response[None, Page]):
-        driver = response.driver
+    async def parse(self, response: Response[PlaywrightDownloader, Page]):
+        driver = response.driver.page
         await driver.wait_for_load_state()
         await asyncio.sleep(1)
 

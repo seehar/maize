@@ -6,13 +6,13 @@ from playwright.async_api import Page
 from maize import Request
 from maize import Response
 from maize import Spider
-from maize.downloader.playwright_downloader import PlaywrightDownloader
+from maize.downloader.patchright_downloader import PatchrightDownloader
 
 
 class RpaBaiduSpider(Spider):
     custom_settings = {
         "CONCURRENCY": 1,
-        "DOWNLOADER": "maize.downloader.playwright_downloader.PlaywrightDownloader",
+        "DOWNLOADER": "maize.downloader.patchright_downloader.PatchrightDownloader",
         "USE_SESSION": True,
     }
 
@@ -20,7 +20,7 @@ class RpaBaiduSpider(Spider):
         for _ in range(2):
             yield Request("https://www.baidu.com", cookies={})
 
-    async def parse(self, response: Response[PlaywrightDownloader, Page]):
+    async def parse(self, response: Response[PatchrightDownloader, Page]):
         print(response.url)
 
         print("-" * 100)
