@@ -1,7 +1,10 @@
+from dataclasses import dataclass
+
 from maize import SpiderSettings
 
 
-class SpiderSettings(SpiderSettings):
+@dataclass
+class BaiduSpiderSettings(SpiderSettings):
     PROJECT_NAME = "baidu_spider"
     CONCURRENCY = 1
     LOG_LEVEL = "DEBUG"

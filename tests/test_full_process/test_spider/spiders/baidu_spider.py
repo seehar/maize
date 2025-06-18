@@ -1,4 +1,6 @@
 import typing
+from typing import Any
+from typing import AsyncGenerator
 
 from maize import Request
 from maize import Spider
@@ -11,7 +13,8 @@ if typing.TYPE_CHECKING:
 
 
 class BaiduSpider(Spider):
-    start_urls = ["http://www.baidu.com", "http://www.baidu.com"]
+    async def start_requests(self) -> AsyncGenerator[Request, Any]:
+        yield Request(url="http://www.baidu.com")
 
     async def open(self, settings: "SpiderSettings"):
         await super().open(settings)
