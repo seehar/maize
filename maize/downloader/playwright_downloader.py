@@ -76,15 +76,7 @@ class PlaywrightDownloader(BaseDownloader):
         if self._use_session:
             self.playwright = await async_playwright().start()
             self.browser: Browser = await self.__get_browser(self.playwright)
-
-            self.context = await self.browser.new_context(
-                user_agent=self.__rpa_user_agent,
-                screen=self.__view_size,
-                viewport=self.__view_size,
-            )
-            if self._use_stealth_js:
-                await self.context.add_init_script(path=self._stealth_js_path)
-            self.page = await self.context.new_page()
+            await self.__gen_context_and_page()
             self.page.on("download", self.handle_download)
 
         if self.__rpa_url_regexes:
@@ -229,6 +221,21 @@ class PlaywrightDownloader(BaseDownloader):
                 downloads_path=self.__rpa_download_path,
             )
         return browser
+
+    async def __gen_context_and_page(self):
+        if self.__rpa_endpoint_url:
+            self.context = self.browser.contexts[0]
+            self.page = self.context.pages[0]
+            return
+
+        self.context = await self.browser.new_context(
+            user_agent=self.__rpa_user_agent,
+            screen=self.__view_size,
+            viewport=self.__view_size,
+        )
+        if self._use_stealth_js:
+            await self.context.add_init_script(path=self._stealth_js_path)
+        self.page = await self.context.new_page()
 
     def get_response(self, url_regex: str) -> Optional[InterceptResponse]:
         response_list = self._cache_data.get(url_regex)

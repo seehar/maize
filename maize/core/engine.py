@@ -23,8 +23,8 @@ from maize.exceptions.spider_exception import OutputException
 
 try:
     from maize.utils.redis_util import RedisUtil
-except Exception:
-    pass
+except ImportError:
+    RedisUtil = None
 from maize.utils.log_util import get_logger
 from maize.utils.project_util import load_class
 from maize.utils.spider_util import transform
@@ -160,7 +160,7 @@ class Engine:
                 # 1. 发起请求的 task 全部运行完毕
                 # 2. 调度器是否空闲
                 # 3. 下载器是否空闲
-                if not await self._exist():
+                if not self._idle():
                     await asyncio.sleep(0.1)
                     continue
 
@@ -194,7 +194,7 @@ class Engine:
                 # 2. 调度器是否空闲
                 # 3. 下载器是否空闲
                 self.task_requests = None
-                if not await self._exist():
+                if not self._idle():
                     await asyncio.sleep(0.1)
                     continue
 
@@ -309,7 +309,7 @@ class Engine:
             else:
                 raise OutputException(f"{type(spider_output)} must return `Request` or `Item`")
 
-    async def _exist(self) -> bool:
+    def _idle(self) -> bool:
         return (
             self.scheduler.idle()
             and self.downloader.idle()
