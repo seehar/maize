@@ -21,6 +21,7 @@ from patchright.async_api import async_playwright
 from maize import BaseDownloader
 from maize import Request
 from maize import Response
+from maize.common.downloader.page_pool import PagePool
 from maize.common.model.download_response_model import DownloadResponse
 from maize.common.model.rpa_model import InterceptRequest
 from maize.common.model.rpa_model import InterceptResponse
@@ -35,8 +36,8 @@ class PatchrightDownloader(BaseDownloader):
         super().__init__(crawler)
         self.playwright: Optional[Playwright] = None
         self.browser: Optional[Browser] = None
-        self.page: Optional[Page] = None
         self.context: Optional[BrowserContext] = None
+        self.page_pool: Optional[PagePool] = None
 
         self._timeout: Optional[float] = None
         self._use_session: Optional[bool] = None
@@ -73,22 +74,14 @@ class PatchrightDownloader(BaseDownloader):
 
         self.__view_size = ViewportSize(width=self.__rpa_window_size[0], height=self.__rpa_window_size[1])
 
+        # 获取并发数设置，用于页面池大小
+        concurrency = self.crawler.settings.CONCURRENCY or 10
+        self.page_pool = PagePool(crawler=self.crawler, max_pages=concurrency)
+
         if self._use_session:
             self.playwright = await async_playwright().start()
             self.browser: Browser = await self.__get_browser(self.playwright)
-
-            self.context = await self.browser.new_context(
-                user_agent=self.__rpa_user_agent,
-                screen=self.__view_size,
-                viewport=self.__view_size,
-            )
-            if self._use_stealth_js:
-                await self.context.add_init_script(path=self._stealth_js_path)
-            self.page = await self.context.new_page()
-            self.page.on("download", self.handle_download)
-
-        if self.__rpa_url_regexes:
-            self.page.on("response", self.on_response)
+            await self._gen_context_and_page()
 
     async def on_response(self, response: PlaywrightResponse):
         for regex in self.__rpa_url_regexes:
@@ -123,9 +116,14 @@ class PatchrightDownloader(BaseDownloader):
             original_file_path.unlink()
 
     async def close(self):
-        if self.page:
-            await self.page.close()
-            self.page = None
+        # 关闭页面池
+        if self.page_pool:
+            await self.page_pool.close_all()
+            self.page_pool = None
+
+        if self.context:
+            await self.context.close()
+            self.context = None
 
         if self.browser:
             await self.browser.close()
@@ -140,17 +138,47 @@ class PatchrightDownloader(BaseDownloader):
     async def download(self, request: Request) -> Optional[DownloadResponse["PatchrightDownloader", Page]]:
         response = ""
         cookies = []
+        page = None
+        context = None
+
         try:
             if self._use_session:
+                # 使用页面池获取页面
+                if not self.context:
+                    await self._gen_context_and_page()
+
+                page = await self.page_pool.acquire_page(self.context)
+
+                # 设置下载和响应拦截（每次获取页面时重新设置）
+                page.on("download", self.handle_download)
+                if self.__rpa_url_regexes:
+                    page.on("response", self.on_response)
+
                 if request.cookies:
-                    await self.page.context.add_cookies(request.cookies)
-                await self.page.goto(request.url)
-                await asyncio.sleep(self.__rpa_render_time)
-                await self.page.wait_for_load_state()
-                response = await self.page.content()
-                cookies = await self.page.context.cookies()
+                    await self.context.add_cookies(request.cookies)
+
+                # 添加更好的错误处理和超时控制
+                try:
+                    self.logger.info(f"Navigating to {request.url}")
+                    await page.goto(request.url, timeout=self._timeout, wait_until="load")
+                    self.logger.info(f"Navigation completed, waiting for render time: {self.__rpa_render_time}s")
+                    await asyncio.sleep(self.__rpa_render_time)
+                    response = await page.content()
+                    cookies = await self.context.cookies()
+                    self.logger.info(f"Successfully retrieved content from {request.url}")
+                except Exception as e:
+                    self.logger.error(f"Page navigation error for {request.url}: {e}")
+                    # 检查页面状态
+                    if page:
+                        try:
+                            page_state = "closed" if page.is_closed() else "open"
+                            self.logger.info(f"Page state: {page_state}")
+                        except Exception as e:
+                            self.logger.info(f"Error checking page state: {e}")
+                    raise
 
             else:
+                # 非session模式，为每个请求创建独立的browser实例
                 async with async_playwright() as playwright:
                     browser = await self.__get_browser(playwright)
                     context = await browser.new_context(
@@ -170,13 +198,22 @@ class PatchrightDownloader(BaseDownloader):
                     await page.wait_for_load_state()
                     await asyncio.sleep(self.__rpa_render_time)
                     response = await page.content()
-                    cookies = await page.context.cookies()
+                    cookies = await context.cookies()
+            return self.structure_response(request, response, cookies)
 
         except Exception as e:
             self.logger.error(f"Error during request: {e}")
             return None
-
-        return self.structure_response(request, response, cookies)
+        finally:
+            # 清理资源
+            if self._use_session and page:
+                await self.page_pool.release_page(page)
+            elif not self._use_session and context:
+                try:
+                    await page.close()
+                    await context.close()
+                except Exception as e:
+                    self.logger.warning(f"Failed to close page or context: {e}")
 
     def structure_response(
         self, request: Request, response: str, cookies: List[Cookie]
@@ -200,7 +237,7 @@ class PatchrightDownloader(BaseDownloader):
             request=request,
             cookie_list=cookie_list,
             driver=self,
-            source_response=self.page,
+            source_response=None,  # 由于使用页面池，不再有固定的page引用
         )
         download_response = DownloadResponse()
         download_response.response = response_instance
@@ -230,6 +267,20 @@ class PatchrightDownloader(BaseDownloader):
             )
         return browser
 
+    async def _gen_context_and_page(self):
+        if self.__rpa_endpoint_url:
+            self.context = self.browser.contexts[0]
+            return
+
+        self.context = await self.browser.new_context(
+            user_agent=self.__rpa_user_agent,
+            screen=self.__view_size,
+            viewport=self.__view_size,
+        )
+        if self._use_stealth_js:
+            await self.context.add_init_script(path=self._stealth_js_path)
+        # 不再创建单个page，页面池会在需要时创建页面
+
     def get_response(self, url_regex: str) -> Optional[InterceptResponse]:
         response_list = self._cache_data.get(url_regex)
         return response_list[0] if response_list else None
@@ -252,3 +303,34 @@ class PatchrightDownloader(BaseDownloader):
 
     def clear_cache(self):
         self._cache_data = defaultdict(list)
+
+    class PageOperationContext:
+        """页面操作上下文管理器，确保页面正确释放"""
+
+        def __init__(self, downloader: "PatchrightDownloader"):
+            self.downloader = downloader
+            self.page = None
+
+        async def __aenter__(self) -> Page:
+            """进入上下文，获取页面"""
+            if not self.downloader.context:
+                await self.downloader._gen_context_and_page()
+
+            self.page = await self.downloader.page_pool.acquire_page(self.downloader.context)
+            return self.page
+
+        async def __aexit__(self, exc_type, exc_val, exc_tb):
+            """退出上下文，释放页面"""
+            if self.page:
+                await self.downloader.page_pool.release_page(self.page)
+                self.page = None
+
+    def get_page(self) -> "PageOperationContext":
+        """
+        获取页面操作上下文管理器
+        使用示例：
+        async with downloader.get_page() as page:
+            # 在此处使用page进行操作
+            await page.goto("https://example.com")
+        """
+        return self.PageOperationContext(self)

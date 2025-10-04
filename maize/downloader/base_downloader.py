@@ -1,4 +1,5 @@
 import asyncio
+from abc import ABC
 from abc import ABCMeta
 from abc import abstractmethod
 from contextlib import asynccontextmanager
@@ -47,7 +48,7 @@ class DownloaderMeta(ABCMeta):
         )
 
 
-class BaseDownloader(metaclass=DownloaderMeta):
+class BaseDownloader(ABC, metaclass=DownloaderMeta):
     def __init__(self, crawler: "Crawler"):
         self.crawler = crawler
         self._active = ActiveRequestManager()
