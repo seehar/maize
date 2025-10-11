@@ -12,7 +12,7 @@ from aiohttp import TraceRequestStartParams
 from maize.common.http import Response
 from maize.common.http.request import Request
 from maize.common.model.download_response_model import DownloadResponse
-from maize.downloader.base_downloader import BaseDownloader
+from maize.downloader.base.base_downloader import BaseDownloader
 
 
 if typing.TYPE_CHECKING:

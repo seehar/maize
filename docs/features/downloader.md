@@ -79,7 +79,7 @@ from aiohttp import TCPConnector
 from aiohttp import TraceConfig
 from aiohttp import TraceRequestStartParams
 
-from maize.downloader.base_downloader import BaseDownloader
+from maize.downloader.base.base_downloader import BaseDownloader
 from maize.common.http.request import Request
 from maize.common.http import Response
 

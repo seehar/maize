@@ -33,7 +33,7 @@ from maize.utils.string_util import StringUtil
 
 if TYPE_CHECKING:
     from maize.core.crawler import Crawler
-    from maize.downloader.base_downloader import BaseDownloader
+    from maize.downloader.base.base_downloader import BaseDownloader
     from maize.settings import SpiderSettings
     from maize.spider.spider import Spider
     from maize.spider.task_spider import TaskSpider

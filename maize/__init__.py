@@ -5,7 +5,7 @@ from maize.common.items.field import Field
 from maize.core.crawler import CrawlerProcess
 from maize.core.decorator_entry import SpiderEntry
 from maize.downloader.aiohttp_downloader import AioHttpDownloader
-from maize.downloader.base_downloader import BaseDownloader
+from maize.downloader.base.base_downloader import BaseDownloader
 from maize.downloader.httpx_downloader import HTTPXDownloader
 from maize.pipelines.base_pipeline import BasePipeline
 from maize.settings.spider_settings import SpiderSettings

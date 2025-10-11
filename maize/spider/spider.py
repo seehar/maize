@@ -1,5 +1,4 @@
 import asyncio
-import sys
 import typing
 from typing import TYPE_CHECKING
 from typing import Any
