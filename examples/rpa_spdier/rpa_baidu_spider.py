@@ -1,5 +1,6 @@
 import asyncio
 import typing
+from urllib.parse import urlencode
 
 from playwright.async_api import Page
 
@@ -11,17 +12,19 @@ from maize.downloader.playwright_downloader import PlaywrightDownloader
 
 class RpaBaiduSpider(Spider):
     custom_settings = {
-        "CONCURRENCY": 2,
-        # "DOWNLOADER": "maize.downloader.playwright_downloader.PlaywrightDownloader",
-        "DOWNLOADER": "maize.downloader.patchright_downloader.PatchrightDownloader",
+        "CONCURRENCY": 1,
+        "DOWNLOADER": "maize.downloader.playwright_downloader.PlaywrightDownloader",
+        # "DOWNLOADER": "maize.downloader.patchright_downloader.PatchrightDownloader",
         "LOGGER_HANDLER": "examples.baidu_spider.logger_util.InterceptHandler",
         "USE_SESSION": True,
         "RPA_HEADLESS": False,
+        "RPA_SKIP_RESOURCE_TYPES": ["image", "media", "font", "stylesheet"],
     }
 
     async def start_requests(self) -> typing.AsyncGenerator[Request, typing.Any]:
-        for _ in range(2):
-            yield Request("https://www.baidu.com", cookies={})
+        for _ in range(1):
+            keyword_encode = urlencode({"search_query": "#CoupleVlog"})
+            yield Request(f"https://www.youtube.com/results?{keyword_encode}")
 
     async def parse(self, response: Response[PlaywrightDownloader, Page]):
         self.logger.info(f"原始响应URL:{response.url}")

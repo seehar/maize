@@ -109,6 +109,12 @@ class SpiderSettings(BaseModel):
     # 渲染时长，即打开网页等待指定时间后再获取源码
     RPA_RENDER_TIME: Optional[int] = field(default_factory=lambda: None)
 
+    # rpa 不加载资源类型列表，支持以下资源类型：
+    # document、stylesheet、image、media、font、script、texttrack、xhr、fetch、eventsource、websocket、manifest、other
+    RPA_SKIP_RESOURCE_TYPES: List[str] = field(default_factory=lambda: [])
+
+    RPA_SKIP_URL_PATTERNS: List[str] = field(default_factory=lambda: [])
+
     # 自定义浏览器渲染参数
     RPA_CUSTOM_ARGUMENT: List[str] = field(
         default_factory=lambda: ["--no-sandbox", "--disable-blink-features=AutomationControlled"]
