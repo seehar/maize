@@ -263,7 +263,7 @@ class Engine:
             await self.enqueue_request(download_result)
             return None
 
-        if download_result.response is None:
+        if download_result is None or download_result.response is None:
             # 下载失败
             await self.spider.stats_collector.record_download_fail(download_result.reason)
             return await _error(request)

@@ -4,7 +4,7 @@ from abc import ABCMeta
 from abc import abstractmethod
 from collections import defaultdict
 from pathlib import Path
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Union
 from typing import Optional
 from typing import Protocol
 from typing import Dict
@@ -192,7 +192,7 @@ class BaseBrowserDownloader(
 
         await super().close()
 
-    async def download(self, request: Request) -> Optional[DownloadResponse]:
+    async def download(self, request: Request) -> Union[DownloadResponse, Request]:
         """下载请求"""
         response = ""
         cookies = []
@@ -231,9 +231,9 @@ class BaseBrowserDownloader(
                         try:
                             page_state = "closed" if page.is_closed() else "open"
                             self.logger.info(f"Page state: {page_state}")
-                        except Exception as e:
-                            self.logger.info(f"Error checking page state: {e}")
-                    raise
+                        except Exception as child_e:
+                            self.logger.info(f"Error checking page state: {child_e}")
+                    raise e
 
             else:
                 # 非 session 模式：为每个请求创建独立的 browser/ context
@@ -275,7 +275,10 @@ class BaseBrowserDownloader(
             self.logger.error(f"Error during request: {e}")
             if new_request := await self._download_retry(request, e):
                 return new_request
-            return None
+
+            download_response = DownloadResponse()
+            download_response.reason = str(e)
+            return download_response
         finally:
             # 清理资源
             if self._use_session and page:
