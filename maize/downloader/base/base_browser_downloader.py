@@ -87,6 +87,9 @@ class BaseBrowserDownloader(
         self.__rpa_url_regexes_save_all = self.crawler.settings.RPA_URL_REGEXES_SAVE_ALL
         self.__rpa_skip_resource_types = self.crawler.settings.RPA_SKIP_RESOURCE_TYPES
         self.__rpa_skip_url_patterns = self.crawler.settings.RPA_SKIP_URL_PATTERNS
+        self.__proxy: str = self.crawler.settings.PROXY_TUNNEL
+        self.__proxy_username: str = self.crawler.settings.PROXY_TUNNEL_USERNAME
+        self.__proxy_password: str = self.crawler.settings.PROXY_TUNNEL_PASSWORD
         self.__view_size: Optional[ViewportSizeT] = None
         self._cache_data: Dict[str, List[InterceptResponse]] = {}
 
@@ -240,13 +243,27 @@ class BaseBrowserDownloader(
                 playwright_context = await self._get_playwright_instance()
                 async with playwright_context as playwright:
                     browser = await self._get_browser(playwright)
-                    context = await browser.new_context(
-                        user_agent=self.__rpa_user_agent,
-                        screen=self.__view_size,
-                        viewport=self.__view_size,
-                    )
-                    if self._use_stealth_js:
-                        await context.add_init_script(path=self._stealth_js_path)
+
+                    # 如果使用远程浏览器连接(CDP)，使用已存在的 context
+                    if self.__rpa_endpoint_url:
+                        context = browser.contexts[0]
+                        if self.__proxy:
+                            self.logger.warning("使用 RPA_ENDPOINT_URL 连接远程浏览器时，代理需要在远程浏览器启动时配置")
+                    else:
+                        # 否则创建新的 context
+                        context_kwargs = {
+                            "user_agent": self.__rpa_user_agent,
+                            "screen": self.__view_size,
+                            "viewport": self.__view_size,
+                        }
+                        proxy_config = self._get_proxy_config()
+                        if proxy_config:
+                            context_kwargs["proxy"] = proxy_config
+
+                        context = await browser.new_context(**context_kwargs)
+                        if self._use_stealth_js:
+                            await context.add_init_script(path=self._stealth_js_path)
+
                     if request.cookies:
                         await context.add_cookies(request.cookies)
 
@@ -264,7 +281,7 @@ class BaseBrowserDownloader(
                     page = await context.new_page()
                     page.on("download", self.handle_download)
 
-                    await page.goto(request.url)
+                    await page.goto(request.url, timeout=self._timeout, wait_until="load")
                     await page.wait_for_load_state()
                     await asyncio.sleep(self.__rpa_render_time)
                     response = await page.content()
@@ -283,12 +300,22 @@ class BaseBrowserDownloader(
             # 清理资源
             if self._use_session and page:
                 await self.page_pool.release_page(page)
-            elif not self._use_session and context:
+            elif not self._use_session:
+                # 非 session 模式：需要清理 page 和 context
                 try:
-                    await page.close()
-                    await context.close()
+                    # 关闭 page
+                    if page and not page.is_closed():
+                        await page.close()
                 except Exception as e:
-                    self.logger.warning(f"Failed to close page or context: {e}")
+                    self.logger.debug(f"Failed to close page: {e}")
+
+                try:
+                    # 关闭 context（仅在非远程浏览器模式下）
+                    # 远程浏览器的 context 不应该由我们关闭
+                    if context and not self.__rpa_endpoint_url:
+                        await context.close()
+                except Exception as e:
+                    self.logger.debug(f"Failed to close context: {e}")
 
     def structure_response(self, request: Request, response: str, cookies: List[CookieT]) -> DownloadResponse:
         """构建并返回 DownloadResponse 对象"""
@@ -317,6 +344,27 @@ class BaseBrowserDownloader(
         download_response.response = response_instance
         return download_response
 
+    def _get_proxy_config(self) -> Optional[Dict]:
+        """构建代理配置字典"""
+        if not self.__proxy:
+            return None
+
+        # 确保代理地址格式正确
+        proxy_server = self.__proxy
+        if not proxy_server.startswith(("http://", "https://", "socks5://")):
+            proxy_server = f"http://{proxy_server}"
+
+        proxy_config = {
+            "server": proxy_server
+        }
+
+        if self.__proxy_username and self.__proxy_password:
+            proxy_config["username"] = self.__proxy_username
+            proxy_config["password"] = self.__proxy_password
+
+        self.logger.debug(f"代理配置: server={proxy_server}, with_auth={bool(self.__proxy_username)}")
+        return proxy_config
+
     async def _get_browser(self, playwright: PlaywrightT) -> BrowserT:
         """获取 browser 实例"""
         if self.__rpa_endpoint_url:
@@ -340,13 +388,22 @@ class BaseBrowserDownloader(
         """生成 context 和 page"""
         if self.__rpa_endpoint_url:
             self.context = self.browser.contexts[0]
+            # 使用远程浏览器连接时，记录代理配置提示
+            if self.__proxy:
+                self.logger.warning("使用 RPA_ENDPOINT_URL 连接远程浏览器时，代理需要在远程浏览器启动时配置，而不是在 context 级别配置")
             return
 
-        self.context = await self.browser.new_context(
-            user_agent=self.__rpa_user_agent,
-            screen=self.__view_size,
-            viewport=self.__view_size,
-        )
+        context_kwargs = {
+            "user_agent": self.__rpa_user_agent,
+            "screen": self.__view_size,
+            "viewport": self.__view_size,
+        }
+        # 只在非远程连接模式下应用代理配置
+        proxy_config = self._get_proxy_config()
+        if proxy_config:
+            context_kwargs["proxy"] = proxy_config
+
+        self.context = await self.browser.new_context(**context_kwargs)
         if self._use_stealth_js:
             await self.context.add_init_script(path=self._stealth_js_path)
 
