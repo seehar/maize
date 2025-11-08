@@ -5,7 +5,7 @@ from typing import List
 
 if TYPE_CHECKING:
     from maize import Item
-    from maize.settings.settings_manager import SpiderSettings
+    from maize.settings import SpiderSettings
 
 
 class BasePipeline(metaclass=ABCMeta):

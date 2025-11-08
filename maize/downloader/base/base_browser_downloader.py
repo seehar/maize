@@ -4,13 +4,14 @@ from abc import ABCMeta
 from abc import abstractmethod
 from collections import defaultdict
 from pathlib import Path
-from typing import TYPE_CHECKING, Union
-from typing import Optional
-from typing import Protocol
+from typing import TYPE_CHECKING
 from typing import Dict
 from typing import Generic
 from typing import List
+from typing import Optional
+from typing import Protocol
 from typing import TypeVar
+from typing import Union
 
 import ujson
 
@@ -72,24 +73,25 @@ class BaseBrowserDownloader(
 
         self._use_stealth_js: Optional[bool] = None
         self._stealth_js_path: Optional[Path | str] = None
-        self.__rpa_headless = self.crawler.settings.RPA_HEADLESS
-        self.__rpa_driver_type = self.crawler.settings.RPA_DRIVER_TYPE
-        self.__rpa_user_agent = self.crawler.settings.RPA_USER_AGENT
-        self.__rpa_timeout = self.crawler.settings.REQUEST_TIMEOUT
-        self.__rpa_window_size = self.crawler.settings.RPA_WINDOW_SIZE
-        self.__rpa_executable_path = self.crawler.settings.RPA_EXECUTABLE_PATH
-        self.__rpa_download_path = self.crawler.settings.RPA_DOWNLOAD_PATH
-        self.__rpa_render_time = self.crawler.settings.RPA_RENDER_TIME or 0
-        self.__rpa_custom_argument = self.crawler.settings.RPA_CUSTOM_ARGUMENT
-        self.__rpa_endpoint_url = self.crawler.settings.RPA_ENDPOINT_URL
-        self.__rpa_slow_mo = self.crawler.settings.RPA_SLOW_MO
-        self.__rpa_url_regexes = self.crawler.settings.RPA_URL_REGEXES
-        self.__rpa_url_regexes_save_all = self.crawler.settings.RPA_URL_REGEXES_SAVE_ALL
-        self.__rpa_skip_resource_types = self.crawler.settings.RPA_SKIP_RESOURCE_TYPES
-        self.__rpa_skip_url_patterns = self.crawler.settings.RPA_SKIP_URL_PATTERNS
-        self.__proxy: str = self.crawler.settings.PROXY_TUNNEL
-        self.__proxy_username: str = self.crawler.settings.PROXY_TUNNEL_USERNAME
-        self.__proxy_password: str = self.crawler.settings.PROXY_TUNNEL_PASSWORD
+        rpa_settings = self.crawler.settings.rpa
+        self.__rpa_headless = rpa_settings.headless
+        self.__rpa_driver_type = rpa_settings.driver_type
+        self.__rpa_user_agent = rpa_settings.user_agent
+        self.__rpa_timeout = self.crawler.settings.request.request_timeout
+        self.__rpa_window_size = rpa_settings.window_size
+        self.__rpa_executable_path = rpa_settings.executable_path
+        self.__rpa_download_path = rpa_settings.download_path
+        self.__rpa_render_time = rpa_settings.render_time or 0
+        self.__rpa_custom_argument = rpa_settings.custom_argument
+        self.__rpa_endpoint_url = rpa_settings.endpoint_url
+        self.__rpa_slow_mo = rpa_settings.slow_mo
+        self.__rpa_url_regexes = rpa_settings.url_regexes
+        self.__rpa_url_regexes_save_all = rpa_settings.url_regexes_save_all
+        self.__rpa_skip_resource_types = rpa_settings.skip_resource_types
+        self.__rpa_skip_url_patterns = rpa_settings.skip_url_patterns
+        self.__proxy: str = self.crawler.settings.proxy.proxy_url
+        self.__proxy_username: str = self.crawler.settings.proxy.proxy_username
+        self.__proxy_password: str = self.crawler.settings.proxy.proxy_password
         self.__view_size: Optional[ViewportSizeT] = None
         self._cache_data: Dict[str, List[InterceptResponse]] = {}
 
@@ -116,17 +118,17 @@ class BaseBrowserDownloader(
         # 打开下载器，初始化播放引擎等资源
         await super().open()
 
-        self._timeout = self.crawler.settings.REQUEST_TIMEOUT * 1000
-        self._use_session = self.crawler.settings.USE_SESSION
+        self._timeout = self.crawler.settings.request.request_timeout * 1000
+        self._use_session = self.crawler.settings.request.use_session
 
-        self._use_stealth_js = self.crawler.settings.RPA_USE_STEALTH_JS
-        self._stealth_js_path = self.crawler.settings.RPA_STEALTH_JS_PATH
+        self._use_stealth_js = self.crawler.settings.rpa.use_stealth_js
+        self._stealth_js_path = self.crawler.settings.rpa.stealth_js_path
 
         viewport_size_class = self._get_viewport_size_class()
         self.__view_size = viewport_size_class(width=self.__rpa_window_size[0], height=self.__rpa_window_size[1])
 
         # 获取并发数设置，用于页面池大小
-        concurrency = self.crawler.settings.CONCURRENCY or 10
+        concurrency = self.crawler.settings.concurrency or 10
         self.page_pool = PagePool(crawler=self.crawler, max_pages=concurrency)
 
         if self._use_session:
@@ -354,9 +356,7 @@ class BaseBrowserDownloader(
         if not proxy_server.startswith(("http://", "https://", "socks5://")):
             proxy_server = f"http://{proxy_server}"
 
-        proxy_config = {
-            "server": proxy_server
-        }
+        proxy_config = {"server": proxy_server}
 
         if self.__proxy_username and self.__proxy_password:
             proxy_config["username"] = self.__proxy_username

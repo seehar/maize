@@ -134,14 +134,14 @@ class StatsCollector:
         maize_upload_model.pid = os.getpid()
         maize_upload_model.stat_time = pre_minute_key
         maize_upload_model.spider_name = self._spider_name
-        maize_upload_model.project_name = self._settings.PROJECT_NAME
+        maize_upload_model.project_name = self._settings.project_name
         maize_upload_model.container_id = self._container_id
 
         maize_upload_model_dict = asdict(maize_upload_model)
         maize_upload_model_dict.update(asdict(pre_minute_stat))
         self._logger.info(f"stat: {maize_upload_model_dict}")
 
-        if not self._settings.MAIZE_COB_API:
+        if not self._settings.maize_cob_api:
             del self._stats[pre_minute_key]
             self._last_upload_key = pre_minute_key
             return
@@ -150,7 +150,7 @@ class StatsCollector:
             for _ in range(3):
                 try:
                     async with httpx.AsyncClient() as client:
-                        response = await client.post(self._settings.MAIZE_COB_API, json=maize_upload_model_dict)
+                        response = await client.post(self._settings.maize_cob_api, json=maize_upload_model_dict)
                         self._logger.info(f"upload stat: <{response.status_code}> {response.text}")
                     del self._stats[pre_minute_key]
                     self._last_upload_key = pre_minute_key

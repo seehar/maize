@@ -1,14 +1,17 @@
-from dataclasses import dataclass
-
 from maize import SpiderSettings
+from maize.common.constant.setting_constant import LogLevelEnum
+from maize.common.constant.setting_constant import SpiderDownloaderEnum
+from maize.settings.spider_settings import PipelineSettings
 
 
-@dataclass
+class BaiduSpiderPipelineSettings(PipelineSettings):
+    pipelines: list = ["tests.test_full_process.test_spider.pipeline.CustomPipeline"]
+
+
 class BaiduSpiderSettings(SpiderSettings):
-    PROJECT_NAME = "baidu_spider"
-    CONCURRENCY = 1
-    LOG_LEVEL = "DEBUG"
-    DOWNLOADER = "maize.HTTPXDownloader"
-    LOGGER_HANDLER = "tests.test_full_process.test_spider.logger_util.InterceptHandler"
-
-    ITEM_PIPELINES = ["tests.test_full_process.test_spider.pipeline.CustomPipeline"]
+    project_name: str = "baidu_spider"
+    concurrency: int = 1
+    log_level: str = LogLevelEnum.DEBUG.value
+    downloader: str = SpiderDownloaderEnum.HTTPX.value
+    logger_handler: str = "tests.test_full_process.test_spider.logger_util.InterceptHandler"
+    pipeline: PipelineSettings = BaiduSpiderPipelineSettings()

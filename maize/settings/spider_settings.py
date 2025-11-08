@@ -1,177 +1,260 @@
-"""
-default config
-"""
-from dataclasses import dataclass
-from dataclasses import field
 from pathlib import Path
+from typing import Any
 from typing import List
-from typing import Literal
 from typing import Optional
 from typing import Tuple
 
-from maize.common.model.base_model import BaseModel
+from pydantic import BaseModel
+from pydantic import Field
+from pydantic_settings import BaseSettings
+from pydantic_settings import PydanticBaseSettingsSource
+from pydantic_settings import SettingsConfigDict
+from pydantic_settings import TomlConfigSettingsSource
+from pydantic_settings import YamlConfigSettingsSource
+
+from maize.common.constant.setting_constant import LogLevelEnum
+from maize.common.constant.setting_constant import PipelineEnum
+from maize.common.constant.setting_constant import RPADriverTypeEnum
+from maize.common.constant.setting_constant import SpiderDownloaderEnum
 
 
 BASE_DIR = Path(__file__).parent.parent
 
 
-@dataclass
-class SpiderSettings(BaseModel):
-    PROJECT_NAME: str = "project name"
+class RequestSettings(BaseModel):
+    """请求配置"""
 
-    # 并发数
-    CONCURRENCY: int = 1
+    verify_ssl: bool = Field(default=True, description="是否验证 SSL 证书")
+    request_timeout: int = Field(default=60, description="请求超时时间，单位：秒")
+    random_wait_time: Tuple[int, int] = Field(default=(0, 0), description="随机等待时间，单位：秒")
+    use_session: bool = Field(default=True, description="是否使用 session（HTTPXDownloader 不支持）")
+    max_retry_count: int = Field(default=0, description="请求最大重试次数")
 
-    # 是否验证 SSL 证书
-    VERIFY_SSL: bool = True
 
-    # 请求超时时间，单位：秒
-    REQUEST_TIMEOUT: int = 60
-
-    # 随机等待时间，单位：秒
-    RANDOM_WAIT_TIME: Tuple[int, int] = (0, 0)
-
-    # 是否使用 session
-    # 注意：基于 httpx 的下载器（HTTPXDownloader）不支持 session，所以此选项无效
-    USE_SESSION: bool = True
-
-    # 下载器
-    # 基于 aiohttp 封装的下载器：maize.AioHttpDownloader
-    # 基于 httpx 封装的下载器：maize.HTTPXDownloader
-    # 基于 playwright 封装的下载器: maize.downloader.playwright_downloader.PlaywrightDownloader
-    DOWNLOADER: str = "maize.AioHttpDownloader"
-
-    # 日志级别，与 logging 日志级别相同
-    # 如果您使用自定义日志处理模块，此选项无效，请您在自定义日志处理模块中设置日志级别
-    LOG_LEVEL: str = "INFO"
-
-    # 日志 handler
-    # 如不想使用默认的 logging 模块，可以自定义日志处理模块
-    LOGGER_HANDLER: str = ""
-
-    # 请求最大重试次数
-    MAX_RETRY_COUNT: int = 0
-
-    # item在内存队列中最大缓存数量
-    ITEM_MAX_CACHE_COUNT: int = 5000
-
-    # item每批入库的最大数量
-    ITEM_HANDLE_BATCH_MAX_SIZE: int = 1000
-
-    # item入库时间间隔，单位：秒
-    ITEM_HANDLE_INTERVAL: int = 2
-
-    # 入库异常的 item 最大重试次数
-    ERROR_ITEM_MAX_RETRY_COUNT: int = 5
-
-    # 入库异常的 item 在内存队列中最大缓存数量
-    ERROR_ITEM_MAX_CACHE_COUNT: int = 5000
-
-    # 入库异常的 item 重试每批处理的最大数量
-    # 批量入库可能会因为某个 item 异常，导致整批数据无法入库，建议每批处理一个 item
-    ERROR_ITEM_RETRY_BATCH_MAX_SIZE: int = 1
-
-    # 入库异常的 item 超过重试次数后，每批处理的最大数量
-    ERROR_ITEM_HANDLE_BATCH_MAX_SIZE: int = 1000
-
-    # 处理入库异常的 item 时间间隔，单位：秒
-    ERROR_ITEM_HANDLE_INTERVAL: int = 60
+class PipelineSettings(BaseModel):
+    """数据管道配置"""
 
     # 数据管道，支持多个数据管道
-    # maize.BasePipeline: 默认数据管道，不做任何处理
-    # maize.MysqlPipeline: 集成 aiomysql 的数据管道，自动入库 mysql 数据库
-    ITEM_PIPELINES: List[str] = field(default_factory=lambda: ["maize.BasePipeline"])
+    pipelines: List[str] = Field(default=[PipelineEnum.BASE.value], description="数据管道列表")
 
-    # rpa
-    # 使用使用 stealth js
-    RPA_USE_STEALTH_JS: bool = True
+    # Item 正常处理配置
+    max_cache_count: int = Field(default=5000, description="item在内存队列中最大缓存数量")
+    handle_batch_max_size: int = Field(default=1000, description="item每批入库的最大数量")
+    handle_interval: int = Field(default=2, description="item入库时间间隔，单位：秒")
+
+    # 异常 Item 处理配置
+    error_max_retry_count: int = Field(default=5, description="入库异常的 item 最大重试次数")
+    error_max_cache_count: int = Field(default=5000, description="入库异常的 item 在内存队列中最大缓存数量")
+    error_retry_batch_max_size: int = Field(default=1, description="入库异常的 item 重试每批处理的最大数量")
+    error_handle_batch_max_size: int = Field(default=1000, description="入库异常的 item 超过重试次数后，每批处理的最大数量")
+    error_handle_interval: int = Field(default=60, description="处理入库异常的 item 时间间隔，单位：秒")
+
+
+class RPASettings(BaseModel):
+    """RPA 浏览器配置"""
+
+    # 使用 stealth js
+    use_stealth_js: bool = Field(default=True, description="是否使用 stealth js")
     # stealth js 文件路径
-    RPA_STEALTH_JS_PATH: Path = BASE_DIR / "utils/js/stealth.min.js"
-
+    stealth_js_path: Path = Field(default=BASE_DIR / "utils/js/stealth.min.js", description="stealth js 文件路径")
     # 是否为无头浏览器
-    RPA_HEADLESS: bool = True
-
-    # chromium、firefox、webkit
-    RPA_DRIVER_TYPE: Literal["chromium", "firefox", "webkit"] = "chromium"
-
+    headless: bool = Field(default=True, description="是否为无头浏览器")
+    # 浏览器驱动类型
+    driver_type: str = Field(default=RPADriverTypeEnum.CHROMIUM.value, description="浏览器驱动类型")
     # 请求头
-    RPA_USER_AGENT: Optional[str] = field(default_factory=lambda: None)
-
-    # # 窗口大小
-    RPA_WINDOW_SIZE: Tuple[int, int] = field(default_factory=lambda: (1024, 800))
-
-    # 浏览器路径，默认为默认路径
-    RPA_EXECUTABLE_PATH: Optional[str] = field(default_factory=lambda: None)
-
+    user_agent: Optional[str] = Field(default=None, description="User Agent")
+    # 窗口大小
+    window_size: Tuple[int, int] = Field(default=(1024, 800), description="窗口大小")
+    # 浏览器路径
+    executable_path: Optional[str] = Field(default=None, description="浏览器可执行文件路径")
     # 下载文件的路径
-    RPA_DOWNLOAD_PATH: Optional[str] = field(default_factory=lambda: None)
-
-    # 渲染时长，即打开网页等待指定时间后再获取源码
-    RPA_RENDER_TIME: Optional[int] = field(default_factory=lambda: None)
-
-    # rpa 不加载资源类型列表，支持以下资源类型：
-    # document、stylesheet、image、media、font、script、texttrack、xhr、fetch、eventsource、websocket、manifest、other
-    RPA_SKIP_RESOURCE_TYPES: List[str] = field(default_factory=lambda: [])
-
-    RPA_SKIP_URL_PATTERNS: List[str] = field(default_factory=lambda: [])
-
+    download_path: Optional[str] = Field(default=None, description="下载文件的路径")
+    # 渲染时长
+    render_time: Optional[int] = Field(default=None, description="渲染时长，单位：秒")
+    # 不加载资源类型列表
+    skip_resource_types: List[str] = Field(default=[], description="不加载的资源类型列表")
+    # 跳过的 URL 模式
+    skip_url_patterns: List[str] = Field(default=[], description="跳过的 URL 模式")
     # 自定义浏览器渲染参数
-    RPA_CUSTOM_ARGUMENT: List[str] = field(
-        default_factory=lambda: ["--no-sandbox", "--disable-blink-features=AutomationControlled"]
+    custom_argument: List[str] = Field(
+        default=["--no-sandbox", "--disable-blink-features=AutomationControlled"], description="自定义浏览器渲染参数"
     )
+    # CDP websocket 端点
+    endpoint_url: Optional[str] = Field(default=None, description="CDP websocket 端点")
+    # 操作减慢时间
+    slow_mo: Optional[float] = Field(default=None, description="RPA 操作减慢时间，单位：毫秒")
+    # 拦截 xhr 接口正则表达式列表
+    url_regexes: List[str] = Field(default=[], description="拦截 xhr 接口正则表达式列表")
+    # 是否保存所有拦截的接口
+    url_regexes_save_all: bool = Field(default=False, description="是否保存所有拦截的接口")
 
-    # 要连接的 CDP websocket 端点或 http url。例如 `http://localhost:9222/` 或
-    # `ws://127.0.0.1:9222/devtools/browser/387adf4c-243f-4051-a181-46798f4a46f4`.
-    RPA_ENDPOINT_URL: Optional[str] = field(default_factory=lambda: None)
 
-    # 将 RPA 操作减慢指定的毫秒数。很有用，这样您就可以看到发生了什么。默认为0。
-    RPA_SLOW_MO: Optional[float] = field(default_factory=lambda: None)
+class RedisSettings(BaseModel):
+    """Redis 配置"""
 
-    # 是否使用分布式爬虫，开启后，需要对 redis 进行配置
-    IS_DISTRIBUTED: bool = False
-
-    # 拦截 xhr 接口，支持正则，数组类型
-    RPA_URL_REGEXES: List[str] = field(default_factory=lambda: [])
-
-    # 是否保存所有拦截的接口, 配合 url_regexes 使用，为 False 时只保存最后一次拦截的接口
-    RPA_URL_REGEXES_SAVE_ALL: bool = False
-
-    # redis
-    USE_REDIS: bool = False
-    REDIS_HOST: str = "localhost"
-    REDIS_PORT: int = 6379
-    REDIS_DB: int = 0
-    REDIS_USERNAME: Optional[str] = field(default_factory=lambda: None)
-    REDIS_PASSWORD: Optional[str] = field(default_factory=lambda: None)
-
-    REDIS_KEY_PREFIX: str = "maize"
-    REDIS_KEY_LOCK: str = "lock"
-    REDIS_KEY_RUNNING: str = "running"
-    REDIS_KEY_QUEUE: str = "queue"
-
-    # 隧道代理，示例：xxx.xxx:2132。注意：不包含 http:// 或 https://
-    PROXY_TUNNEL: str = ""
-
-    # 隧道代理用户名
-    PROXY_TUNNEL_USERNAME: str = ""
-
-    # 隧道代理密码
-    PROXY_TUNNEL_PASSWORD: str = ""
-
-    # mysql数据库配置
-    MYSQL_HOST: str = "localhost"
-    MYSQL_PORT: str | int = 3306
-    MYSQL_DB: str = ""
-    MYSQL_USER: str = ""
-    MYSQL_PASSWORD: str = ""
-
-    # maize-cob 配置
-    MAIZE_COB_API: str = ""
+    use_redis: bool = Field(default=False, description="是否使用 Redis")
+    host: str = Field(default="localhost", description="Redis 主机")
+    port: int = Field(default=6379, description="Redis 端口")
+    db: int = Field(default=0, description="Redis 数据库")
+    username: Optional[str] = Field(default=None, description="Redis 用户名")
+    password: Optional[str] = Field(default=None, description="Redis 密码")
+    key_prefix: str = Field(default="maize", description="Redis key 前缀")
+    key_lock: str = Field(default="lock", description="Redis lock key")
+    key_running: str = Field(default="running", description="Redis running key")
+    key_queue: str = Field(default="queue", description="Redis queue key")
 
     @property
-    def redis_url(self):
-        redis_url_username_password = ""
-        if self.REDIS_USERNAME or self.REDIS_PASSWORD:
-            redis_url_username_password = f"{self.REDIS_USERNAME or ''}:{self.REDIS_PASSWORD or ''}@"
+    def url(self) -> str:
+        """生成 Redis 连接 URL"""
+        url_username_password = ""
+        if self.username or self.password:
+            url_username_password = f"{self.username or ''}:{self.password or ''}@"
+        return f"redis://{url_username_password}{self.host}:{self.port}/{self.db}"
 
-        return f"redis://{redis_url_username_password}{self.REDIS_HOST}:{self.REDIS_PORT}/{self.REDIS_DB}"
+
+class ProxySettings(BaseModel):
+    """代理配置"""
+
+    # 代理，示例：xxx.xxx:2132（不包含 http:// 或 https://）
+    proxy_url: str = Field(default="", description="代理地址")
+    proxy_username: str = Field(default="", description="代理用户名")
+    proxy_password: str = Field(default="", description="代理密码")
+
+    # 建议添加:
+    enabled: bool = Field(default=False, description="是否启用代理")
+
+    @property
+    def proxy_dict(self) -> dict | None:
+        """生成代理字典"""
+        if not self.enabled or not self.proxy_url:
+            return None
+
+        if self.proxy_username and self.proxy_password:
+            return {
+                "http": f"http://{self.proxy_username}:{self.proxy_password}@{self.proxy_url}",
+                "https": f"http://{self.proxy_username}:{self.proxy_password}@{self.proxy_url}",
+            }
+        return {"http": f"http://{self.proxy_url}", "https": f"http://{self.proxy_url}"}
+
+
+class MySQLSettings(BaseModel):
+    """MySQL 数据库配置"""
+
+    host: str = Field(default="localhost", description="MySQL 主机")
+    port: str | int = Field(default=3306, description="MySQL 端口")
+    db: str = Field(default="", description="MySQL 数据库名")
+    user: str = Field(default="", description="MySQL 用户名")
+    password: str = Field(default="", description="MySQL 密码")
+
+
+class SpiderSettings(BaseSettings):
+    """爬虫配置主类"""
+
+    # 基础配置
+    project_name: str = Field(default="project name", description="项目名称")
+    concurrency: int = Field(default=1, description="并发数")
+
+    # 下载器配置
+    downloader: str = Field(default=SpiderDownloaderEnum.AIOHTTP.value, description="下载器")
+
+    # 日志配置
+    log_level: str = Field(default=LogLevelEnum.INFO.value, description="日志级别")
+    logger_handler: str = Field(default="", description="日志 handler")
+
+    # 是否使用分布式爬虫
+    is_distributed: bool = Field(default=False, description="是否使用分布式爬虫")
+
+    # maize-cob 配置
+    maize_cob_api: str = Field(default="", description="maize-cob API 地址")
+
+    # 子配置
+    request: RequestSettings = Field(default_factory=RequestSettings, description="请求配置")
+    pipeline: PipelineSettings = Field(default_factory=PipelineSettings, description="数据管道配置")
+    rpa: RPASettings = Field(default_factory=RPASettings, description="RPA 配置")
+    redis: RedisSettings = Field(default_factory=RedisSettings, description="Redis 配置")
+    proxy: ProxySettings = Field(default_factory=ProxySettings, description="代理配置")
+    mysql: MySQLSettings = Field(default_factory=MySQLSettings, description="MySQL 配置")
+
+    # 支持 .env, yml, toml 等格式
+    model_config = SettingsConfigDict(
+        env_file=".env",
+        yaml_file="settings.yaml",
+        toml_file="settings.toml",
+        env_file_encoding="utf-8",
+        extra="ignore",
+        env_nested_delimiter=".",
+        nested_model_default_partial_update=True,
+    )
+
+    @classmethod
+    def settings_customise_sources(
+        cls,
+        settings_cls: type["BaseSettings"],
+        init_settings: PydanticBaseSettingsSource,
+        env_settings: PydanticBaseSettingsSource,
+        dotenv_settings: PydanticBaseSettingsSource,
+        file_secret_settings: PydanticBaseSettingsSource,
+    ) -> tuple[PydanticBaseSettingsSource, ...]:
+        """
+        加载优先级：
+        1️. 初始化参数
+        2️. 系统环境变量
+        3️. .env 文件
+        4️. YAML 文件
+        5️. TOML 文件
+        6️. 文件机密目录（如 /var/run/secrets）
+        """
+        yaml_source = YamlConfigSettingsSource(settings_cls, yaml_file_encoding="utf-8")
+        toml_source = TomlConfigSettingsSource(settings_cls)
+
+        return (
+            init_settings,
+            env_settings,
+            dotenv_settings,
+            yaml_source,
+            toml_source,
+            file_secret_settings,
+        )
+
+    def merge_settings(self, settings: "SpiderSettings") -> "SpiderSettings":
+        """
+        合并另一个 Settings 实例的配置到当前实例
+
+        :param settings: 要合并的 Settings 实例
+        :return: 当前实例
+        """
+        updated_data = {}
+        for field_name in settings.__class__.model_fields.keys():
+            new_value = getattr(settings, field_name)
+            current_value = getattr(self, field_name)
+            # 只更新与当前值不同的字段
+            if new_value != current_value:
+                updated_data[field_name] = new_value
+
+        # 创建更新后的实例
+        updated_self = self.model_copy(update=updated_data)
+
+        # 使用 __dict__.update() 直接更新当前实例的字段，保持模型实例类型
+        self.__dict__.update(updated_self.__dict__)
+
+        return self
+
+    def merge_settings_from_dict(self, settings_dict: dict[str, Any]) -> "SpiderSettings":
+        """
+        合并 dict 的配置到当前实例
+
+        :param settings_dict: dict 类型的配置
+        :return: 当前实例
+        """
+        # 创建更新后的实例
+        updated_self = self.model_copy(update=settings_dict, deep=True)
+
+        # 使用 __dict__.update() 直接更新当前实例的字段，保持模型实例类型
+        self.__dict__.update(updated_self.__dict__)
+
+        return self
+
+    @property
+    def redis_url(self) -> str:
+        """生成 Redis 连接 URL（向后兼容）"""
+        return self.redis.url

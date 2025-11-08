@@ -22,11 +22,11 @@ class HTTPXDownloader(BaseDownloader):
 
     async def open(self):
         await super().open()
-        request_timeout = self.crawler.settings.REQUEST_TIMEOUT
+        request_timeout = self.crawler.settings.request.request_timeout
 
-        proxy_tunnel = self.crawler.settings.PROXY_TUNNEL
-        proxy_tunnel_username = self.crawler.settings.PROXY_TUNNEL_USERNAME
-        proxy_tunnel_password = self.crawler.settings.PROXY_TUNNEL_PASSWORD
+        proxy_tunnel = self.crawler.settings.proxy.proxy_url
+        proxy_tunnel_username = self.crawler.settings.proxy.proxy_username
+        proxy_tunnel_password = self.crawler.settings.proxy.proxy_password
         if proxy_tunnel and proxy_tunnel_username and proxy_tunnel_password:
             proxy_url = f"http://{proxy_tunnel_username}:{proxy_tunnel_password}@{proxy_tunnel}/"
             self.httpx_proxy = Proxy(url=proxy_url)

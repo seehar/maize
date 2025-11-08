@@ -9,7 +9,7 @@ from maize.utils.mysql_util import MysqlSingletonUtil
 
 if TYPE_CHECKING:
     from maize import Item
-    from maize.settings.settings_manager import SpiderSettings
+    from maize.settings import SpiderSettings
 
 
 class MysqlPipeline(BasePipeline):
@@ -19,11 +19,11 @@ class MysqlPipeline(BasePipeline):
         self.logger = get_logger(settings, self.__class__.__name__)
 
     async def open(self):
-        host = self.settings.MYSQL_HOST
-        port = self.settings.MYSQL_PORT or 3306
-        db = self.settings.MYSQL_DB
-        user = self.settings.MYSQL_USER
-        password = self.settings.MYSQL_PASSWORD
+        host = self.settings.mysql.host
+        port = self.settings.mysql.port or 3306
+        db = self.settings.mysql.db
+        user = self.settings.mysql.user
+        password = self.settings.mysql.password
 
         if not host or not db or not user or not password:
             raise ValueError("Mysql settings not found")

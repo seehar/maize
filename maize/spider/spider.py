@@ -10,6 +10,7 @@ from maize.common.http import Response
 from maize.common.http.request import Request
 from maize.core.crawler import CrawlerProcess
 from maize.core.stats_collector import StatsCollector
+from maize.settings import SpiderSettings
 from maize.utils.log_util import get_logger
 
 
@@ -17,7 +18,6 @@ if TYPE_CHECKING:
     from logging import Logger
 
     from maize.core.crawler import Crawler
-    from maize.settings import SpiderSettings
 
 
 class Spider:

@@ -1,6 +1,7 @@
 import asyncio
 import logging
 import typing
+from typing import Optional
 
 from maize.core.engine import Engine
 from maize.exceptions.spider_exception import SpiderTypeException
@@ -48,12 +49,12 @@ class Crawler:
         :return:
         """
         try:
-            custom_settings = getattr(spider, "custom_settings")
+            custom_settings: Optional[dict] = getattr(spider, "custom_settings")
         except AttributeError:
             custom_settings = None
 
         if custom_settings:
-            self.settings.update_from_dict(custom_settings)
+            self.settings.merge_settings_from_dict(custom_settings)
 
     def idle(self) -> bool:
         return self.spider.idle()

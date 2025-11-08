@@ -1,63 +1,71 @@
-from dataclasses import dataclass
-from dataclasses import field
+import ujson
 
+from maize.settings.spider_settings import PipelineSettings
 from maize.settings.spider_settings import SpiderSettings
 
 
 class TestSpiderSettings:
     def test_base_settings(self):
         spider_settings = SpiderSettings()
-        assert spider_settings.CONCURRENCY == 1
+        assert spider_settings.concurrency == 1
 
     def test_get_dict(self):
         spider_settings = SpiderSettings()
-        spider_settings_dict = spider_settings.get_dict()
+        spider_settings_dict = spider_settings.model_dump()
         assert isinstance(spider_settings_dict, dict)
 
     def test_from_json(self):
-        json_data = '{"CONCURRENCY": 5, "DOWNLOADER": "custom.Downloader", "ITEM_PIPELINES": ["custom.Pipeline1", "custom.Pipeline2"]}'
-        settings_from_json = SpiderSettings.from_json(json_data)
-        print("From JSON:", settings_from_json.ITEM_PIPELINES)
+        json_data = '{"concurrency": 5, "downloader": "custom.Downloader", "pipeline": {"pipelines": ["custom.Pipeline1", "custom.Pipeline2"]}}'
+        settings_from_json = SpiderSettings(**ujson.loads(json_data))
+        print("From JSON:", settings_from_json.pipeline.pipelines)
 
     def test_from_base_model(self):
-        @dataclass
+        class CustomPipelineSettings(PipelineSettings):
+            pipelines: list[str] = ["custom.Pipeline1", "custom.Pipeline2"]
+
         class CustomSpiderSettings(SpiderSettings):
-            CONCURRENCY: int = 5
-            DOWNLOADER: str = "custom.Downloader"
-            ITEM_PIPELINES: list = field(default_factory=lambda: ["custom.Pipeline1", "custom.Pipeline2"])
+            concurrency: int = 5
+            downloader: str = "custom.Downloader"
+            pipeline: PipelineSettings = CustomPipelineSettings()
 
         custom_spider_settings = CustomSpiderSettings()
-        assert custom_spider_settings.CONCURRENCY == 5
+        assert custom_spider_settings.concurrency == 5
 
     def test_from_base_model_from_dict(self):
-        @dataclass
+        class CustomPipelineSettings(PipelineSettings):
+            pipelines: list[str] = ["custom.Pipeline1", "custom.Pipeline2"]
+
         class CustomSpiderSettings(SpiderSettings):
-            CONCURRENCY: int = 5
-            DOWNLOADER: str = "custom.Downloader"
-            ITEM_PIPELINES: list = field(default_factory=lambda: ["custom.Pipeline1", "custom.Pipeline2"])
+            concurrency: int = 5
+            downloader: str = "custom.Downloader"
+            pipeline: PipelineSettings = CustomPipelineSettings()
 
         custom_spider_settings = CustomSpiderSettings()
-        assert custom_spider_settings.CONCURRENCY == 5
+        assert custom_spider_settings.concurrency == 5
 
         custom_settings = {
-            "PROJECT_NAME": "百度爬虫",
-            "USE_REDIS": True,
-            "REDIS_HOST": "192.168.137.219",
-            "REDIS_PORT": 6379,
-            "REDIS_DB": 0,
-            "REDIS_USERNAME": None,
-            "REDIS_PASSWORD": "123456",
+            "project_name": "百度爬虫",
+            "redis": {
+                "use_redis": True,
+                "redis_host": "192.168.137.219",
+                "redis_port": 6379,
+                "redis_db": 0,
+                "redis_username": None,
+                "redis_password": "123456",
+            },
         }
-        custom_spider_settings = custom_spider_settings.from_dict(
-            {
-                "CONCURRENCY": 10,
-                "DOWNLOADER": "custom.Downloader",
-                "ITEM_PIPELINES": ["custom.Pipeline1", "custom.Pipeline2"],
+        custom_spider_settings = CustomSpiderSettings(
+            **{
+                "concurrency": 10,
+                "downloader": "custom.Downloader",
+                "pipeline": {
+                    "pipelines": ["custom.Pipeline1", "custom.Pipeline2"],
+                },
             }
         )
         print("---> ", custom_spider_settings)
 
-        custom_spider_settings.update_from_dict(custom_settings)
-        assert custom_spider_settings.CONCURRENCY == 10
+        custom_spider_settings.merge_settings_from_dict(custom_settings)
+        assert custom_spider_settings.concurrency == 10
         print(custom_spider_settings)
-        print(custom_spider_settings.ITEM_PIPELINES)
+        print(custom_spider_settings.pipeline.pipelines)

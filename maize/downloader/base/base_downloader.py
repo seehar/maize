@@ -52,9 +52,9 @@ class BaseDownloader(ABC, metaclass=DownloaderMeta):
     def __init__(self, crawler: "Crawler"):
         self.crawler = crawler
         self._active = ActiveRequestManager()
-        self._max_retry_count: int = self.crawler.settings.MAX_RETRY_COUNT
+        self._max_retry_count: int = self.crawler.settings.request.max_retry_count
 
-        self.logger = get_logger(crawler.settings, self.__class__.__name__, crawler.settings.LOG_LEVEL)
+        self.logger = get_logger(crawler.settings, self.__class__.__name__, crawler.settings.log_level)
 
     @classmethod
     def create_instance(cls, *args, **kwargs):
@@ -63,7 +63,7 @@ class BaseDownloader(ABC, metaclass=DownloaderMeta):
     async def open(self):
         self.logger.info(
             f"{self.crawler.spider} <downloader class: {type(self).__name__}> "
-            f"<concurrency: {self.crawler.settings.CONCURRENCY}>"
+            f"<concurrency: {self.crawler.settings.concurrency}>"
         )
 
     async def fetch(self, request: Request) -> Union[DownloadResponse, Request]:
@@ -126,4 +126,4 @@ class BaseDownloader(ABC, metaclass=DownloaderMeta):
 
         :return:
         """
-        await asyncio.sleep(*self.crawler.settings.RANDOM_WAIT_TIME)
+        await asyncio.sleep(*self.crawler.settings.request.random_wait_time)

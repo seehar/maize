@@ -29,7 +29,7 @@ class LoggerManager:
         key = (name, log_level)
 
         def get_logger_handler():
-            logger_handler_path = spider_settings.LOGGER_HANDLER
+            logger_handler_path = spider_settings.logger_handler
             if logger_handler_path:
                 logger_handler_cls = load_class(logger_handler_path)
                 return logger_handler_cls()

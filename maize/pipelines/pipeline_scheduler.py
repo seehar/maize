@@ -12,7 +12,7 @@ from maize.utils.project_util import load_class
 if TYPE_CHECKING:
     from maize import BasePipeline
     from maize import Item
-    from maize.settings.settings_manager import SpiderSettings
+    from maize.settings import SpiderSettings
 
 
 class PipelineScheduler:
@@ -26,19 +26,20 @@ class PipelineScheduler:
         self.item_pipelines: List["BasePipeline"] = []
 
         # item
-        item_max_cache_count = settings.ITEM_MAX_CACHE_COUNT
-        self.item_handle_batch_max_size = settings.ITEM_HANDLE_BATCH_MAX_SIZE
-        self.item_handle_interval = settings.ITEM_HANDLE_INTERVAL
+        pipeline_settings = settings.pipeline
+        item_max_cache_count = pipeline_settings.max_cache_count
+        self.item_handle_batch_max_size = pipeline_settings.handle_batch_max_size
+        self.item_handle_interval = pipeline_settings.handle_interval
 
         self.item_queue = Queue(maxsize=item_max_cache_count)
         self._last_handle_item_time = 0
 
         # error item
-        self.error_item_max_retry_count = settings.ERROR_ITEM_MAX_RETRY_COUNT
-        error_item_max_cache_count = settings.ERROR_ITEM_MAX_CACHE_COUNT
-        self.error_item_retry_batch_max_size = settings.ERROR_ITEM_RETRY_BATCH_MAX_SIZE
-        self.error_item_handle_batch_max_size = settings.ERROR_ITEM_HANDLE_BATCH_MAX_SIZE
-        self.error_item_handle_interval = settings.ERROR_ITEM_HANDLE_INTERVAL
+        self.error_item_max_retry_count = pipeline_settings.error_max_retry_count
+        error_item_max_cache_count = pipeline_settings.error_max_cache_count
+        self.error_item_retry_batch_max_size = pipeline_settings.error_retry_batch_max_size
+        self.error_item_handle_batch_max_size = pipeline_settings.error_handle_batch_max_size
+        self.error_item_handle_interval = pipeline_settings.error_handle_interval
         self.error_item_queue = Queue(maxsize=error_item_max_cache_count)
         self._error_last_handle_item_time = 0
 
@@ -49,7 +50,7 @@ class PipelineScheduler:
         return self.item_queue.qsize()
 
     async def open(self):
-        pipeline_path_list = self.settings.ITEM_PIPELINES
+        pipeline_path_list = self.settings.pipeline.pipelines
         for pipeline_path in pipeline_path_list:
             self.logger.info(f"Loading pipeline: {pipeline_path}")
             pipeline_instance = load_class(pipeline_path)(self.settings)

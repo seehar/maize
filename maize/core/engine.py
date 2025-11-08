@@ -57,36 +57,36 @@ class Engine:
         self.task_requests: Optional[AsyncIterator[Request]] = None
 
         self.spider: Optional[Union["Spider", "TaskSpider"]] = None
-        self.task_manager: TaskManager = TaskManager(self.settings.CONCURRENCY)
+        self.task_manager: TaskManager = TaskManager(self.settings.concurrency)
         self.start_requests_running = False
         self.task_requests_running = False
         self._single_task_requests_running = False
         self.running = False
 
         # 分布式
-        self.is_distributed = self.settings.IS_DISTRIBUTED
+        self.is_distributed = self.settings.is_distributed
         self.__redis_util = None
         self.__redis_key_distributed_lock = None
         self.__redis_key_queue = None
         self.__redis_key_running = None
 
     def __init_redis(self):
-        if self.is_distributed or self.settings.USE_REDIS:
+        if self.is_distributed or self.settings.redis.use_redis:
             self.__redis_util = RedisUtil(self.settings.redis_url)
-            self.__redis_key_distributed_lock = self.__get_redis_key(self.settings.REDIS_KEY_LOCK)
-            self.__redis_key_queue = self.__get_redis_key(self.settings.REDIS_KEY_QUEUE)
-            self.__redis_key_running = self.__get_redis_key(self.settings.REDIS_KEY_RUNNING)
+            self.__redis_key_distributed_lock = self.__get_redis_key(self.settings.redis.key_lock)
+            self.__redis_key_queue = self.__get_redis_key(self.settings.redis.key_queue)
+            self.__redis_key_running = self.__get_redis_key(self.settings.redis.key_running)
 
     def __get_redis_key(self, key: str) -> str:
-        redis_key_prefix = self.settings.REDIS_KEY_PREFIX
+        redis_key_prefix = self.settings.redis.key_prefix
         spider_name = StringUtil.camel_to_snake(self.spider.__class__.__name__)
         return f"{redis_key_prefix}:{spider_name}:{key}"
 
     def _get_downloader(self):
-        downloader_cls = load_class(self.settings.DOWNLOADER)
+        downloader_cls = load_class(self.settings.downloader)
         if not issubclass(downloader_cls, BaseDownloader):
             raise TypeError(
-                f"The downloader class ({self.settings.DOWNLOADER}) " f"does not fully implement required interface"
+                f"The downloader class ({self.settings.downloader}) " f"does not fully implement required interface"
             )
         return downloader_cls
 
@@ -94,14 +94,14 @@ class Engine:
         self.running = True
         self.start_requests_running = True
 
-        self.logger.info(f"spider started. (project name: {self.settings.PROJECT_NAME})")
+        self.logger.info(f"spider started. (project name: {self.settings.project_name})")
         self.spider = spider
         self.__init_redis()
         self.scheduler = Scheduler()
         if getattr(self.scheduler, "open"):
             self.scheduler.open()
 
-        downloader_cls = load_class(self.settings.DOWNLOADER)
+        downloader_cls = load_class(self.settings.downloader)
         self.downloader = downloader_cls(self.crawler)
         if getattr(self.downloader, "open"):
             await self.downloader.open()
