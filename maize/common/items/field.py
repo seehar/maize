@@ -1,4 +1,4 @@
-class Field(dict):
-    def __init__(self, default=None):
-        super().__init__()
-        self.default = default
+from pydantic import Field as PydanticField
+
+
+Field = PydanticField

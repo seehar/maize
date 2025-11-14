@@ -3,5 +3,5 @@ from maize import Item
 
 
 class BaiduItem(Item):
-    url = Field()
-    title = Field()
+    url: str = Field()
+    title: str = Field()

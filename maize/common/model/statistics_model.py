@@ -1,10 +1,7 @@
-from dataclasses import dataclass
-from dataclasses import field
-
+from maize import Field
 from maize.common.model.base_model import BaseModel
 
 
-@dataclass
 class SpiderStatistics(BaseModel):
     # 下载总量
     download_total: int = 0
@@ -16,10 +13,10 @@ class SpiderStatistics(BaseModel):
     download_fail_count: int = 0
 
     # 下载失败原因统计
-    download_fail_reason: dict[str, int] = field(default_factory=lambda: {})
+    download_fail_reason: dict[str, int] = Field(default={})
 
     # 下载状态码统计
-    download_status: dict[str, int] = field(default_factory=lambda: {})
+    download_status: dict[str, int] = Field(default={})
 
     # 解析成功量
     parse_success_count: int = 0

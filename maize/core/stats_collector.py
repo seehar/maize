@@ -2,7 +2,6 @@ import asyncio
 import datetime
 import os
 from contextlib import asynccontextmanager
-from dataclasses import asdict
 from typing import Any
 from typing import AsyncGenerator
 from typing import Optional
@@ -137,8 +136,8 @@ class StatsCollector:
         maize_upload_model.project_name = self._settings.project_name
         maize_upload_model.container_id = self._container_id
 
-        maize_upload_model_dict = asdict(maize_upload_model)
-        maize_upload_model_dict.update(asdict(pre_minute_stat))
+        maize_upload_model_dict = maize_upload_model.model_dump()
+        maize_upload_model_dict.update(pre_minute_stat.model_dump())
         self._logger.info(f"stat: {maize_upload_model_dict}")
 
         if not self._settings.maize_cob_api:

@@ -52,7 +52,7 @@ class MysqlPipeline(BasePipeline):
 
     async def _process_items(self, items: List["Item"]):
         first_item = items[0]
-        item_key = first_item.to_dict().keys()
+        item_key = first_item.model_dump().keys()
         item_data_list = []
         for item in items:
             item_data_list.append([item[key] for key in item_key])
