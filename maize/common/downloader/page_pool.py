@@ -21,7 +21,7 @@ class PagePool:
         self.available_pages: List["Page"] = []
         self.in_use_pages: Set["Page"] = set()
         self._lock = asyncio.Lock()
-        self.logger = get_logger(crawler.settings, self.__class__.__name__, crawler.settings.LOG_LEVEL)
+        self.logger = get_logger(crawler.settings, self.__class__.__name__, crawler.settings.log_level)
 
     async def acquire_page(self, context: "BrowserContext") -> "Page":
         """获取一个页面"""

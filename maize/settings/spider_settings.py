@@ -15,6 +15,7 @@ from pydantic_settings import YamlConfigSettingsSource
 from maize.common.constant.setting_constant import LogLevelEnum
 from maize.common.constant.setting_constant import PipelineEnum
 from maize.common.constant.setting_constant import RPADriverTypeEnum
+from maize.common.constant.setting_constant import RPAWaitUntilEnum
 from maize.common.constant.setting_constant import SpiderDownloaderEnum
 
 
@@ -71,6 +72,11 @@ class RPASettings(BaseModel):
     download_path: Optional[str] = Field(default=None, description="下载文件的路径")
     # 渲染时长
     render_time: Optional[int] = Field(default=None, description="渲染时长，单位：秒")
+    # 页面加载等待策略
+    wait_until: str = Field(
+        default=RPAWaitUntilEnum.DOMCONTENTLOADED.value,
+        description="页面加载等待策略: 'commit'(仅导航完成), 'domcontentloaded'(DOM加载完成), 'load'(等待所有资源), 'networkidle'(网络空闲)",
+    )
     # 不加载资源类型列表
     skip_resource_types: List[str] = Field(default=[], description="不加载的资源类型列表")
     # 跳过的 URL 模式

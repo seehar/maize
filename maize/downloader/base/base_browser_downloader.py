@@ -89,6 +89,7 @@ class BaseBrowserDownloader(
         self.__rpa_url_regexes_save_all = rpa_settings.url_regexes_save_all
         self.__rpa_skip_resource_types = rpa_settings.skip_resource_types
         self.__rpa_skip_url_patterns = rpa_settings.skip_url_patterns
+        self.__rpa_wait_until = rpa_settings.wait_until
         self.__proxy: str = self.crawler.settings.proxy.proxy_url
         self.__proxy_username: str = self.crawler.settings.proxy.proxy_username
         self.__proxy_password: str = self.crawler.settings.proxy.proxy_password
@@ -223,8 +224,10 @@ class BaseBrowserDownloader(
                 # 添加更好的错误处理和超时控制
                 try:
                     self.logger.info(f"Navigating to {request.url}")
-                    await page.goto(request.url, timeout=self._timeout, wait_until="load")
-                    self.logger.info(f"Navigation completed, waiting for render time: {self.__rpa_render_time}s")
+                    await page.goto(request.url, timeout=self._timeout, wait_until=self.__rpa_wait_until)
+                    self.logger.info(
+                        f"Navigation completed (wait_until: {self.__rpa_wait_until}), waiting for render time: {self.__rpa_render_time}s"
+                    )
                     await asyncio.sleep(self.__rpa_render_time)
                     response = await page.content()
                     cookies = await self.context.cookies()
@@ -283,7 +286,7 @@ class BaseBrowserDownloader(
                     page = await context.new_page()
                     page.on("download", self.handle_download)
 
-                    await page.goto(request.url, timeout=self._timeout, wait_until="load")
+                    await page.goto(request.url, timeout=self._timeout, wait_until=self.__rpa_wait_until)
                     await page.wait_for_load_state()
                     await asyncio.sleep(self.__rpa_render_time)
                     response = await page.content()
