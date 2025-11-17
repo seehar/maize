@@ -1,9 +1,10 @@
 import asyncio
 import typing
+from abc import ABCMeta
+from abc import abstractmethod
 from typing import TYPE_CHECKING
 from typing import Any
 from typing import AsyncGenerator
-from typing import List
 from typing import Optional
 
 from maize.common.http import Response
@@ -20,17 +21,10 @@ if TYPE_CHECKING:
     from maize.core.crawler import Crawler
 
 
-class Spider:
-    custom_settings: dict
-
+class Spider(metaclass=ABCMeta):
     def __init__(self):
         self._lock = asyncio.Lock()
         self.__spider_type__: str = "spider"
-        self.start_urls: List[str] = []
-        self.start_url: Optional[str] = None
-
-        if not hasattr(self, "start_urls"):
-            self.start_urls = []
 
         self.crawler: Optional["Crawler"] = None
         self.stats_collector: Optional["StatsCollector"] = None
@@ -67,13 +61,9 @@ class Spider:
         instance.crawler = crawler
         return instance
 
+    @abstractmethod
     async def start_requests(self) -> AsyncGenerator[Request, Any]:
-        if self.start_urls:
-            for url in self.start_urls:
-                yield Request(url=url)
-
-        elif self.start_url and isinstance(self.start_url, str):
-            yield Request(url=self.start_url)
+        raise NotImplementedError
 
     async def parse(self, response: Response):
         """

@@ -19,6 +19,7 @@ from maize.core.processor import Processor
 from maize.core.scheduler import Scheduler
 from maize.core.task_manager import TaskManager
 from maize.exceptions.spider_exception import OutputException
+from maize.exceptions.spider_exception import StartRequestsNotImplementedException
 
 
 try:
@@ -108,7 +109,21 @@ class Engine:
 
         self.processor = Processor(self.crawler)
         await self.processor.open()
-        self.start_requests = aiter(spider.start_requests())
+
+        # 校验 start_requests 是否已实现
+        try:
+            start_requests_result = spider.start_requests()
+            # 检查是否是一个异步生成器
+            if not hasattr(start_requests_result, "__anext__"):
+                raise StartRequestsNotImplementedException(
+                    f"Spider {spider.__class__.__name__}.start_requests() must be implemented as an async generator"
+                )
+            self.start_requests = start_requests_result
+        except NotImplementedError:
+            raise StartRequestsNotImplementedException(
+                f"Spider {spider.__class__.__name__}.start_requests() must be implemented"
+            )
+
         await self._open_spider()
 
     async def _open_spider(self):
@@ -123,7 +138,7 @@ class Engine:
             # 任务爬虫
             if self.spider.__spider_type__ == "task_spider":
                 self.logger.info("Task spider start get task requests")
-                spider_task_requests: AsyncGenerator[Request, Any] = self.spider.task_requests()
+                spider_task_requests: AsyncGenerator[Request, Any] = self.spider.start_requests()
                 if spider_task_requests:
                     self.task_requests = aiter(spider_task_requests)
                     self.task_requests_running = True

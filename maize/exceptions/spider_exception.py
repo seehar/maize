@@ -24,3 +24,9 @@ class DecodeException(Exception):
 
 class EncodeException(Exception):
     pass
+
+
+class StartRequestsNotImplementedException(NotImplementedError):
+    """start_requests method not implemented"""
+
+    pass

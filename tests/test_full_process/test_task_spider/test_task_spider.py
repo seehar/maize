@@ -10,9 +10,8 @@ from maize import TaskSpider
 
 class DemoTaskSpider(TaskSpider):
     batch = 1
-    start_urls = []
 
-    async def task_requests(self) -> typing.AsyncGenerator[Request, typing.Any]:
+    async def start_requests(self) -> typing.AsyncGenerator[Request, typing.Any]:
         if self.batch > 2:
             raise StopAsyncIteration
 
