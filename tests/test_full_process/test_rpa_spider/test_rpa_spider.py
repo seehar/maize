@@ -2,6 +2,7 @@ import asyncio
 import typing
 from urllib.parse import urlencode
 
+import pytest
 from playwright.async_api import Page
 
 from maize import Request
@@ -12,6 +13,7 @@ from maize.common.constant.setting_constant import SpiderDownloaderEnum
 from maize.downloader.playwright_downloader import PlaywrightDownloader
 
 
+@pytest.skip(reason="rpa spider", allow_module_level=True)
 class DemoRpaSpider(Spider):
     async def start_requests(self) -> typing.AsyncGenerator[Request, typing.Any]:
         for _ in range(1):

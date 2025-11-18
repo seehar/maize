@@ -6,6 +6,7 @@ from typing import Optional
 from maize.core.engine import Engine
 from maize.exceptions.spider_exception import SpiderTypeException
 from maize.utils.log_util import get_logger
+from maize.utils.log_util import set_spider_settings
 from maize.utils.project_util import get_settings
 
 
@@ -22,6 +23,9 @@ class Crawler:
         self.settings: "SpiderSettings" = settings
 
     async def crawl(self):
+        # 设置 settings 到上下文中，这样后续调用 get_logger() 时可以自动获取
+        set_spider_settings(self.settings)
+
         self.spider = self._create_spider()
         await self.spider.open(self.settings)
 

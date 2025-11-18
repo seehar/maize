@@ -1,8 +1,11 @@
+import sys
+from contextvars import ContextVar
 from logging import INFO
 from logging import Formatter
 from logging import Logger
 from logging import StreamHandler
 from typing import TYPE_CHECKING
+from typing import Optional
 from typing import Union
 
 from maize.utils.project_util import load_class
@@ -11,8 +14,28 @@ from maize.utils.project_util import load_class
 if TYPE_CHECKING:
     from maize.settings import SpiderSettings
 
+LOG_FORMAT = "%(asctime)s | %(threadName)s | %(filename)s:%(lineno)d:%(funcName)s | %(levelname)s - %(message)s"
 
-LOG_FORMAT = f"%(asctime)s [%(name)s] %(levelname)s: %(message)s"
+# 使用 ContextVar 存储当前的 spider_settings
+_current_settings: ContextVar[Optional["SpiderSettings"]] = ContextVar("spider_settings", default=None)
+
+
+def set_spider_settings(settings: "SpiderSettings") -> None:
+    """
+    设置当前的 spider settings 到上下文中
+
+    :param settings: SpiderSettings 实例
+    """
+    _current_settings.set(settings)
+
+
+def get_spider_settings() -> Optional["SpiderSettings"]:
+    """
+    从上下文中获取当前的 spider settings
+
+    :return: SpiderSettings 实例或 None
+    """
+    return _current_settings.get()
 
 
 class LoggerManager:
@@ -21,11 +44,19 @@ class LoggerManager:
     @classmethod
     def get_logger(
         cls,
-        spider_settings: "SpiderSettings",
+        spider_settings: Optional["SpiderSettings"] = None,
         name: str = "default",
         log_level: Union[int, str] = None,
         log_format: str = LOG_FORMAT,
     ) -> Logger:
+        # 如果没有传入 spider_settings，则从上下文中获取
+        if spider_settings is None:
+            spider_settings = get_spider_settings()
+            if spider_settings is None:
+                raise ValueError(
+                    "spider_settings is required. Please pass it explicitly or set it using set_spider_settings()"
+                )
+
         key = (name, log_level)
 
         def get_logger_handler():
@@ -35,7 +66,7 @@ class LoggerManager:
                 return logger_handler_cls()
             else:
                 logger_formatter = Formatter(log_format)
-                logger_handler = StreamHandler()
+                logger_handler = StreamHandler(stream=sys.stdout)
                 logger_handler.setFormatter(logger_formatter)
                 logger_handler.setLevel(log_level or INFO)
                 return logger_handler
