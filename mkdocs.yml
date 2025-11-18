@@ -1,70 +1,154 @@
 site_name: Maize
+site_description: 一个基于异步、强大易用的 Python 爬虫框架
+site_author: seehar
+
 theme:
   name: material
   language: zh
   features:
-    - search.highlight
+    - announce.dismiss
+    - content.code.annotate
+    - content.code.copy
+    - content.tabs.link
+    - content.tooltips
+    - navigation.expand
+    - navigation.footer
+    - navigation.indexes
+    - navigation.instant
+    - navigation.instant.prefetch
+    - navigation.instant.progress
+    - navigation.path
     - navigation.sections
-    - navigation.top
     - navigation.tabs
-    - navigation.tracking # 锚点导航
-  palette: # 主题模式切换。
-    - media: "(prefers-color-scheme: light)" # 跟随系统主题模式
+    - navigation.tabs.sticky
+    - navigation.top
+    - navigation.tracking
+    - search.highlight
+    - search.share
+    - search.suggest
+    - toc.follow
+  palette:
+    - media: "(prefers-color-scheme: light)"
       scheme: default
+      primary: indigo
+      accent: indigo
       toggle:
         icon: material/weather-sunny
-        name: Switch to dark mode
+        name: 切换到暗色模式
     - media: "(prefers-color-scheme: dark)"
       scheme: slate
+      primary: black
+      accent: indigo
       toggle:
         icon: material/weather-night
-        name: Switch to light mode
+        name: 切换到亮色模式
+  font:
+    text: Roboto
+    code: Roboto Mono
   icon:
     repo: fontawesome/brands/github
+    logo: material/spider-web
 
 nav:
   - 简介: index.md
   - 快速上手: quick_start.md
-  - 使用说明:
+  - 使用指南:
       - 使用前必读: use/before_use.md
-  - 进阶:
-      - Request: features/request.md
-      - Response: features/response.md
-      - Item: features/item.md
-      - Pipeline: features/pipeline.md
-      - Downloader: features/downloader.md
+      - 配置说明: features/settings.md
+  - 核心组件:
       - Spider 进阶: features/spider.md
       - TaskSpider 任务爬虫: features/task_spider.md
+      - Request 请求: features/request.md
+      - Response 响应: features/response.md
+      - Item 数据项: features/item.md
+      - Pipeline 管道: features/pipeline.md
+      - Downloader 下载器: features/downloader.md
+  - 工具类:
       - MysqlUtil: features/mysql_util.md
       - RedisUtil: features/redis_util.md
       - 日志配置: features/log.md
-      - 配置文件: features/settings.md
 
 markdown_extensions:
-- footnotes
-- admonition
-- pymdownx.details
-- pymdownx.superfences
-- pymdownx.tabbed
-- pymdownx.caret
-- pymdownx.mark
-- pymdownx.tilde
-- attr_list
-- md_in_html
-- pymdownx.tasklist:
-    custom_checkbox: true
-- pymdownx.tabbed:
-    alternate_style: true
-- pymdownx.highlight:
-    anchor_linenums: true
-    line_spans: __span
-    pygments_lang_class: true
-- pymdownx.inlinehilite
-- pymdownx.snippets
+  - abbr
+  - admonition
+  - attr_list
+  - def_list
+  - footnotes
+  - md_in_html
+  - toc:
+      permalink: true
+      toc_depth: 3
+  - pymdownx.arithmatex:
+      generic: true
+  - pymdownx.betterem:
+      smart_enable: all
+  - pymdownx.caret
+  - pymdownx.details
+  - pymdownx.emoji:
+      emoji_index: !!python/name:material.extensions.emoji.twemoji
+      emoji_generator: !!python/name:material.extensions.emoji.to_svg
+  - pymdownx.highlight:
+      anchor_linenums: true
+      line_spans: __span
+      pygments_lang_class: true
+      auto_title: true
+  - pymdownx.inlinehilite
+  - pymdownx.keys
+  - pymdownx.magiclink:
+      normalize_issue_symbols: true
+      repo_url_shorthand: true
+      user: seehar
+      repo: maize
+  - pymdownx.mark
+  - pymdownx.smartsymbols
+  - pymdownx.snippets
+  - pymdownx.superfences:
+      custom_fences:
+        - name: mermaid
+          class: mermaid
+          format: !!python/name:pymdownx.superfences.fence_code_format
+  - pymdownx.tabbed:
+      alternate_style: true
+      combine_header_slug: true
+  - pymdownx.tasklist:
+      custom_checkbox: true
+  - pymdownx.tilde
+
+plugins:
+  - search:
+      separator: '[\s\u200b\-_,:!=\[\]()"`/]+|\.(?!\d)|&[lg]t;|(?!\b)(?=[A-Z][a-z])'
+      lang:
+        - zh
+        - en
+
+extra:
+  version:
+    provider: mike
+  social:
+    - icon: fontawesome/brands/github
+      link: https://github.com/seehar/maize
+      name: GitHub
+    - icon: fontawesome/brands/python
+      link: https://pypi.org/project/maize/
+      name: PyPI
+  analytics:
+    feedback:
+      title: 这个页面有帮助吗？
+      ratings:
+        - icon: material/emoticon-happy-outline
+          name: 这个页面很有帮助
+          data: 1
+          note: >-
+            感谢您的反馈！
+        - icon: material/emoticon-sad-outline
+          name: 这个页面可以改进
+          data: 0
+          note: >-
+            感谢您的反馈！帮助我们改进这个页面。
+
+copyright: Copyright &copy; 2024 seehar
 
 repo_url: https://github.com/seehar/maize
 repo_name: seehar/maize
 site_url: https://seehar.github.io/maize/
-
-plugins:
-- search
+edit_uri: edit/main/docs/

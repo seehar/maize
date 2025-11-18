@@ -16,13 +16,16 @@ class BaiduItem(Item):
 在 `Spider` 的 `parse` 中
 
 ```python
-from maize import Spider
+from typing import Any, AsyncGenerator
+
+from maize import Request, Response, Spider
 
 
 class BaiduSpider(Spider):
-    start_urls = ["http://www.baidu.com"]
+    async def start_requests(self) -> AsyncGenerator[Request, Any]:
+        yield Request(url="http://www.baidu.com")
 
-    async def parse(self, response):
+    async def parse(self, response: Response):
         # 解析或处理 response
         item = BaiduItem()
         item["url"] = "https://www.baidu.com"

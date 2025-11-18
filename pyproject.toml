@@ -46,6 +46,7 @@ nox = "^2024.3.2"
 [tool.poetry.group.docs.dependencies]
 mkdocs = "^1.5.3"
 mkdocs-material = "^9.5.4"
+mkdocs-minify-plugin = "^0.8.0"
 
 
 [build-system]
