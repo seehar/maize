@@ -12,7 +12,16 @@ from maize.downloader.base.base_browser_downloader import BaseBrowserDownloader
 
 
 class PlaywrightDownloader(
-    BaseBrowserDownloader[Playwright, Browser, BrowserContext, Page, ViewportSize, Cookie, Download, PlaywrightResponse]
+    BaseBrowserDownloader[
+        Playwright,
+        Browser,
+        BrowserContext,
+        Page,
+        ViewportSize,
+        Cookie,
+        Download,
+        PlaywrightResponse,
+    ]
 ):
     """Playwright 下载器实现"""
 

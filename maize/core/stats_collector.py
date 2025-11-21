@@ -48,7 +48,9 @@ class StatsCollector:
 
         self._logger.info("-" * 100)
         self._logger.info(f"爬虫运行时间: {self._start_time} ~ {self._end_time}")
-        self._logger.info(f"耗时: {(self._end_time - self._start_time).total_seconds()}s")
+        self._logger.info(
+            f"耗时: {(self._end_time - self._start_time).total_seconds()}s"
+        )
         self._logger.info("-" * 100)
 
     @staticmethod
@@ -149,13 +151,19 @@ class StatsCollector:
             for _ in range(3):
                 try:
                     async with httpx.AsyncClient() as client:
-                        response = await client.post(self._settings.maize_cob_api, json=maize_upload_model_dict)
-                        self._logger.info(f"upload stat: <{response.status_code}> {response.text}")
+                        response = await client.post(
+                            self._settings.maize_cob_api, json=maize_upload_model_dict
+                        )
+                        self._logger.info(
+                            f"upload stat: <{response.status_code}> {response.text}"
+                        )
                     del self._stats[pre_minute_key]
                     self._last_upload_key = pre_minute_key
                     break
                 except Exception as e:
-                    self._logger.warning(f"upload stat error: {e}，准备第 {_ + 1} 次重试")
+                    self._logger.warning(
+                        f"upload stat error: {e}，准备第 {_ + 1} 次重试"
+                    )
 
         await self._task_manager.semaphore.acquire()
         self._task_manager.create_task(upload_stat())

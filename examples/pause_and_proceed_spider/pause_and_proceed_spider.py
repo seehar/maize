@@ -16,13 +16,19 @@ class PauseAndProceedSpider(Spider):
 
     async def start_requests(self) -> AsyncGenerator[Request, Any]:
         for i in range(2):
-            yield Request(url="http://www.baidu.com", priority=1, error_callback=self.error_callback)
+            yield Request(
+                url="http://www.baidu.com",
+                priority=1,
+                error_callback=self.error_callback,
+            )
 
     async def parse(self, response: Response):
         li_list = response.xpath("//li[contains(@class, 'hotsearch-item')]")
         for li in li_list:
             item = BaiduItem()
-            item["title"] = li.xpath(".//span[@class='title-content-title']/text()").get()
+            item["title"] = li.xpath(
+                ".//span[@class='title-content-title']/text()"
+            ).get()
             item["url"] = li.xpath("./a/@href").get()
             self.logger.info(item.to_dict())
             yield item
@@ -33,19 +39,28 @@ class PauseAndProceedSpider(Spider):
                 return
 
             yield Request(
-                url="http://www.baidu.com", callback=self.parse_bing, priority=99, error_callback=self.bing_error
+                url="http://www.baidu.com",
+                callback=self.parse_bing,
+                priority=99,
+                error_callback=self.bing_error,
             )
             await self.pause_spider(lte_priority=0)
             self.logger.warning(f"爬虫已暂停 {self.gte_priority=}")
             yield Request(
-                url="http://www.baidu.com", callback=self.parse_bing, priority=99, error_callback=self.bing_error
+                url="http://www.baidu.com",
+                callback=self.parse_bing,
+                priority=99,
+                error_callback=self.bing_error,
             )
 
     async def error_callback(self, request: Request):
         self.logger.info(request)
         if not self.is_pause():
             yield Request(
-                url="http://www.baidu.com", callback=self.parse_bing, priority=99, error_callback=self.bing_error
+                url="http://www.baidu.com",
+                callback=self.parse_bing,
+                priority=99,
+                error_callback=self.bing_error,
             )
             await self.pause_spider(lte_priority=0)
             self.logger.warning(f"爬虫已暂停 {self.gte_priority=}")
@@ -55,7 +70,9 @@ class PauseAndProceedSpider(Spider):
         li_list = response.xpath("//li[contains(@class, 'hotsearch-item')]")
         for li in li_list:
             item = BaiduItem()
-            item["title"] = li.xpath(".//span[@class='title-content-title']/text()").get()
+            item["title"] = li.xpath(
+                ".//span[@class='title-content-title']/text()"
+            ).get()
             item["url"] = li.xpath("./a/@href").get()
             self.logger.info(item.to_dict())
             yield item

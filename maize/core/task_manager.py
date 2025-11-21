@@ -12,7 +12,9 @@ class TaskManager:
         self.current_task: Final[set] = set()
         self.semaphore: Semaphore = Semaphore(total_concurrency)
 
-    def create_task(self, coroutine: Generator[Any, None, None] | Coroutine[Any, Any, None]) -> Task:
+    def create_task(
+        self, coroutine: Generator[Any, None, None] | Coroutine[Any, Any, None]
+    ) -> Task:
         task = asyncio.create_task(coroutine)
         self.current_task.add(task)
 

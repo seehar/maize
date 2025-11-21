@@ -20,7 +20,9 @@ class BaiduSpider(Spider):
         li_list = response.xpath("//li[contains(@class, 'hotsearch-item')]")
         for li in li_list:
             item = BaiduItem()
-            item["title"] = li.xpath(".//span[@class='title-content-title']/text()").get()
+            item["title"] = li.xpath(
+                ".//span[@class='title-content-title']/text()"
+            ).get()
             item["url"] = li.xpath("./a/@href").get()
             yield item
 
@@ -33,6 +35,8 @@ class BaiduSpider(Spider):
         li_list = response.xpath("//li[contains(@class, 'hotsearch-item')]")
         for li in li_list:
             item = BaiduItem()
-            item["title"] = li.xpath(".//span[@class='title-content-title']/text()").get()
+            item["title"] = li.xpath(
+                ".//span[@class='title-content-title']/text()"
+            ).get()
             item["url"] = li.xpath("./a/@href").get()
             yield item

@@ -18,4 +18,6 @@ async def transform(func_result: T) -> AsyncGenerator[T, Any]:
         async for r in func_result:
             yield r
     else:
-        raise TransformTypeException("callback return value must be `generator` or `async generator`")
+        raise TransformTypeException(
+            "callback return value must be `generator` or `async generator`"
+        )

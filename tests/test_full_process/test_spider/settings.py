@@ -13,5 +13,7 @@ class BaiduSpiderSettings(SpiderSettings):
     concurrency: int = 1
     log_level: str = LogLevelEnum.DEBUG.value
     downloader: str = SpiderDownloaderEnum.HTTPX.value
-    logger_handler: str = "tests.test_full_process.test_spider.logger_util.InterceptHandler"
+    logger_handler: str = (
+        "tests.test_full_process.test_spider.logger_util.InterceptHandler"
+    )
     pipeline: PipelineSettings = BaiduSpiderPipelineSettings()

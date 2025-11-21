@@ -1,5 +1,4 @@
 from pydantic import BaseModel as PydanticBaseModel
 
 
-class BaseModel(PydanticBaseModel):
-    ...
+class BaseModel(PydanticBaseModel): ...

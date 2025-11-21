@@ -1,6 +1,7 @@
 """
 测试 logger 上下文功能
 """
+
 import pytest
 
 from maize.settings import SpiderSettings

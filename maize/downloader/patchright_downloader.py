@@ -12,7 +12,16 @@ from maize.downloader.base.base_browser_downloader import BaseBrowserDownloader
 
 
 class PatchrightDownloader(
-    BaseBrowserDownloader[Playwright, Browser, BrowserContext, Page, ViewportSize, Cookie, Download, PatchrightResponse]
+    BaseBrowserDownloader[
+        Playwright,
+        Browser,
+        BrowserContext,
+        Page,
+        ViewportSize,
+        Cookie,
+        Download,
+        PatchrightResponse,
+    ]
 ):
     """Patchright 下载器实现"""
 

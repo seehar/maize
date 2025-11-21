@@ -37,8 +37,12 @@ class PipelineScheduler:
         # error item
         self.error_item_max_retry_count = pipeline_settings.error_max_retry_count
         error_item_max_cache_count = pipeline_settings.error_max_cache_count
-        self.error_item_retry_batch_max_size = pipeline_settings.error_retry_batch_max_size
-        self.error_item_handle_batch_max_size = pipeline_settings.error_handle_batch_max_size
+        self.error_item_retry_batch_max_size = (
+            pipeline_settings.error_retry_batch_max_size
+        )
+        self.error_item_handle_batch_max_size = (
+            pipeline_settings.error_handle_batch_max_size
+        )
         self.error_item_handle_interval = pipeline_settings.error_handle_interval
         self.error_item_queue = Queue(maxsize=error_item_max_cache_count)
         self._error_last_handle_item_time = 0
@@ -74,7 +78,9 @@ class PipelineScheduler:
             retry_result, retry_error_process_result = await self._retry_error_items()
             close_process_result.add(retry_error_process_result)
             if not retry_result:
-                self.logger.info(f"任务重试完成，剩余错误任务: {self.retry_item_queue.qsize()}")
+                self.logger.info(
+                    f"任务重试完成，剩余错误任务: {self.retry_item_queue.qsize()}"
+                )
                 break
 
         # 处理超过重试次数的 item
@@ -91,7 +97,9 @@ class PipelineScheduler:
         pipeline_process_result = PipelineProcessResult()
         await self.item_queue.put(item)
         current_time = int(time.time())
-        if ((current_time - self.item_handle_interval) > self._last_handle_item_time) or self.item_queue.full():
+        if (
+            (current_time - self.item_handle_interval) > self._last_handle_item_time
+        ) or self.item_queue.full():
             self._last_handle_item_time = current_time
             process_result = await self._process_item()
             retry_process_result = await self.process_retry_items()
@@ -216,7 +224,9 @@ class PipelineScheduler:
         """
         for item in items:
             if item.__retry_count__ >= self.error_item_max_retry_count:
-                self.logger.warning(f"超过重试次数({item.__retry_count__}/{self.error_item_max_retry_count}) item: {item}")
+                self.logger.warning(
+                    f"超过重试次数({item.__retry_count__}/{self.error_item_max_retry_count}) item: {item}"
+                )
                 await self.error_item_queue.put(item)
             else:
                 await self.retry_item_queue.put(item)

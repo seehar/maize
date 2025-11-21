@@ -27,8 +27,12 @@ class RequestSettings(BaseModel):
 
     verify_ssl: bool = Field(default=True, description="是否验证 SSL 证书")
     request_timeout: int = Field(default=60, description="请求超时时间，单位：秒")
-    random_wait_time: Tuple[int, int] = Field(default=(0, 0), description="随机等待时间，单位：秒")
-    use_session: bool = Field(default=True, description="是否使用 session（HTTPXDownloader 不支持）")
+    random_wait_time: Tuple[int, int] = Field(
+        default=(0, 0), description="随机等待时间，单位：秒"
+    )
+    use_session: bool = Field(
+        default=True, description="是否使用 session（HTTPXDownloader 不支持）"
+    )
     max_retry_count: int = Field(default=0, description="请求最大重试次数")
 
 
@@ -36,19 +40,35 @@ class PipelineSettings(BaseModel):
     """数据管道配置"""
 
     # 数据管道，支持多个数据管道
-    pipelines: List[str] = Field(default=[PipelineEnum.BASE.value], description="数据管道列表")
+    pipelines: List[str] = Field(
+        default=[PipelineEnum.BASE.value], description="数据管道列表"
+    )
 
     # Item 正常处理配置
-    max_cache_count: int = Field(default=5000, description="item在内存队列中最大缓存数量")
-    handle_batch_max_size: int = Field(default=1000, description="item每批入库的最大数量")
+    max_cache_count: int = Field(
+        default=5000, description="item在内存队列中最大缓存数量"
+    )
+    handle_batch_max_size: int = Field(
+        default=1000, description="item每批入库的最大数量"
+    )
     handle_interval: int = Field(default=2, description="item入库时间间隔，单位：秒")
 
     # 异常 Item 处理配置
-    error_max_retry_count: int = Field(default=5, description="入库异常的 item 最大重试次数")
-    error_max_cache_count: int = Field(default=5000, description="入库异常的 item 在内存队列中最大缓存数量")
-    error_retry_batch_max_size: int = Field(default=1, description="入库异常的 item 重试每批处理的最大数量")
-    error_handle_batch_max_size: int = Field(default=1000, description="入库异常的 item 超过重试次数后，每批处理的最大数量")
-    error_handle_interval: int = Field(default=60, description="处理入库异常的 item 时间间隔，单位：秒")
+    error_max_retry_count: int = Field(
+        default=5, description="入库异常的 item 最大重试次数"
+    )
+    error_max_cache_count: int = Field(
+        default=5000, description="入库异常的 item 在内存队列中最大缓存数量"
+    )
+    error_retry_batch_max_size: int = Field(
+        default=1, description="入库异常的 item 重试每批处理的最大数量"
+    )
+    error_handle_batch_max_size: int = Field(
+        default=1000, description="入库异常的 item 超过重试次数后，每批处理的最大数量"
+    )
+    error_handle_interval: int = Field(
+        default=60, description="处理入库异常的 item 时间间隔，单位：秒"
+    )
 
 
 class RPASettings(BaseModel):
@@ -57,17 +77,23 @@ class RPASettings(BaseModel):
     # 使用 stealth js
     use_stealth_js: bool = Field(default=True, description="是否使用 stealth js")
     # stealth js 文件路径
-    stealth_js_path: Path = Field(default=BASE_DIR / "utils/js/stealth.min.js", description="stealth js 文件路径")
+    stealth_js_path: Path = Field(
+        default=BASE_DIR / "utils/js/stealth.min.js", description="stealth js 文件路径"
+    )
     # 是否为无头浏览器
     headless: bool = Field(default=True, description="是否为无头浏览器")
     # 浏览器驱动类型
-    driver_type: str = Field(default=RPADriverTypeEnum.CHROMIUM.value, description="浏览器驱动类型")
+    driver_type: str = Field(
+        default=RPADriverTypeEnum.CHROMIUM.value, description="浏览器驱动类型"
+    )
     # 请求头
     user_agent: Optional[str] = Field(default=None, description="User Agent")
     # 窗口大小
     window_size: Tuple[int, int] = Field(default=(1024, 800), description="窗口大小")
     # 浏览器路径
-    executable_path: Optional[str] = Field(default=None, description="浏览器可执行文件路径")
+    executable_path: Optional[str] = Field(
+        default=None, description="浏览器可执行文件路径"
+    )
     # 下载文件的路径
     download_path: Optional[str] = Field(default=None, description="下载文件的路径")
     # 渲染时长
@@ -78,21 +104,30 @@ class RPASettings(BaseModel):
         description="页面加载等待策略: 'commit'(仅导航完成), 'domcontentloaded'(DOM加载完成), 'load'(等待所有资源), 'networkidle'(网络空闲)",
     )
     # 不加载资源类型列表
-    skip_resource_types: List[str] = Field(default=[], description="不加载的资源类型列表")
+    skip_resource_types: List[str] = Field(
+        default=[], description="不加载的资源类型列表"
+    )
     # 跳过的 URL 模式
     skip_url_patterns: List[str] = Field(default=[], description="跳过的 URL 模式")
     # 自定义浏览器渲染参数
     custom_argument: List[str] = Field(
-        default=["--no-sandbox", "--disable-blink-features=AutomationControlled"], description="自定义浏览器渲染参数"
+        default=["--no-sandbox", "--disable-blink-features=AutomationControlled"],
+        description="自定义浏览器渲染参数",
     )
     # CDP websocket 端点
     endpoint_url: Optional[str] = Field(default=None, description="CDP websocket 端点")
     # 操作减慢时间
-    slow_mo: Optional[float] = Field(default=None, description="RPA 操作减慢时间，单位：毫秒")
+    slow_mo: Optional[float] = Field(
+        default=None, description="RPA 操作减慢时间，单位：毫秒"
+    )
     # 拦截 xhr 接口正则表达式列表
-    url_regexes: List[str] = Field(default=[], description="拦截 xhr 接口正则表达式列表")
+    url_regexes: List[str] = Field(
+        default=[], description="拦截 xhr 接口正则表达式列表"
+    )
     # 是否保存所有拦截的接口
-    url_regexes_save_all: bool = Field(default=False, description="是否保存所有拦截的接口")
+    url_regexes_save_all: bool = Field(
+        default=False, description="是否保存所有拦截的接口"
+    )
 
 
 class RedisSettings(BaseModel):
@@ -161,7 +196,9 @@ class SpiderSettings(BaseSettings):
     concurrency: int = Field(default=1, description="并发数")
 
     # 下载器配置
-    downloader: str = Field(default=SpiderDownloaderEnum.AIOHTTP.value, description="下载器")
+    downloader: str = Field(
+        default=SpiderDownloaderEnum.AIOHTTP.value, description="下载器"
+    )
 
     # 日志配置
     log_level: str = Field(default=LogLevelEnum.INFO.value, description="日志级别")
@@ -174,12 +211,20 @@ class SpiderSettings(BaseSettings):
     maize_cob_api: str = Field(default="", description="maize-cob API 地址")
 
     # 子配置
-    request: RequestSettings = Field(default_factory=RequestSettings, description="请求配置")
-    pipeline: PipelineSettings = Field(default_factory=PipelineSettings, description="数据管道配置")
+    request: RequestSettings = Field(
+        default_factory=RequestSettings, description="请求配置"
+    )
+    pipeline: PipelineSettings = Field(
+        default_factory=PipelineSettings, description="数据管道配置"
+    )
     rpa: RPASettings = Field(default_factory=RPASettings, description="RPA 配置")
-    redis: RedisSettings = Field(default_factory=RedisSettings, description="Redis 配置")
+    redis: RedisSettings = Field(
+        default_factory=RedisSettings, description="Redis 配置"
+    )
     proxy: ProxySettings = Field(default_factory=ProxySettings, description="代理配置")
-    mysql: MySQLSettings = Field(default_factory=MySQLSettings, description="MySQL 配置")
+    mysql: MySQLSettings = Field(
+        default_factory=MySQLSettings, description="MySQL 配置"
+    )
 
     # 支持 .env, yml, toml 等格式
     model_config = SettingsConfigDict(
@@ -245,7 +290,9 @@ class SpiderSettings(BaseSettings):
 
         return self
 
-    def merge_settings_from_dict(self, settings_dict: dict[str, Any]) -> "SpiderSettings":
+    def merge_settings_from_dict(
+        self, settings_dict: dict[str, Any]
+    ) -> "SpiderSettings":
         """
         合并 dict 的配置到当前实例
 

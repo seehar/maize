@@ -59,4 +59,6 @@ def load_class(_path: Union[str, Callable]):
     try:
         return getattr(module, class_name)
     except AttributeError:
-        raise NameError(f"Module {module_name!r} does not define any object class named {class_name!r}")
+        raise NameError(
+            f"Module {module_name!r} does not define any object class named {class_name!r}"
+        )

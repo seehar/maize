@@ -22,7 +22,9 @@ class Processor:
         self.queue = Queue()
         self.item_pipelines: List["BasePipeline"] = []
 
-        self.pipeline_scheduler: PipelineScheduler = PipelineScheduler(self.crawler.settings)
+        self.pipeline_scheduler: PipelineScheduler = PipelineScheduler(
+            self.crawler.settings
+        )
 
     def __len__(self):
         return self.queue.qsize()
@@ -38,13 +40,21 @@ class Processor:
             else:
                 assert isinstance(result, Item)
                 process_result = await self.pipeline_scheduler.process(result)
-                await self.crawler.spider.stats_collector.record_pipeline_success(process_result.success_count)
-                await self.crawler.spider.stats_collector.record_pipeline_fail(process_result.fail_count)
+                await self.crawler.spider.stats_collector.record_pipeline_success(
+                    process_result.success_count
+                )
+                await self.crawler.spider.stats_collector.record_pipeline_fail(
+                    process_result.fail_count
+                )
 
     async def close(self):
         close_process_result = await self.pipeline_scheduler.close()
-        await self.crawler.spider.stats_collector.record_pipeline_success(close_process_result.success_count)
-        await self.crawler.spider.stats_collector.record_pipeline_fail(close_process_result.fail_count)
+        await self.crawler.spider.stats_collector.record_pipeline_success(
+            close_process_result.success_count
+        )
+        await self.crawler.spider.stats_collector.record_pipeline_fail(
+            close_process_result.fail_count
+        )
         self.logger.debug("processor closed")
 
     async def enqueue(self, output: Union[Request, Item]):

@@ -43,14 +43,20 @@ class CodeGenerate:
             url = f"https://{url}"
 
         spider_template = self._get_template_file_content(TemplateFile.SPIDER)
-        return spider_template.replace("SpiderTemplate", self._get_class_name(spider_name)).replace("url_template", url)
+        return spider_template.replace(
+            "SpiderTemplate", self._get_class_name(spider_name)
+        ).replace("url_template", url)
 
     def get_item_template(self, spider_name: str) -> str:
         template = self._get_template_file_content(TemplateFile.ITEM)
-        return template.replace("ItemTemplate", f"{self._get_class_name(spider_name)}Item")
+        return template.replace(
+            "ItemTemplate", f"{self._get_class_name(spider_name)}Item"
+        )
 
     def _get_template_file_content(self, template: TemplateFile) -> str:
-        with open(self._code_template_path / template.value, "r", encoding="utf-8") as f:
+        with open(
+            self._code_template_path / template.value, "r", encoding="utf-8"
+        ) as f:
             template_content = f.read()
         return template_content
 

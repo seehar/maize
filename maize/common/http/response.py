@@ -83,9 +83,13 @@ class Response(Generic[Driver, R]):
                 if _encoding:
                     self._body_cache = self._text_cache.encode(_encoding)
                 else:
-                    raise EncodeException(f"{self.request} {self.request.encoding} error.")
+                    raise EncodeException(
+                        f"{self.request} {self.request.encoding} error."
+                    )
             except UnicodeEncodeError as e:
-                raise EncodeException(e.encoding, e.object, e.start, e.end, f"{self.request}")
+                raise EncodeException(
+                    e.encoding, e.object, e.start, e.end, f"{self.request}"
+                )
         return self._body_cache
 
     @property
@@ -101,15 +105,21 @@ class Response(Generic[Driver, R]):
                 if _encoding:
                     self._text_cache = self.body.decode(_encoding, errors="ignore")
                 else:
-                    raise DecodeException(f"{self.request} {self.request.encoding} error.")
+                    raise DecodeException(
+                        f"{self.request} {self.request.encoding} error."
+                    )
             except UnicodeDecodeError as e:
-                raise DecodeException(e.encoding, e.object, e.start, e.end, f"{self.request}")
+                raise DecodeException(
+                    e.encoding, e.object, e.start, e.end, f"{self.request}"
+                )
         return self._text_cache
 
     def _get_encoding(self) -> Optional[str]:
         _encoding_re = re.compile(r"charset=([\w-]+)", flags=re.I)
 
-        _headers_encoding_string = self.headers.get("Content-Type", "") or self.headers.get("content-type", "")
+        _headers_encoding_string = self.headers.get(
+            "Content-Type", ""
+        ) or self.headers.get("content-type", "")
         _encoding = _encoding_re.search(_headers_encoding_string)
         if _encoding:
             _encoding_str = _encoding.group(1)
@@ -161,7 +171,9 @@ class Response(Generic[Driver, R]):
         if self._cookies_cache:
             return self._cookies_cache
 
-        self._cookies_cache = {cookie["key"]: cookie["value"] for cookie in self.cookie_list}
+        self._cookies_cache = {
+            cookie["key"]: cookie["value"] for cookie in self.cookie_list
+        }
         return self._cookies_cache
 
     def json(self) -> Dict[str, Any]:

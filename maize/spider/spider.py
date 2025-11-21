@@ -140,4 +140,6 @@ class Spider(metaclass=ABCMeta):
         """
         loop = asyncio.new_event_loop()
         asyncio.set_event_loop(loop)
-        loop.run_until_complete(self._async_run(settings=settings, settings_path=settings_path))
+        loop.run_until_complete(
+            self._async_run(settings=settings, settings_path=settings_path)
+        )

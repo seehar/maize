@@ -44,13 +44,17 @@ class RpaBaiduSpider(Spider):
                 # 检查是否在百度页面
                 if "baidu.com" in page.url:
                     # 示例：在搜索框中输入内容
-                    search_input = await page.query_selector("//textarea[@id='chat-textarea']")
+                    search_input = await page.query_selector(
+                        "//textarea[@id='chat-textarea']"
+                    )
                     if search_input:
                         await search_input.fill("Playwright并发测试")
                         self.logger.info("成功在搜索框中输入内容")
 
                         # 点击搜索按钮
-                        search_btn = await page.query_selector("//button[@id='chat-submit-button']")
+                        search_btn = await page.query_selector(
+                            "//button[@id='chat-submit-button']"
+                        )
                         if search_btn:
                             await search_btn.click()
                             await page.wait_for_load_state()

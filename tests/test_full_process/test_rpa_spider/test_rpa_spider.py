@@ -38,13 +38,17 @@ class DemoRpaSpider(Spider):
                 # 检查是否在百度页面
                 if "baidu.com" in page.url:
                     # 示例：在搜索框中输入内容
-                    search_input = await page.query_selector("//textarea[@id='chat-textarea']")
+                    search_input = await page.query_selector(
+                        "//textarea[@id='chat-textarea']"
+                    )
                     if search_input:
                         await search_input.fill("Playwright并发测试")
                         self.logger.info("成功在搜索框中输入内容")
 
                         # 点击搜索按钮
-                        search_btn = await page.query_selector("//button[@id='chat-submit-button']")
+                        search_btn = await page.query_selector(
+                            "//button[@id='chat-submit-button']"
+                        )
                         if search_btn:
                             await search_btn.click()
                             await page.wait_for_load_state()
@@ -68,7 +72,9 @@ def test_rpa_spider():
     spider_settings = SpiderSettings()
     spider_settings.concurrency = 1
     spider_settings.downloader = SpiderDownloaderEnum.PLAYWRIGHT.value
-    spider_settings.logger_handler = "examples.baidu_spider.logger_util.InterceptHandler"
+    spider_settings.logger_handler = (
+        "examples.baidu_spider.logger_util.InterceptHandler"
+    )
     spider_settings.request.use_session = True
     spider_settings.rpa.headless = True
     spider_settings.rpa.skip_resource_types = ["image", "media", "font", "stylesheet"]

@@ -23,7 +23,9 @@ def retry(retry_times: int = 3, interval: int = 0):
                 try:
                     return func(*args, **kwargs)
                 except Exception as e:
-                    logging.error(f"函数 {func.__name__} 执行失败 重试 {i + 1} 次. error {e}")
+                    logging.error(
+                        f"函数 {func.__name__} 执行失败 重试 {i + 1} 次. error {e}"
+                    )
                     time.sleep(interval)
                     if i + 1 >= retry_times:
                         raise e
@@ -51,7 +53,9 @@ def retry_asyncio(retry_times: int = 3, interval: int = 0):
                 try:
                     return await func(*args, **kwargs)
                 except Exception as e:
-                    logging.error(f"函数 {func.__name__} 执行失败 重试 {i + 1} 次. error {e}")
+                    logging.error(
+                        f"函数 {func.__name__} 执行失败 重试 {i + 1} 次. error {e}"
+                    )
                     await asyncio.sleep(interval)
                     if i + 1 >= retry_times:
                         raise e
@@ -67,6 +71,8 @@ class SingletonType(type):
     def __call__(cls, *args, **kwargs):
         with SingletonType.single_lock:
             if not hasattr(cls, "_instance"):
-                cls._instance = super(SingletonType, cls).__call__(*args, **kwargs)  # 创建cls的对象
+                cls._instance = super(SingletonType, cls).__call__(
+                    *args, **kwargs
+                )  # 创建cls的对象
 
         return cls._instance

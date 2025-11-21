@@ -56,7 +56,16 @@ class _RequestProtocol(Protocol):
 
 class BaseBrowserDownloader(
     BaseDownloader,
-    Generic[PlaywrightT, BrowserT, BrowserContextT, PageT, ViewportSizeT, CookieT, DownloadT, ResponseT],
+    Generic[
+        PlaywrightT,
+        BrowserT,
+        BrowserContextT,
+        PageT,
+        ViewportSizeT,
+        CookieT,
+        DownloadT,
+        ResponseT,
+    ],
     metaclass=ABCMeta,
 ):
     """Playwright/Patchright 通用基类，抽取公共逻辑"""
@@ -100,7 +109,9 @@ class BaseBrowserDownloader(
         self._context_route_initialized: bool = False
 
         if self.__rpa_url_regexes_save_all and self.__rpa_url_regexes:
-            self.logger.warning("获取完拦截的数据后, 请主动调用PlaywrightDriver的clear_cache()方法清空拦截的数据，否则数据会一直累加，导致内存溢出")
+            self.logger.warning(
+                "获取完拦截的数据后, 请主动调用PlaywrightDriver的clear_cache()方法清空拦截的数据，否则数据会一直累加，导致内存溢出"
+            )
 
     @abstractmethod
     async def _get_playwright_instance(self):
@@ -126,7 +137,9 @@ class BaseBrowserDownloader(
         self._stealth_js_path = self.crawler.settings.rpa.stealth_js_path
 
         viewport_size_class = self._get_viewport_size_class()
-        self.__view_size = viewport_size_class(width=self.__rpa_window_size[0], height=self.__rpa_window_size[1])
+        self.__view_size = viewport_size_class(
+            width=self.__rpa_window_size[0], height=self.__rpa_window_size[1]
+        )
 
         # 获取并发数设置，用于页面池大小
         concurrency = self.crawler.settings.concurrency or 10
@@ -224,14 +237,20 @@ class BaseBrowserDownloader(
                 # 添加更好的错误处理和超时控制
                 try:
                     self.logger.info(f"Navigating to {request.url}")
-                    await page.goto(request.url, timeout=self._timeout, wait_until=self.__rpa_wait_until)
+                    await page.goto(
+                        request.url,
+                        timeout=self._timeout,
+                        wait_until=self.__rpa_wait_until,
+                    )
                     self.logger.info(
                         f"Navigation completed (wait_until: {self.__rpa_wait_until}), waiting for render time: {self.__rpa_render_time}s"
                     )
                     await asyncio.sleep(self.__rpa_render_time)
                     response = await page.content()
                     cookies = await self.context.cookies()
-                    self.logger.info(f"Successfully retrieved content from {request.url}")
+                    self.logger.info(
+                        f"Successfully retrieved content from {request.url}"
+                    )
                 except Exception as e:
                     self.logger.error(f"Page navigation error for {request.url}: {e}")
                     # 检查页面状态
@@ -253,7 +272,9 @@ class BaseBrowserDownloader(
                     if self.__rpa_endpoint_url:
                         context = browser.contexts[0]
                         if self.__proxy:
-                            self.logger.warning("使用 RPA_ENDPOINT_URL 连接远程浏览器时，代理需要在远程浏览器启动时配置")
+                            self.logger.warning(
+                                "使用 RPA_ENDPOINT_URL 连接远程浏览器时，代理需要在远程浏览器启动时配置"
+                            )
                     else:
                         # 否则创建新的 context
                         context_kwargs = {
@@ -281,12 +302,18 @@ class BaseBrowserDownloader(
                                 await _res
                         except Exception as e:
                             # 忽略无法注册路由的错误（不是所有驱动都支持 route）
-                            self.logger.debug(f"Failed to register route handler on non-session context, error: {e}")
+                            self.logger.debug(
+                                f"Failed to register route handler on non-session context, error: {e}"
+                            )
 
                     page = await context.new_page()
                     page.on("download", self.handle_download)
 
-                    await page.goto(request.url, timeout=self._timeout, wait_until=self.__rpa_wait_until)
+                    await page.goto(
+                        request.url,
+                        timeout=self._timeout,
+                        wait_until=self.__rpa_wait_until,
+                    )
                     await page.wait_for_load_state()
                     await asyncio.sleep(self.__rpa_render_time)
                     response = await page.content()
@@ -322,7 +349,9 @@ class BaseBrowserDownloader(
                 except Exception as e:
                     self.logger.debug(f"Failed to close context: {e}")
 
-    def structure_response(self, request: Request, response: str, cookies: List[CookieT]) -> DownloadResponse:
+    def structure_response(
+        self, request: Request, response: str, cookies: List[CookieT]
+    ) -> DownloadResponse:
         """构建并返回 DownloadResponse 对象"""
         cookie_list = [
             {
@@ -365,13 +394,17 @@ class BaseBrowserDownloader(
             proxy_config["username"] = self.__proxy_username
             proxy_config["password"] = self.__proxy_password
 
-        self.logger.debug(f"代理配置: server={proxy_server}, with_auth={bool(self.__proxy_username)}")
+        self.logger.debug(
+            f"代理配置: server={proxy_server}, with_auth={bool(self.__proxy_username)}"
+        )
         return proxy_config
 
     async def _get_browser(self, playwright: PlaywrightT) -> BrowserT:
         """获取 browser 实例"""
         if self.__rpa_endpoint_url:
-            browser = await getattr(playwright, self.__rpa_driver_type).connect_over_cdp(
+            browser = await getattr(
+                playwright, self.__rpa_driver_type
+            ).connect_over_cdp(
                 endpoint_url=self.__rpa_endpoint_url,
                 timeout=self._timeout,
                 slow_mo=self.__rpa_slow_mo,
@@ -393,7 +426,9 @@ class BaseBrowserDownloader(
             self.context = self.browser.contexts[0]
             # 使用远程浏览器连接时，记录代理配置提示
             if self.__proxy:
-                self.logger.warning("使用 RPA_ENDPOINT_URL 连接远程浏览器时，代理需要在远程浏览器启动时配置，而不是在 context 级别配置")
+                self.logger.warning(
+                    "使用 RPA_ENDPOINT_URL 连接远程浏览器时，代理需要在远程浏览器启动时配置，而不是在 context 级别配置"
+                )
             return
 
         context_kwargs = {
@@ -420,7 +455,9 @@ class BaseBrowserDownloader(
                 self._context_route_initialized = True
             except Exception as e:
                 # 并非所有浏览器驱动都支持 route；静默失败并打印调试信息
-                self.logger.debug(f"无法在 session context 上注册路由处理器，error: {e}")
+                self.logger.debug(
+                    f"无法在 session context 上注册路由处理器，error: {e}"
+                )
 
         # 不再创建单个page，页面池会在需要时创建页面
 
@@ -440,7 +477,9 @@ class BaseBrowserDownloader(
 
     def get_all_text(self, url_regex: str) -> List[str]:
         """获取所有匹配拦截响应的文本内容列表。"""
-        return [response.content.decode() for response in self.get_all_response(url_regex)]
+        return [
+            response.content.decode() for response in self.get_all_response(url_regex)
+        ]
 
     def get_json(self, url_regex: str) -> Optional[dict]:
         """尝试将第一个匹配的拦截响应解析为 JSON 并返回，失败返回 None。"""
@@ -467,7 +506,9 @@ class BaseBrowserDownloader(
             if not self.downloader.context:
                 await self.downloader._gen_context_and_page()
 
-            self.page = await self.downloader.page_pool.acquire_page(self.downloader.context)
+            self.page = await self.downloader.page_pool.acquire_page(
+                self.downloader.context
+            )
             return self.page
 
         async def __aexit__(self, exc_type, exc_val, exc_tb) -> None:
@@ -486,14 +527,18 @@ class BaseBrowserDownloader(
         """
         return self.PageOperationContext(self)
 
-    async def _route_handler(self, route: _RouteProtocol, request: _RequestProtocol) -> None:
+    async def _route_handler(
+        self, route: _RouteProtocol, request: _RequestProtocol
+    ) -> None:
         """路由处理器：根据配置的资源类型列表或 URL 模式中止特定请求（异步）。"""
         try:
             url = request.url
 
             # 检查 URL 模式黑名单
             if self.__rpa_skip_url_patterns:
-                if any(re.search(pattern, url) for pattern in self.__rpa_skip_url_patterns):
+                if any(
+                    re.search(pattern, url) for pattern in self.__rpa_skip_url_patterns
+                ):
                     try:
                         await route.abort()
                         self.logger.debug(f"已拦截匹配 URL: {url[:100]}")
@@ -502,7 +547,9 @@ class BaseBrowserDownloader(
                         self.logger.warning(f"路由中止请求失败: {e}")
 
             # 检查资源类型黑名单
-            rtype = getattr(request, "resource_type", None) or getattr(request, "resourceType", None)
+            rtype = getattr(request, "resource_type", None) or getattr(
+                request, "resourceType", None
+            )
             if rtype and self.__rpa_skip_resource_types:
                 rtype_str = rtype.lower()
                 if any(rtype_str == t.lower() for t in self.__rpa_skip_resource_types):
