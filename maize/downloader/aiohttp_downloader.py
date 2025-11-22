@@ -1,19 +1,20 @@
 import typing
 
-from aiohttp import BaseConnector
-from aiohttp import BasicAuth
-from aiohttp import ClientResponse
-from aiohttp import ClientSession
-from aiohttp import ClientTimeout
-from aiohttp import TCPConnector
-from aiohttp import TraceConfig
-from aiohttp import TraceRequestStartParams
+from aiohttp import (
+    BaseConnector,
+    BasicAuth,
+    ClientResponse,
+    ClientSession,
+    ClientTimeout,
+    TCPConnector,
+    TraceConfig,
+    TraceRequestStartParams,
+)
 
 from maize.common.http import Response
 from maize.common.http.request import Request
 from maize.common.model.download_response_model import DownloadResponse
 from maize.downloader.base.base_downloader import BaseDownloader
-
 
 if typing.TYPE_CHECKING:
     from maize.core.crawler import Crawler
@@ -22,16 +23,16 @@ if typing.TYPE_CHECKING:
 class AioHttpDownloader(BaseDownloader):
     def __init__(self, crawler: "Crawler"):
         super().__init__(crawler)
-        self.session: typing.Optional[ClientSession] = None
-        self.connector: typing.Optional[BaseConnector] = None
+        self.session: ClientSession | None = None
+        self.connector: BaseConnector | None = None
 
-        self._verify_ssl: typing.Optional[bool] = None
-        self._timeout: typing.Optional[ClientTimeout] = None
-        self._use_session: typing.Optional[bool] = None
-        self.trace_config: typing.Optional[TraceConfig] = None
+        self._verify_ssl: bool | None = None
+        self._timeout: ClientTimeout | None = None
+        self._use_session: bool | None = None
+        self.trace_config: TraceConfig | None = None
 
-        self.proxy_tunnel: typing.Optional[str] = None
-        self.proxy_auth: typing.Optional[BasicAuth] = None
+        self.proxy_tunnel: str | None = None
+        self.proxy_auth: BasicAuth | None = None
 
     async def open(self):
         await super().open()
@@ -57,9 +58,7 @@ class AioHttpDownloader(BaseDownloader):
                 trace_configs=[self.trace_config],
             )
 
-    async def download(
-        self, request: Request
-    ) -> typing.Union[DownloadResponse, Request]:
+    async def download(self, request: Request) -> typing.Union[DownloadResponse, Request]:
         await self.random_wait()
         try:
             if self._use_session:
@@ -68,17 +67,16 @@ class AioHttpDownloader(BaseDownloader):
                 structure_response = self.structure_response(request, response, body)
                 return DownloadResponse(response=structure_response)
 
-            else:
-                connector = TCPConnector(verify_ssl=self._verify_ssl)
-                async with ClientSession(
-                    connector=connector,
-                    timeout=self._timeout,
-                    trace_configs=[self.trace_config],
-                ) as session:
-                    response = await self.send_request(session, request)
-                    body = await response.content.read()
-                structure_response = self.structure_response(request, response, body)
-                return DownloadResponse(response=structure_response)
+            connector = TCPConnector(verify_ssl=self._verify_ssl)
+            async with ClientSession(
+                connector=connector,
+                timeout=self._timeout,
+                trace_configs=[self.trace_config],
+            ) as session:
+                response = await self.send_request(session, request)
+                body = await response.content.read()
+            structure_response = self.structure_response(request, response, body)
+            return DownloadResponse(response=structure_response)
 
         except Exception as e:
             if new_request := await self._download_retry(request, e):
@@ -88,9 +86,7 @@ class AioHttpDownloader(BaseDownloader):
             return DownloadResponse(reason=str(e))
 
     @staticmethod
-    def structure_response(
-        request: Request, response: ClientResponse, body: bytes
-    ) -> Response[None, ClientResponse]:
+    def structure_response(request: Request, response: ClientResponse, body: bytes) -> Response[None, ClientResponse]:
         return Response[None, ClientResponse](
             url=request.url,
             headers=dict(response.headers),
@@ -100,9 +96,7 @@ class AioHttpDownloader(BaseDownloader):
             source_response=response,
         )
 
-    async def send_request(
-        self, session: ClientSession, request: Request
-    ) -> ClientResponse:
+    async def send_request(self, session: ClientSession, request: Request) -> ClientResponse:
         if request.proxy_username and request.proxy_password:
             proxy_auth = BasicAuth(request.proxy_username, request.proxy_password)
         else:
@@ -123,12 +117,8 @@ class AioHttpDownloader(BaseDownloader):
             max_redirects=request.max_redirects,
         )
 
-    async def request_start(
-        self, _session, _trace_config_ctx, params: TraceRequestStartParams
-    ):
-        self.logger.debug(
-            rf"request downloading: {params.url}, method: {params.method}"
-        )
+    async def request_start(self, _session, _trace_config_ctx, params: TraceRequestStartParams):
+        self.logger.debug(rf"request downloading: {params.url}, method: {params.method}")
 
     async def close(self):
         await super().close()

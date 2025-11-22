@@ -1,7 +1,6 @@
-from maize import Field
-from maize import Item
+from maize import Field, Item
 
 
 class BaiduItem(Item):
-    url: str = Field()
-    title: str = Field()
+    url: str | None = Field(default=None)
+    title: str | None = Field(default=None)

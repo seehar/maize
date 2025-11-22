@@ -1,14 +1,13 @@
 from __future__ import annotations
 
 import asyncio
+from collections.abc import AsyncGenerator, AsyncIterator, Callable
 from inspect import iscoroutine
-from typing import TYPE_CHECKING
-from typing import Any
-from typing import AsyncGenerator
-from typing import AsyncIterator
-from typing import Callable
-from typing import Optional
-from typing import Union
+from typing import (
+    TYPE_CHECKING,
+    Any,
+    Union,
+)
 
 import ujson
 
@@ -18,9 +17,10 @@ from maize.common.items import Item
 from maize.core.processor import Processor
 from maize.core.scheduler import Scheduler
 from maize.core.task_manager import TaskManager
-from maize.exceptions.spider_exception import OutputException
-from maize.exceptions.spider_exception import StartRequestsNotImplementedException
-
+from maize.exceptions.spider_exception import (
+    OutputException,
+    StartRequestsNotImplementedException,
+)
 
 try:
     from maize.utils.redis_util import RedisUtil
@@ -30,7 +30,6 @@ from maize.utils.log_util import get_logger
 from maize.utils.project_util import load_class
 from maize.utils.spider_util import transform
 from maize.utils.string_util import StringUtil
-
 
 if TYPE_CHECKING:
     from maize.core.crawler import Crawler
@@ -45,19 +44,19 @@ class Engine:
     爬虫引擎
     """
 
-    def __init__(self, crawler: "Crawler"):
+    def __init__(self, crawler: Crawler):
         self.logger = get_logger(crawler.settings, self.__class__.__name__)
-        self.crawler: "Crawler" = crawler
-        self.settings: "SpiderSettings" = self.crawler.settings
+        self.crawler: Crawler = crawler
+        self.settings: SpiderSettings = self.crawler.settings
 
-        self.downloader: Optional["BaseDownloader"] = None
-        self.scheduler: Optional[Scheduler] = None
-        self.processor: Optional[Processor] = None
+        self.downloader: BaseDownloader | None = None
+        self.scheduler: Scheduler | None = None
+        self.processor: Processor | None = None
 
-        self.start_requests: Optional[AsyncGenerator] = None
-        self.task_requests: Optional[AsyncIterator[Request]] = None
+        self.start_requests: AsyncGenerator | None = None
+        self.task_requests: AsyncIterator[Request] | None = None
 
-        self.spider: Optional[Union["Spider", "TaskSpider"]] = None
+        self.spider: Union[Spider, TaskSpider] | None = None
         self.task_manager: TaskManager = TaskManager(self.settings.concurrency)
         self.start_requests_running = False
         self.task_requests_running = False
@@ -74,13 +73,9 @@ class Engine:
     def __init_redis(self):
         if self.is_distributed or self.settings.redis.use_redis:
             self.__redis_util = RedisUtil(self.settings.redis_url)
-            self.__redis_key_distributed_lock = self.__get_redis_key(
-                self.settings.redis.key_lock
-            )
+            self.__redis_key_distributed_lock = self.__get_redis_key(self.settings.redis.key_lock)
             self.__redis_key_queue = self.__get_redis_key(self.settings.redis.key_queue)
-            self.__redis_key_running = self.__get_redis_key(
-                self.settings.redis.key_running
-            )
+            self.__redis_key_running = self.__get_redis_key(self.settings.redis.key_running)
 
     def __get_redis_key(self, key: str) -> str:
         redis_key_prefix = self.settings.redis.key_prefix
@@ -91,27 +86,24 @@ class Engine:
         downloader_cls = load_class(self.settings.downloader)
         if not issubclass(downloader_cls, BaseDownloader):
             raise TypeError(
-                f"The downloader class ({self.settings.downloader}) "
-                f"does not fully implement required interface"
+                f"The downloader class ({self.settings.downloader}) does not fully implement required interface"
             )
         return downloader_cls
 
-    async def start_spider(self, spider: "Spider"):
+    async def start_spider(self, spider: Spider):
         self.running = True
         self.start_requests_running = True
 
-        self.logger.info(
-            f"spider started. (project name: {self.settings.project_name})"
-        )
+        self.logger.info(f"spider started. (project name: {self.settings.project_name})")
         self.spider = spider
         self.__init_redis()
         self.scheduler = Scheduler()
-        if getattr(self.scheduler, "open"):
+        if self.scheduler.open:
             self.scheduler.open()
 
         downloader_cls = load_class(self.settings.downloader)
         self.downloader = downloader_cls(self.crawler)
-        if getattr(self.downloader, "open"):
+        if self.downloader.open:
             await self.downloader.open()
 
         self.processor = Processor(self.crawler)
@@ -129,7 +121,7 @@ class Engine:
         except NotImplementedError:
             raise StartRequestsNotImplementedException(
                 f"Spider {spider.__class__.__name__}.start_requests() must be implemented"
-            )
+            ) from None
 
         await self._open_spider()
 
@@ -145,9 +137,7 @@ class Engine:
             # 任务爬虫
             if self.spider.__spider_type__ == "task_spider":
                 self.logger.info("Task spider start get task requests")
-                spider_task_requests: AsyncGenerator[Request, Any] = (
-                    self.spider.start_requests()
-                )
+                spider_task_requests: AsyncGenerator[Request, Any] = self.spider.start_requests()
                 if spider_task_requests:
                     self.task_requests = aiter(spider_task_requests)
                     self.task_requests_running = True
@@ -239,12 +229,10 @@ class Engine:
         await self.task_manager.semaphore.acquire()
         self.task_manager.create_task(crawl_task())
 
-    async def _fetch(
-        self, request: Request
-    ) -> Optional[AsyncGenerator[Union[Request, Item], Any]]:
+    async def _fetch(self, request: Request) -> AsyncGenerator[Union[Request, Item], Any] | None:
         async def _success(
             _response: Response,
-        ) -> Optional[AsyncGenerator[Union[Request, Item], Any]]:
+        ) -> AsyncGenerator[Union[Request, Item], Any] | None:
             callback: Callable = request.callback or self.spider.parse
             if _output := callback(_response):
                 try:
@@ -260,17 +248,13 @@ class Engine:
                     await self.spider.stats_collector.record_parse_fail()
 
             if self.__redis_util:
-                self.logger.debug(
-                    f"redis delete {self.__redis_key_running}:{request.hash}"
-                )
-                await self.__redis_util.delete(
-                    f"{self.__redis_key_running}:{request.hash}"
-                )
+                self.logger.debug(f"redis delete {self.__redis_key_running}:{request.hash}")
+                await self.__redis_util.delete(f"{self.__redis_key_running}:{request.hash}")
             return None
 
         async def _error(
             _request: Request,
-        ) -> Optional[AsyncGenerator[Union[Request, Item], Any]]:
+        ) -> AsyncGenerator[Union[Request, Item], Any] | None:
             error_callback: Callable = request.error_callback
             if not error_callback:
                 return None
@@ -288,12 +272,8 @@ class Engine:
                     self.logger.error(f"Error during error_callback: {e}")
 
             if self.__redis_util:
-                self.logger.debug(
-                    f"redis delete {self.__redis_key_running}:{request.hash}"
-                )
-                await self.__redis_util.delete(
-                    f"{self.__redis_key_running}:{request.hash}"
-                )
+                self.logger.debug(f"redis delete {self.__redis_key_running}:{request.hash}")
+                await self.__redis_util.delete(f"{self.__redis_key_running}:{request.hash}")
             return None
 
         download_result = await self.downloader.fetch(request)
@@ -303,15 +283,11 @@ class Engine:
 
         if download_result is None or download_result.response is None:
             # 下载失败
-            await self.spider.stats_collector.record_download_fail(
-                download_result.reason
-            )
+            await self.spider.stats_collector.record_download_fail(download_result.reason)
             return await _error(request)
 
         # 下载成功
-        await self.spider.stats_collector.record_download_success(
-            download_result.response.status
-        )
+        await self.spider.stats_collector.record_download_success(download_result.response.status)
         return await _success(download_result.response)
 
     async def enqueue_request(self, request: Request):
@@ -325,17 +301,13 @@ class Engine:
     async def _schedule_request(self, request: Request):
         await self.scheduler.enqueue_request(request)
 
-    async def _get_next_request(self) -> Optional[Request]:
-        request: Optional[Request] = await self.scheduler.next_request(
-            self.crawler.spider.gte_priority
-        )
+    async def _get_next_request(self) -> Request | None:
+        request: Request | None = await self.scheduler.next_request(self.crawler.spider.gte_priority)
         if not request:
             return None
 
         if self.is_distributed:
-            nx_set_result = await self.__redis_util.nx_set(
-                self.__redis_key_distributed_lock, request.hash, 600
-            )
+            nx_set_result = await self.__redis_util.nx_set(self.__redis_key_distributed_lock, request.hash, 600)
             if not nx_set_result:
                 return None
 
@@ -348,16 +320,12 @@ class Engine:
             await self.__redis_util.delete(f"{self.__redis_key_queue}:{request.hash}")
         return request
 
-    async def _handle_spider_output(
-        self, outputs: AsyncGenerator[Union[Request, Item], Any]
-    ):
+    async def _handle_spider_output(self, outputs: AsyncGenerator[Union[Request, Item], Any]):
         async for spider_output in outputs:
-            if isinstance(spider_output, (Request, Item)):
+            if isinstance(spider_output, Request | Item):
                 await self.processor.enqueue(spider_output)
             else:
-                raise OutputException(
-                    f"{type(spider_output)} must return `Request` or `Item`"
-                )
+                raise OutputException(f"{type(spider_output)} must return `Request` or `Item`")
 
     def _idle(self) -> bool:
         return (

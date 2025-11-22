@@ -2,10 +2,7 @@ import typing
 
 import pytest
 
-from maize import CrawlerProcess
-from maize import Request
-from maize import Response
-from maize import TaskSpider
+from maize import CrawlerProcess, Request, Response, TaskSpider
 
 
 class DemoTaskSpider(TaskSpider):
@@ -15,7 +12,7 @@ class DemoTaskSpider(TaskSpider):
         if self.batch > 2:
             raise StopAsyncIteration
 
-        for i in range(1):
+        for _i in range(1):
             yield Request("http://seehar.com")
         self.batch += 1
 

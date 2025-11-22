@@ -1,15 +1,17 @@
+from collections.abc import AsyncGenerator
+from typing import Any
+
 import pytest
 
-from maize import Spider
-from maize import SpiderEntry
-
+from maize import Request, Spider, SpiderEntry
 
 spider_entry = SpiderEntry()
 
 
 @spider_entry.register()
 class BaiduSpider(Spider):
-    start_url = "http://www.baidu.com"
+    async def start_requests(self) -> AsyncGenerator[Request, Any]:
+        yield Request("http://www.baidu.com")
 
     def parse(self, response):
         print(response.text)

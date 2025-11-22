@@ -1,5 +1,4 @@
 from pathlib import Path
-from typing import Optional
 
 import click
 
@@ -14,7 +13,7 @@ class CodeGenerate:
     def __init__(self):
         self._code_template_path = Path(__file__).parent / "code_template"
 
-    def generate(self, spider_name: str, url: Optional[str] = None):
+    def generate(self, spider_name: str, url: str | None = None):
         """生成爬虫代码结构"""
 
         base_path = Path(spider_name)
@@ -35,7 +34,7 @@ class CodeGenerate:
 
         click.echo(f"✅ 项目 {spider_name} 创建成功！")
 
-    def get_spider_template(self, spider_name: str, url: Optional[str] = None) -> str:
+    def get_spider_template(self, spider_name: str, url: str | None = None) -> str:
         if not url:
             url = input("目标网站：")
 
@@ -43,22 +42,15 @@ class CodeGenerate:
             url = f"https://{url}"
 
         spider_template = self._get_template_file_content(TemplateFile.SPIDER)
-        return spider_template.replace(
-            "SpiderTemplate", self._get_class_name(spider_name)
-        ).replace("url_template", url)
+        return spider_template.replace("SpiderTemplate", self._get_class_name(spider_name)).replace("url_template", url)
 
     def get_item_template(self, spider_name: str) -> str:
         template = self._get_template_file_content(TemplateFile.ITEM)
-        return template.replace(
-            "ItemTemplate", f"{self._get_class_name(spider_name)}Item"
-        )
+        return template.replace("ItemTemplate", f"{self._get_class_name(spider_name)}Item")
 
     def _get_template_file_content(self, template: TemplateFile) -> str:
-        with open(
-            self._code_template_path / template.value, "r", encoding="utf-8"
-        ) as f:
-            template_content = f.read()
-        return template_content
+        with open(self._code_template_path / template.value, encoding="utf-8") as f:
+            return f.read()
 
     @staticmethod
     def _get_class_name(spider_name: str):

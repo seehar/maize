@@ -34,8 +34,8 @@ maize = "maize.command.maize_command:cli"
 
 [dependency-groups]
 dev = [
-    "black==24.3.0",
-    "isort==7.0.0",
+    "ruff>=0.8.0",
+    "mypy>=1.13.0",
     "pre-commit>=3.5.0",
     "aiomysql>=0.2.0",
     "playwright==1.50.0",
@@ -60,3 +60,96 @@ docs = [
 [build-system]
 requires = ["hatchling"]
 build-backend = "hatchling.build"
+
+
+[tool.ruff]
+# Ruff 是一个更快的 Python linter，可以替代 flake8, isort, 部分 pylint
+line-length = 120
+target-version = "py310"
+
+[tool.ruff.lint]
+# 启用的规则集
+select = [
+    "E",      # pycodestyle errors
+    "W",      # pycodestyle warnings
+    "F",      # pyflakes
+    "I",      # isort
+    "N",      # pep8-naming
+    "UP",     # pyupgrade
+    "B",      # flake8-bugbear
+    "C4",     # flake8-comprehensions
+    "SIM",    # flake8-simplify
+    "RET",    # flake8-return
+    "ARG",    # flake8-unused-arguments
+    "PTH",    # flake8-use-pathlib
+    "ERA",    # eradicate (commented out code)
+    "PL",     # pylint
+    "RUF",    # ruff-specific rules
+]
+
+# 忽略的规则
+ignore = [
+    "E501",    # line too long (handled by ruff format)
+    "PLR0913", # too many arguments
+    "PLR2004", # magic value used in comparison
+    "PLR0912", # too many branches
+    "PLR0915", # too many statements
+    "N818",    # exception name should end in Error
+    "SIM108",  # use ternary operator instead of if-else
+    "ARG002",  # unused method argument
+    "PTH123",  # open() should be replaced by Path.open()
+    "UP006",   # use type instead of Type for type annotations (for Python 3.9+ compatibility)
+    "UP007",   # use X | Y for type annotations (for Python 3.9+ compatibility)
+    "RUF001",  # String contains ambiguous unicode character (中文字符)
+    "RUF002",  # Docstring contains ambiguous unicode character (中文注释)
+    "RUF003",  # Comment contains ambiguous unicode character (中文注释)
+]
+
+[tool.ruff.lint.per-file-ignores]
+"__init__.py" = ["F401", "E402"]  # allow unused imports and import not at top
+"tests/**/*.py" = ["PLR2004", "ARG001", "S101"]  # allow magic values, unused args, and asserts in tests
+
+[tool.ruff.lint.isort]
+known-first-party = ["maize"]
+force-single-line = false
+combine-as-imports = true
+known-third-party = [
+    "aiohttp",
+    "aiomysql",
+    "httpx",
+    "parsel",
+    "patchright",
+    "playwright",
+    "pydantic",
+    "pydantic_settings",
+    "redis",
+    "ujson",
+    "pytest",
+    "nox",
+]
+sections = {future = [], stdlib = [], thirdparty = [], firstparty = [], localfolder = []}
+
+[tool.ruff.format]
+# Ruff 格式化配置（兼容 Black）
+quote-style = "double"
+indent-style = "space"
+skip-magic-trailing-comma = false
+line-ending = "auto"
+
+[tool.mypy]
+python_version = "3.10"
+warn_return_any = true
+warn_unused_configs = true
+disallow_untyped_defs = false
+disallow_incomplete_defs = false
+check_untyped_defs = true
+no_implicit_optional = true
+warn_redundant_casts = true
+warn_unused_ignores = true
+warn_no_return = true
+follow_imports = "normal"
+ignore_missing_imports = true
+
+[[tool.mypy.overrides]]
+module = "tests.*"
+ignore_errors = true

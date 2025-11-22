@@ -1,11 +1,8 @@
 import asyncio
 import typing
-from abc import ABCMeta
-from abc import abstractmethod
-from typing import TYPE_CHECKING
-from typing import Any
-from typing import AsyncGenerator
-from typing import Optional
+from abc import ABCMeta, abstractmethod
+from collections.abc import AsyncGenerator
+from typing import TYPE_CHECKING, Any
 
 from maize.common.http import Response
 from maize.common.http.request import Request
@@ -13,7 +10,6 @@ from maize.core.crawler import CrawlerProcess
 from maize.core.stats_collector import StatsCollector
 from maize.settings import SpiderSettings
 from maize.utils.log_util import get_logger
-
 
 if TYPE_CHECKING:
     from logging import Logger
@@ -26,11 +22,11 @@ class Spider(metaclass=ABCMeta):
         self._lock = asyncio.Lock()
         self.__spider_type__: str = "spider"
 
-        self.crawler: Optional["Crawler"] = None
-        self.stats_collector: Optional["StatsCollector"] = None
-        self.logger: Optional["Logger"] = None
+        self.crawler: Crawler | None = None
+        self.stats_collector: StatsCollector | None = None
+        self.logger: Logger | None = None
 
-        self.gte_priority: Optional[int] = None
+        self.gte_priority: int | None = None
 
     def __str__(self):
         return self.__class__.__name__
@@ -74,7 +70,7 @@ class Spider(metaclass=ABCMeta):
         """
         raise NotImplementedError
 
-    async def pause_spider(self, lte_priority: Optional[int] = None):
+    async def pause_spider(self, lte_priority: int | None = None):
         """
         暂停爬虫
 
@@ -92,7 +88,7 @@ class Spider(metaclass=ABCMeta):
 
             self.gte_priority = lte_priority + 1
 
-    async def proceed_spider(self, gte_priority: Optional[int] = None):
+    async def proceed_spider(self, gte_priority: int | None = None):
         """
         继续爬虫
 
@@ -120,7 +116,7 @@ class Spider(metaclass=ABCMeta):
     async def _async_run(
         self,
         settings: typing.Optional["SpiderSettings"] = None,
-        settings_path: typing.Optional[str] = "settings.Settings",
+        settings_path: str | None = "settings.Settings",
     ):
         process = CrawlerProcess(settings=settings, settings_path=settings_path)
         await process.crawl(self)
@@ -129,7 +125,7 @@ class Spider(metaclass=ABCMeta):
     def run(
         self,
         settings: typing.Optional["SpiderSettings"] = None,
-        settings_path: typing.Optional[str] = "settings.Settings",
+        settings_path: str | None = "settings.Settings",
     ):
         """
         启动爬虫
@@ -140,6 +136,4 @@ class Spider(metaclass=ABCMeta):
         """
         loop = asyncio.new_event_loop()
         asyncio.set_event_loop(loop)
-        loop.run_until_complete(
-            self._async_run(settings=settings, settings_path=settings_path)
-        )
+        loop.run_until_complete(self._async_run(settings=settings, settings_path=settings_path))

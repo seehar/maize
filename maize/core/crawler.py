@@ -1,14 +1,11 @@
 import asyncio
 import logging
 import typing
-from typing import Optional
 
 from maize.core.engine import Engine
 from maize.exceptions.spider_exception import SpiderTypeException
-from maize.utils.log_util import get_logger
-from maize.utils.log_util import set_spider_settings
+from maize.utils.log_util import get_logger, set_spider_settings
 from maize.utils.project_util import get_settings
-
 
 if typing.TYPE_CHECKING:
     from maize.settings import SpiderSettings
@@ -18,9 +15,9 @@ if typing.TYPE_CHECKING:
 class Crawler:
     def __init__(self, spider_cls: "Spider", settings: "SpiderSettings"):
         self.spider_cls = spider_cls
-        self.spider: typing.Optional["Spider"] = None
-        self.engine: typing.Optional[Engine] = None
-        self.settings: "SpiderSettings" = settings
+        self.spider: Spider | None = None
+        self.engine: Engine | None = None
+        self.settings: SpiderSettings = settings
 
     async def crawl(self):
         # 设置 settings 到上下文中，这样后续调用 get_logger() 时可以自动获取
@@ -53,7 +50,7 @@ class Crawler:
         :return:
         """
         try:
-            custom_settings: Optional[dict] = getattr(spider, "custom_settings")
+            custom_settings: dict | None = spider.custom_settings
         except AttributeError:
             custom_settings = None
 
@@ -72,18 +69,16 @@ class CrawlerProcess:
     def __init__(
         self,
         settings: typing.Optional["SpiderSettings"] = None,
-        settings_path: typing.Optional[str] = "settings.Settings",
+        settings_path: str | None = "settings.Settings",
     ):
         self.crawlers: typing.Final[set[Crawler]] = set()
         self._active: typing.Final[set] = set()
-        self.settings: "SpiderSettings" = (
-            settings if settings else self.__get_settings(settings_path)
-        )
+        self.settings: SpiderSettings = settings if settings else self.__get_settings(settings_path)
 
         self.logger = get_logger(self.settings, self.__class__.__name__)
 
     @staticmethod
-    def __get_settings(settings_path: typing.Optional[str]) -> "SpiderSettings":
+    def __get_settings(settings_path: str | None) -> "SpiderSettings":
         """
         获取配置
         :param settings_path:
@@ -122,8 +117,6 @@ class CrawlerProcess:
 
     def _create_crawler(self, spider_cls: "Spider") -> Crawler:
         if isinstance(spider_cls, str):
-            raise SpiderTypeException(
-                f"{type(self)}.crawl args: String is not supported"
-            )
+            raise SpiderTypeException(f"{type(self)}.crawl args: String is not supported")
 
         return Crawler(spider_cls, self.settings)

@@ -1,8 +1,7 @@
 import typing
 from abc import abstractmethod
 
-from maize import Request
-from maize import Spider
+from maize import Request, Spider
 
 
 class TaskSpider(Spider):

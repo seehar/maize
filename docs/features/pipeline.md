@@ -39,7 +39,7 @@ class CustomPipeline(BasePipeline):
         self.logger.info("Pipeline 启动")
         # 初始化资源，如数据库连接
         # self.db_connection = await create_db_connection()
-    
+
     async def close(self):
         """
         管道关闭时调用
@@ -48,24 +48,24 @@ class CustomPipeline(BasePipeline):
         self.logger.info("Pipeline 关闭")
         # 清理资源
         # await self.db_connection.close()
-    
+
     async def process_item(self, items: List[Item]) -> bool:
         """
         处理数据（必须实现）
-        
+
         :param items: Item 列表，框架会自动批量传入
         :return: True 表示处理成功，False 表示失败（会触发重试）
         """
         for item in items:
             print(f"处理数据: {item.to_dict()}")
             # 处理逻辑，如保存到数据库
-        
+
         return True  # 返回 True 表示处理成功
-    
+
     async def process_error_item(self, items: List[Item]):
         """
         处理超过重试次数的失败数据
-        
+
         :param items: 失败的 Item 列表
         """
         for item in items:
@@ -132,7 +132,7 @@ from maize import BasePipeline, Item
 
 class ConsolePipeline(BasePipeline):
     """将数据输出到控制台"""
-    
+
     async def process_item(self, items: List[Item]) -> bool:
         for item in items:
             print(f"[数据] {item.to_dict()}")
@@ -151,34 +151,34 @@ from maize import BasePipeline, Item
 
 class CsvPipeline(BasePipeline):
     """将数据保存到 CSV 文件"""
-    
+
     async def open(self):
         """初始化文件"""
         self.file_path = Path("data.csv")
         self.file = open(self.file_path, "w", newline="", encoding="utf-8")
         self.writer = None
         self.headers_written = False
-    
+
     async def close(self):
         """关闭文件"""
         if self.file:
             self.file.close()
-    
+
     async def process_item(self, items: List[Item]) -> bool:
         if not items:
             return True
-        
+
         # 写入表头（仅第一次）
         if not self.headers_written:
             headers = items[0].to_dict().keys()
             self.writer = csv.DictWriter(self.file, fieldnames=headers)
             self.writer.writeheader()
             self.headers_written = True
-        
+
         # 写入数据
         for item in items:
             self.writer.writerow(item.to_dict())
-        
+
         self.file.flush()  # 立即写入磁盘
         return True
 ```
@@ -195,7 +195,7 @@ from maize import BasePipeline, Item
 
 class MysqlPipeline(BasePipeline):
     """将数据保存到 MySQL 数据库"""
-    
+
     async def open(self):
         """创建数据库连接池"""
         settings = self.settings
@@ -208,19 +208,19 @@ class MysqlPipeline(BasePipeline):
             charset='utf8mb4'
         )
         self.logger.info("MySQL 连接池已创建")
-    
+
     async def close(self):
         """关闭数据库连接池"""
         if self.pool:
             self.pool.close()
             await self.pool.wait_closed()
             self.logger.info("MySQL 连接池已关闭")
-    
+
     async def process_item(self, items: List[Item]) -> bool:
         """批量插入数据"""
         if not items:
             return True
-        
+
         try:
             async with self.pool.acquire() as conn:
                 async with conn.cursor() as cursor:
@@ -229,27 +229,27 @@ class MysqlPipeline(BasePipeline):
                     if not table_name:
                         self.logger.warning("Item 未设置 __table_name__，跳过保存")
                         return True
-                    
+
                     # 构建批量插入 SQL
                     first_item = items[0].to_dict()
                     columns = ', '.join(first_item.keys())
                     placeholders = ', '.join(['%s'] * len(first_item))
                     sql = f"INSERT INTO {table_name} ({columns}) VALUES ({placeholders})"
-                    
+
                     # 准备数据
                     values = [tuple(item.to_dict().values()) for item in items]
-                    
+
                     # 批量插入
                     await cursor.executemany(sql, values)
                     await conn.commit()
-                    
+
                     self.logger.info(f"成功插入 {len(items)} 条数据到 {table_name}")
                     return True
-        
+
         except Exception as e:
             self.logger.error(f"数据库插入失败: {e}")
             return False  # 返回 False 触发重试
-    
+
     async def process_error_item(self, items: List[Item]):
         """处理失败的数据"""
         for item in items:
@@ -270,7 +270,7 @@ from maize import BasePipeline, Item
 
 class RedisPipeline(BasePipeline):
     """将数据保存到 Redis"""
-    
+
     async def open(self):
         """创建 Redis 连接"""
         self.redis_client = await redis.from_url(
@@ -279,28 +279,28 @@ class RedisPipeline(BasePipeline):
             decode_responses=True
         )
         self.logger.info("Redis 连接已建立")
-    
+
     async def close(self):
         """关闭 Redis 连接"""
         if self.redis_client:
             await self.redis_client.close()
             self.logger.info("Redis 连接已关闭")
-    
+
     async def process_item(self, items: List[Item]) -> bool:
         """批量保存到 Redis"""
         try:
             # 使用 pipeline 批量操作
             pipe = self.redis_client.pipeline()
-            
+
             for item in items:
                 # 将数据保存到 Redis List
                 data = ujson.dumps(item.to_dict())
                 pipe.rpush("spider:items", data)
-            
+
             await pipe.execute()
             self.logger.info(f"成功保存 {len(items)} 条数据到 Redis")
             return True
-        
+
         except Exception as e:
             self.logger.error(f"Redis 保存失败: {e}")
             return False
@@ -316,14 +316,14 @@ from maize import BasePipeline, Item
 
 class DataCleaningPipeline(BasePipeline):
     """数据清洗管道"""
-    
+
     async def process_item(self, items: List[Item]) -> bool:
         """清洗数据"""
         for item in items:
             # 去除标题前后空格
             if 'title' in item:
                 item['title'] = item['title'].strip()
-            
+
             # 价格转换为浮点数
             if 'price' in item:
                 try:
@@ -332,12 +332,12 @@ class DataCleaningPipeline(BasePipeline):
                     item['price'] = float(price_str)
                 except (ValueError, AttributeError):
                     item['price'] = 0.0
-            
+
             # URL 标准化
             if 'url' in item:
                 if not item['url'].startswith('http'):
                     item['url'] = 'http://' + item['url']
-        
+
         return True
 ```
 
@@ -396,7 +396,7 @@ from maize import Field, Item
 
 class ProductItem(Item):
     __table_name__ = "products"  # 数据库表名（可选）
-    
+
     name = Field()
     price = Field()
     url = Field()
@@ -417,7 +417,7 @@ class MySpider(Spider):
         item["price"] = response.xpath('//span[@class="price"]/text()').get()
         item["url"] = response.url
         item["description"] = response.xpath('//div[@class="desc"]/text()').get()
-        
+
         yield item  # 提交到 Pipeline 处理
 ```
 
@@ -464,7 +464,7 @@ settings.pipeline.pipelines = [
 class MyPipeline(BasePipeline):
     async def open(self):
         self.resource = await create_resource()
-    
+
     async def close(self):
         await self.resource.close()
 ```
@@ -493,7 +493,7 @@ async def process_item(self, items: List[Item]) -> bool:
     # 不推荐：逐条插入
     # for item in items:
     #     await db.insert_one(item)
-    
+
     # 推荐：批量插入
     await db.insert_many(items)
     return True
@@ -506,18 +506,18 @@ async def process_item(self, items: List[Item]) -> bool:
 ```python
 async def process_item(self, items: List[Item]) -> bool:
     valid_items = []
-    
+
     for item in items:
         # 验证必填字段
         if not item.get('title') or not item.get('url'):
             self.logger.warning(f"数据不完整，跳过: {item.to_dict()}")
             continue
-        
+
         valid_items.append(item)
-    
+
     if valid_items:
         await self.save_to_db(valid_items)
-    
+
     return True
 ```
 
@@ -550,4 +550,3 @@ class MysqlPipeline(BasePipeline):
 - [Item 详解](item.md) - 了解 Item 的详细用法
 - [配置说明](settings.md) - Pipeline 相关配置
 - [Spider 进阶](spider.md) - 在爬虫中使用 Pipeline
-

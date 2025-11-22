@@ -18,16 +18,16 @@ jobs:
         with:
           python-version: '3.10'
 
-      - name: Install Poetry
+      - name: Install UV
         run: |
-          curl -sSL https://install.python-poetry.org | python3 -
-          export PATH=$PATH:$HOME/.poetry/bin
+          curl -LsSf https://astral.sh/uv/install.sh | sh
+          export PATH=$PATH:$HOME/.cargo/bin
 
       - name: Install project dependencies
-        run: poetry install --all-extras --no-root
+        run: uv sync --all-groups
 
       - name: Run tests and collect coverage
-        run: poetry run pytest --cov=maize --cov-report=xml
+        run: uv run pytest --cov=maize --cov-report=xml
 
       - name: Upload coverage to Codecov
         uses: codecov/codecov-action@v3
@@ -38,4 +38,4 @@ jobs:
           file: ./coverage.xml
 
       - name: Multi version test
-        run: poetry run nox
+        run: uv run nox

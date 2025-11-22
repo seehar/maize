@@ -23,7 +23,5 @@ class TestCodeGenerate:
         code_generate = CodeGenerate()
         with pytest.raises(click.ClickException):
             for _ in range(2):
-                code_generate.generate(
-                    "test_generate_no_remove_dir", "https://www.baidu.com"
-                )
+                code_generate.generate("test_generate_no_remove_dir", "https://www.baidu.com")
         shutil.rmtree("test_generate_no_remove_dir")

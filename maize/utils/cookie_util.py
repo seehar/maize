@@ -1,6 +1,4 @@
 from typing import Any
-from typing import Dict
-from typing import List
 
 
 class CookieUtil:
@@ -13,7 +11,7 @@ class CookieUtil:
         http_only: bool = False,
         secure: bool = False,
         same_site: str = "Lax",
-    ) -> List[Dict[str, Any]]:
+    ) -> list[dict[str, Any]]:
         """
         字符串类型的 cookie 转 list
         :param cookie_string:

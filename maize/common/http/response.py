@@ -1,22 +1,12 @@
 import re
 from http.cookies import SimpleCookie
-from typing import TYPE_CHECKING
-from typing import Any
-from typing import Dict
-from typing import Generic
-from typing import List
-from typing import Optional
-from typing import TypeVar
-from typing import Union
+from typing import TYPE_CHECKING, Any, Generic, TypeVar, Union
 from urllib.parse import urljoin as _urljoin
 
 import ujson
-from parsel import Selector
-from parsel import SelectorList
+from parsel import Selector, SelectorList
 
-from maize.exceptions.spider_exception import DecodeException
-from maize.exceptions.spider_exception import EncodeException
-
+from maize.exceptions.spider_exception import DecodeException, EncodeException
 
 if TYPE_CHECKING:
     from maize.common.http.request import Request
@@ -30,14 +20,14 @@ class Response(Generic[Driver, R]):
         self,
         url: str,
         *,
-        headers: Dict[str, Any],
+        headers: dict[str, Any],
         request: "Request",
         body: bytes = b"",
         text: str = "",
         status: int = 200,
-        cookie_list: Optional[List[Dict[str, Union[str, bool]]]] = None,
-        driver: Optional[Driver] = None,
-        source_response: Optional[R] = None,
+        cookie_list: list[dict[str, Union[str, bool]]] | None = None,
+        driver: Driver | None = None,
+        source_response: R | None = None,
     ):
         """
         响应
@@ -60,9 +50,9 @@ class Response(Generic[Driver, R]):
         self.encoding = request.encoding
 
         self._text_cache: str = text
-        self._cookie_list_cache: Optional[List[Dict[str, Any]]] = cookie_list
-        self._cookies_cache: Optional[Dict[str, Any]] = None
-        self._selector: Optional[Selector] = None
+        self._cookie_list_cache: list[dict[str, Any]] | None = cookie_list
+        self._cookies_cache: dict[str, Any] | None = None
+        self._selector: Selector | None = None
 
         self.driver = driver
         self.source_response = source_response
@@ -83,13 +73,9 @@ class Response(Generic[Driver, R]):
                 if _encoding:
                     self._body_cache = self._text_cache.encode(_encoding)
                 else:
-                    raise EncodeException(
-                        f"{self.request} {self.request.encoding} error."
-                    )
+                    raise EncodeException(f"{self.request} {self.request.encoding} error.")
             except UnicodeEncodeError as e:
-                raise EncodeException(
-                    e.encoding, e.object, e.start, e.end, f"{self.request}"
-                )
+                raise EncodeException(e.encoding, e.object, e.start, e.end, f"{self.request}") from None
         return self._body_cache
 
     @property
@@ -105,21 +91,15 @@ class Response(Generic[Driver, R]):
                 if _encoding:
                     self._text_cache = self.body.decode(_encoding, errors="ignore")
                 else:
-                    raise DecodeException(
-                        f"{self.request} {self.request.encoding} error."
-                    )
+                    raise DecodeException(f"{self.request} {self.request.encoding} error.")
             except UnicodeDecodeError as e:
-                raise DecodeException(
-                    e.encoding, e.object, e.start, e.end, f"{self.request}"
-                )
+                raise DecodeException(e.encoding, e.object, e.start, e.end, f"{self.request}") from None
         return self._text_cache
 
-    def _get_encoding(self) -> Optional[str]:
+    def _get_encoding(self) -> str | None:
         _encoding_re = re.compile(r"charset=([\w-]+)", flags=re.I)
 
-        _headers_encoding_string = self.headers.get(
-            "Content-Type", ""
-        ) or self.headers.get("content-type", "")
+        _headers_encoding_string = self.headers.get("Content-Type", "") or self.headers.get("content-type", "")
         _encoding = _encoding_re.search(_headers_encoding_string)
         if _encoding:
             _encoding_str = _encoding.group(1)
@@ -142,7 +122,7 @@ class Response(Generic[Driver, R]):
         return None
 
     @property
-    def cookie_list(self) -> List[Dict[str, str]]:
+    def cookie_list(self) -> list[dict[str, str]]:
         if self._cookie_list_cache:
             return self._cookie_list_cache
 
@@ -167,16 +147,14 @@ class Response(Generic[Driver, R]):
         return self._cookie_list_cache
 
     @property
-    def cookies(self) -> Dict[str, Any]:
+    def cookies(self) -> dict[str, Any]:
         if self._cookies_cache:
             return self._cookies_cache
 
-        self._cookies_cache = {
-            cookie["key"]: cookie["value"] for cookie in self.cookie_list
-        }
+        self._cookies_cache = {cookie["key"]: cookie["value"] for cookie in self.cookie_list}
         return self._cookies_cache
 
-    def json(self) -> Dict[str, Any]:
+    def json(self) -> dict[str, Any]:
         return ujson.loads(self.text)
 
     def urljoin(self, url: str) -> str:
@@ -189,5 +167,5 @@ class Response(Generic[Driver, R]):
         return self._selector.xpath(xpath)
 
     @property
-    def meta(self) -> Dict[str, Any]:
+    def meta(self) -> dict[str, Any]:
         return self.request.meta

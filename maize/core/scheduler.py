@@ -2,14 +2,13 @@ import typing
 
 from maize.utils.priority_queue import SpiderPriorityQueue
 
-
 if typing.TYPE_CHECKING:
     from maize import Request
 
 
 class Scheduler:
     def __init__(self):
-        self.request_queue: typing.Optional[SpiderPriorityQueue] = None
+        self.request_queue: SpiderPriorityQueue | None = None
 
     def __len__(self):
         return self.request_queue.qsize()
@@ -20,7 +19,7 @@ class Scheduler:
     def open(self):
         self.request_queue = SpiderPriorityQueue()
 
-    async def next_request(self, gte_priority: typing.Optional[int] = None):
+    async def next_request(self, gte_priority: int | None = None):
         """
         获取下一个请求
 

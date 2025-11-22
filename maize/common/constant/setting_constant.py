@@ -1,5 +1,4 @@
-from enum import Enum
-from enum import unique
+from enum import Enum, unique
 
 
 @unique
@@ -7,6 +6,7 @@ class SpiderDownloaderEnum(str, Enum):
     AIOHTTP = "maize.AioHttpDownloader"
     HTTPX = "maize.HTTPXDownloader"
     PLAYWRIGHT = "maize.downloader.playwright_downloader.PlaywrightDownloader"
+    PATCHRIGHT = "maize.downloader.patchright_downloader.PatchrightDownloader"
 
 
 @unique
@@ -21,7 +21,7 @@ class LogLevelEnum(str, Enum):
 
 @unique
 class PipelineEnum(str, Enum):
-    BASE = "maize.BasePipeline"
+    EMPTY = "maize.EmptyPipeline"
     MYSQL = "maize.MysqlPipeline"
 
 

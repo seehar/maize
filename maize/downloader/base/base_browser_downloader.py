@@ -1,28 +1,22 @@
 import asyncio
 import re
-from abc import ABCMeta
-from abc import abstractmethod
+from abc import ABCMeta, abstractmethod
 from collections import defaultdict
 from pathlib import Path
-from typing import TYPE_CHECKING
-from typing import Dict
-from typing import Generic
-from typing import List
-from typing import Optional
-from typing import Protocol
-from typing import TypeVar
-from typing import Union
+from typing import (
+    TYPE_CHECKING,
+    Generic,
+    Protocol,
+    TypeVar,
+    Union,
+)
 
 import ujson
 
-from maize import BaseDownloader
-from maize import Request
-from maize import Response
+from maize import BaseDownloader, Request, Response
 from maize.common.downloader.page_pool import PagePool
 from maize.common.model.download_response_model import DownloadResponse
-from maize.common.model.rpa_model import InterceptRequest
-from maize.common.model.rpa_model import InterceptResponse
-
+from maize.common.model.rpa_model import InterceptRequest, InterceptResponse
 
 if TYPE_CHECKING:
     from maize.core.crawler import Crawler
@@ -49,8 +43,8 @@ class _RouteProtocol(Protocol):
 
 class _RequestProtocol(Protocol):
     # 不同驱动可能使用不同字段名(resource_type 或 resourceType)
-    resource_type: Optional[str]
-    resourceType: Optional[str]
+    resource_type: str | None
+    resourceType: str | None  # noqa: N815 - matches third-party library naming
     url: str
 
 
@@ -72,16 +66,16 @@ class BaseBrowserDownloader(
 
     def __init__(self, crawler: "Crawler"):
         super().__init__(crawler)
-        self.playwright: Optional[PlaywrightT] = None
-        self.browser: Optional[BrowserT] = None
-        self.context: Optional[BrowserContextT] = None
-        self.page_pool: Optional[PagePool] = None
+        self.playwright: PlaywrightT | None = None
+        self.browser: BrowserT | None = None
+        self.context: BrowserContextT | None = None
+        self.page_pool: PagePool | None = None
 
-        self._timeout: Optional[float] = None
-        self._use_session: Optional[bool] = None
+        self._timeout: float | None = None
+        self._use_session: bool | None = None
 
-        self._use_stealth_js: Optional[bool] = None
-        self._stealth_js_path: Optional[Path | str] = None
+        self._use_stealth_js: bool | None = None
+        self._stealth_js_path: Path | str | None = None
         rpa_settings = self.crawler.settings.rpa
         self.__rpa_headless = rpa_settings.headless
         self.__rpa_driver_type = rpa_settings.driver_type
@@ -102,8 +96,8 @@ class BaseBrowserDownloader(
         self.__proxy: str = self.crawler.settings.proxy.proxy_url
         self.__proxy_username: str = self.crawler.settings.proxy.proxy_username
         self.__proxy_password: str = self.crawler.settings.proxy.proxy_password
-        self.__view_size: Optional[ViewportSizeT] = None
-        self._cache_data: Dict[str, List[InterceptResponse]] = {}
+        self.__view_size: ViewportSizeT | None = None
+        self._cache_data: dict[str, list[InterceptResponse]] = {}
 
         # flag to ensure we only register context routes once per downloader
         self._context_route_initialized: bool = False
@@ -137,9 +131,7 @@ class BaseBrowserDownloader(
         self._stealth_js_path = self.crawler.settings.rpa.stealth_js_path
 
         viewport_size_class = self._get_viewport_size_class()
-        self.__view_size = viewport_size_class(
-            width=self.__rpa_window_size[0], height=self.__rpa_window_size[1]
-        )
+        self.__view_size = viewport_size_class(width=self.__rpa_window_size[0], height=self.__rpa_window_size[1])
 
         # 获取并发数设置，用于页面池大小
         concurrency = self.crawler.settings.concurrency or 10
@@ -215,7 +207,7 @@ class BaseBrowserDownloader(
         """下载请求"""
         response = ""
         cookies = []
-        page: Optional[PageT] = None
+        page: PageT | None = None
         context = None
 
         try:
@@ -248,9 +240,7 @@ class BaseBrowserDownloader(
                     await asyncio.sleep(self.__rpa_render_time)
                     response = await page.content()
                     cookies = await self.context.cookies()
-                    self.logger.info(
-                        f"Successfully retrieved content from {request.url}"
-                    )
+                    self.logger.info(f"Successfully retrieved content from {request.url}")
                 except Exception as e:
                     self.logger.error(f"Page navigation error for {request.url}: {e}")
                     # 检查页面状态
@@ -302,9 +292,7 @@ class BaseBrowserDownloader(
                                 await _res
                         except Exception as e:
                             # 忽略无法注册路由的错误（不是所有驱动都支持 route）
-                            self.logger.debug(
-                                f"Failed to register route handler on non-session context, error: {e}"
-                            )
+                            self.logger.debug(f"Failed to register route handler on non-session context, error: {e}")
 
                     page = await context.new_page()
                     page.on("download", self.handle_download)
@@ -349,9 +337,7 @@ class BaseBrowserDownloader(
                 except Exception as e:
                     self.logger.debug(f"Failed to close context: {e}")
 
-    def structure_response(
-        self, request: Request, response: str, cookies: List[CookieT]
-    ) -> DownloadResponse:
+    def structure_response(self, request: Request, response: str, cookies: list[CookieT]) -> DownloadResponse:
         """构建并返回 DownloadResponse 对象"""
         cookie_list = [
             {
@@ -378,7 +364,7 @@ class BaseBrowserDownloader(
         download_response.response = response_instance
         return download_response
 
-    def _get_proxy_config(self) -> Optional[Dict]:
+    def _get_proxy_config(self) -> dict | None:
         """构建代理配置字典"""
         if not self.__proxy:
             return None
@@ -394,17 +380,13 @@ class BaseBrowserDownloader(
             proxy_config["username"] = self.__proxy_username
             proxy_config["password"] = self.__proxy_password
 
-        self.logger.debug(
-            f"代理配置: server={proxy_server}, with_auth={bool(self.__proxy_username)}"
-        )
+        self.logger.debug(f"代理配置: server={proxy_server}, with_auth={bool(self.__proxy_username)}")
         return proxy_config
 
     async def _get_browser(self, playwright: PlaywrightT) -> BrowserT:
         """获取 browser 实例"""
         if self.__rpa_endpoint_url:
-            browser = await getattr(
-                playwright, self.__rpa_driver_type
-            ).connect_over_cdp(
+            browser = await getattr(playwright, self.__rpa_driver_type).connect_over_cdp(
                 endpoint_url=self.__rpa_endpoint_url,
                 timeout=self._timeout,
                 slow_mo=self.__rpa_slow_mo,
@@ -455,38 +437,34 @@ class BaseBrowserDownloader(
                 self._context_route_initialized = True
             except Exception as e:
                 # 并非所有浏览器驱动都支持 route；静默失败并打印调试信息
-                self.logger.debug(
-                    f"无法在 session context 上注册路由处理器，error: {e}"
-                )
+                self.logger.debug(f"无法在 session context 上注册路由处理器，error: {e}")
 
         # 不再创建单个page，页面池会在需要时创建页面
 
-    def get_response(self, url_regex: str) -> Optional[InterceptResponse]:
+    def get_response(self, url_regex: str) -> InterceptResponse | None:
         """获取第一个匹配的拦截响应（如果有）。"""
         response_list = self._cache_data.get(url_regex)
         return response_list[0] if response_list else None
 
-    def get_all_response(self, url_regex: str) -> List[InterceptResponse]:
+    def get_all_response(self, url_regex: str) -> list[InterceptResponse]:
         """获取所有匹配的拦截响应列表（可能为空）。"""
         return self._cache_data.get(url_regex, [])
 
-    def get_text(self, url_regex: str) -> Optional[str]:
+    def get_text(self, url_regex: str) -> str | None:
         """获取第一个匹配拦截响应的文本内容，如果不存在返回 None。"""
         resp = self.get_response(url_regex)
         return resp.content.decode() if resp else None
 
-    def get_all_text(self, url_regex: str) -> List[str]:
+    def get_all_text(self, url_regex: str) -> list[str]:
         """获取所有匹配拦截响应的文本内容列表。"""
-        return [
-            response.content.decode() for response in self.get_all_response(url_regex)
-        ]
+        return [response.content.decode() for response in self.get_all_response(url_regex)]
 
-    def get_json(self, url_regex: str) -> Optional[dict]:
+    def get_json(self, url_regex: str) -> dict | None:
         """尝试将第一个匹配的拦截响应解析为 JSON 并返回，失败返回 None。"""
         text = self.get_text(url_regex)
         return ujson.loads(text) if text else None
 
-    def get_all_json(self, url_regex: str) -> List[dict]:
+    def get_all_json(self, url_regex: str) -> list[dict]:
         """将所有匹配的拦截响应解析为 JSON 列表并返回。"""
         return [ujson.loads(text) for text in self.get_all_text(url_regex)]
 
@@ -499,16 +477,14 @@ class BaseBrowserDownloader(
 
         def __init__(self, downloader: "BaseBrowserDownloader"):
             self.downloader = downloader
-            self.page: Optional[PageT] = None
+            self.page: PageT | None = None
 
         async def __aenter__(self) -> PageT:
             """进入上下文并获取页面（异步）。"""
             if not self.downloader.context:
                 await self.downloader._gen_context_and_page()
 
-            self.page = await self.downloader.page_pool.acquire_page(
-                self.downloader.context
-            )
+            self.page = await self.downloader.page_pool.acquire_page(self.downloader.context)
             return self.page
 
         async def __aexit__(self, exc_type, exc_val, exc_tb) -> None:
@@ -527,29 +503,24 @@ class BaseBrowserDownloader(
         """
         return self.PageOperationContext(self)
 
-    async def _route_handler(
-        self, route: _RouteProtocol, request: _RequestProtocol
-    ) -> None:
+    async def _route_handler(self, route: _RouteProtocol, request: _RequestProtocol) -> None:
         """路由处理器：根据配置的资源类型列表或 URL 模式中止特定请求（异步）。"""
         try:
             url = request.url
 
             # 检查 URL 模式黑名单
-            if self.__rpa_skip_url_patterns:
-                if any(
-                    re.search(pattern, url) for pattern in self.__rpa_skip_url_patterns
-                ):
-                    try:
-                        await route.abort()
-                        self.logger.debug(f"已拦截匹配 URL: {url[:100]}")
-                        return
-                    except Exception as e:
-                        self.logger.warning(f"路由中止请求失败: {e}")
+            if self.__rpa_skip_url_patterns and any(
+                re.search(pattern, url) for pattern in self.__rpa_skip_url_patterns
+            ):
+                try:
+                    await route.abort()
+                    self.logger.debug(f"已拦截匹配 URL: {url[:100]}")
+                    return
+                except Exception as e:
+                    self.logger.warning(f"路由中止请求失败: {e}")
 
             # 检查资源类型黑名单
-            rtype = getattr(request, "resource_type", None) or getattr(
-                request, "resourceType", None
-            )
+            rtype = getattr(request, "resource_type", None) or getattr(request, "resourceType", None)
             if rtype and self.__rpa_skip_resource_types:
                 rtype_str = rtype.lower()
                 if any(rtype_str == t.lower() for t in self.__rpa_skip_resource_types):

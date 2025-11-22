@@ -1,5 +1,4 @@
-from maize import Field
-from maize import Item
+from maize import Field, Item
 
 
 class DemoItem(Item):

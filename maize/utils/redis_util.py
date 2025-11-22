@@ -1,9 +1,5 @@
-from typing import Optional
-
 from redis import asyncio as aioredis
-from redis.typing import EncodableT
-from redis.typing import ExpiryT
-from redis.typing import KeyT
+from redis.typing import EncodableT, ExpiryT, KeyT
 
 from .tools import SingletonType
 
@@ -11,12 +7,12 @@ from .tools import SingletonType
 class RedisUtil:
     def __init__(
         self,
-        url: Optional[str] = None,
-        username: Optional[str] = None,
-        password: Optional[str] = None,
-        host: Optional[str] = None,
-        port: Optional[int] = None,
-        db: Optional[int] = None,
+        url: str | None = None,
+        username: str | None = None,
+        password: str | None = None,
+        host: str | None = None,
+        port: int | None = None,
+        db: int | None = None,
     ):
         """
         redis 工具类
@@ -57,8 +53,8 @@ class RedisUtil:
         self,
         name: KeyT,
         value: EncodableT,
-        ex: Optional[ExpiryT] = None,
-        px: Optional[ExpiryT] = None,
+        ex: ExpiryT | None = None,
+        px: ExpiryT | None = None,
         nx: bool = False,
         xx: bool = False,
         keepttl: bool = False,
@@ -74,15 +70,13 @@ class RedisUtil:
         :param keepttl: 如果为 True，则保留与密钥相关的存活时间。
         :return:
         """
-        return await self._redis.set(
-            name=name, value=value, ex=ex, px=px, nx=nx, xx=xx, keepttl=keepttl
-        )
+        return await self._redis.set(name=name, value=value, ex=ex, px=px, nx=nx, xx=xx, keepttl=keepttl)
 
     async def nx_set(
         self,
         name: KeyT,
         value: EncodableT,
-        ex: Optional[ExpiryT] = None,
+        ex: ExpiryT | None = None,
     ):
         """
         nx set

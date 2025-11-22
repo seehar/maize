@@ -73,7 +73,7 @@ class MultiPageSpider(Spider):
     async def parse(self, response: Response):
         # 不指定 callback，任务会默认调度到 parse
         yield Request(url="http://www.example.com/page2")
-        
+
         # 指定 callback，任务由 callback 指定的函数解析
         yield Request(url="http://www.example.com/detail", callback=self.parse_detail)
 
@@ -87,7 +87,7 @@ class MultiPageSpider(Spider):
 async def parse(self, response: Response):
     # 解析列表页，提取详情页链接
     detail_urls = response.xpath('//a[@class="detail-link"]/@href').getall()
-    
+
     for url in detail_urls:
         yield Request(
             url=response.urljoin(url),  # 自动拼接完整URL
@@ -120,12 +120,12 @@ if __name__ == "__main__":
         log_level="DEBUG",  # 日志级别
         downloader="maize.HTTPXDownloader",  # 使用 HTTPX 下载器
     )
-    
+
     # 配置请求相关参数
     settings.request.verify_ssl = False  # 不验证 SSL
     settings.request.request_timeout = 30  # 请求超时时间
     settings.request.max_retry_count = 3  # 最大重试次数
-    
+
     MySpider().run(settings=settings)
 ```
 
@@ -143,7 +143,7 @@ class Settings(SpiderSettings):
     concurrency = 10
     log_level = "INFO"
     downloader = "maize.AioHttpDownloader"
-    
+
     # 也可以使用嵌套配置
     # request = RequestSettings(
     #     verify_ssl=False,
@@ -179,7 +179,7 @@ class MySpider(Spider):
         "log_level": "DEBUG",
         "downloader": "maize.HTTPXDownloader",
     }
-    
+
     # ...爬虫实现...
 ```
 
@@ -269,11 +269,11 @@ class CustomDownloader(BaseDownloader):
         """
         # 实现下载逻辑
         pass
-    
+
     @staticmethod
     def structure_response(
-        request: Request, 
-        response: typing.Any, 
+        request: Request,
+        response: typing.Any,
         body: bytes
     ) -> Response:
         """
@@ -352,10 +352,10 @@ class Settings(SpiderSettings):
 async def parse(self, response: Response):
     # 提取单个结果
     title = response.xpath('//title/text()').get()
-    
+
     # 提取所有结果
     links = response.xpath('//a/@href').getall()
-    
+
     # 链式调用
     items = response.xpath('//div[@class="item"]')
     for item in items:
@@ -369,10 +369,10 @@ async def parse(self, response: Response):
 async def parse(self, response: Response):
     # 提取单个结果
     title = response.css('title::text').get()
-    
+
     # 提取所有结果
     links = response.css('a::attr(href)').getall()
-    
+
     # 链式调用
     items = response.css('div.item')
     for item in items:
@@ -385,9 +385,9 @@ async def parse(self, response: Response):
 ```python
 async def parse(self, response: Response):
     import re
-    
+
     # 提取邮箱地址
-    emails = re.findall(r'\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,}\b', 
+    emails = re.findall(r'\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,}\b',
                         response.text)
 ```
 
@@ -414,7 +414,7 @@ from maize import Field, Item
 
 class ProductItem(Item):
     __table_name__ = "products"  # 数据库表名
-    
+
     name = Field()
     price = Field()
     url = Field()
@@ -432,7 +432,7 @@ class MySpider(Spider):
         item["name"] = response.xpath('//h1/text()').get()
         item["price"] = response.xpath('//span[@class="price"]/text()').get()
         item["url"] = response.url
-        
+
         yield item  # 提交到数据管道处理
 ```
 
@@ -451,11 +451,11 @@ class CustomPipeline(BasePipeline):
     async def open(self):
         """管道初始化时调用"""
         print("Pipeline 已启动")
-    
+
     async def close(self):
         """管道关闭时调用"""
         print("Pipeline 已关闭")
-    
+
     async def process_item(self, items: List[Item]) -> bool:
         """
         处理数据
@@ -464,7 +464,7 @@ class CustomPipeline(BasePipeline):
         for item in items:
             print(f"保存数据: {item.to_dict()}")
         return True
-    
+
     async def process_error_item(self, items: List[Item]):
         """处理超过重试次数的数据"""
         for item in items:
@@ -495,10 +495,10 @@ class MySpider(Spider):
             callback=self.parse,
             error_callback=self.error_handler  # 指定错误回调
         )
-    
+
     async def parse(self, response: Response):
         print(response.text)
-    
+
     async def error_handler(self, request: Request):
         """处理请求失败的情况"""
         self.logger.error(f"请求失败: {request.url}")
@@ -520,4 +520,3 @@ settings.request.max_retry_count = 3  # 最大重试3次
 - [配置说明](features/settings.md) - 详细的配置选项
 - [Request 详解](features/request.md) - 请求的高级用法
 - [Response 详解](features/response.md) - 响应的处理方法
-

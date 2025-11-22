@@ -37,7 +37,7 @@ if __name__ == "__main__":
         log_level="INFO",
         downloader="maize.HTTPXDownloader"
     )
-    
+
     MySpider().run(settings=settings)
 ```
 
@@ -88,10 +88,10 @@ class Settings(SpiderSettings):
     concurrency = 10
     log_level = "INFO"
     downloader = "maize.AioHttpDownloader"
-    
+
     # 日志处理器
     logger_handler = ""
-    
+
     # 分布式配置
     is_distributed = False
 ```
@@ -127,7 +127,7 @@ class MySpider(Spider):
             "handle_batch_max_size": 50,
         }
     }
-    
+
     # ...爬虫实现...
 ```
 
@@ -391,7 +391,7 @@ settings.proxy.proxy_password = "password"
 
 # 获取代理字典
 proxy_dict = settings.proxy.proxy_dict
-# {'http': 'http://user:password@proxy.example.com:8080', 
+# {'http': 'http://user:password@proxy.example.com:8080',
 #  'https': 'http://user:password@proxy.example.com:8080'}
 ```
 
@@ -463,10 +463,10 @@ def validate_settings(settings: SpiderSettings):
     """验证配置"""
     if settings.concurrency > 100:
         raise ValueError("并发数不能超过100")
-    
+
     if settings.mysql.db and not settings.mysql.password:
         raise ValueError("MySQL 配置缺少密码")
-    
+
     return settings
 
 

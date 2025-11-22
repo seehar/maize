@@ -1,6 +1,6 @@
-import os
+import asyncio
 import platform
-from typing import Optional
+from pathlib import Path
 
 
 def fix_windows_aiohttp_proxy_error():  # pragma: no cover
@@ -10,21 +10,19 @@ def fix_windows_aiohttp_proxy_error():  # pragma: no cover
     system = platform.system().lower()
 
     if system == "windows":
-        import asyncio
-
         asyncio.set_event_loop_policy(asyncio.WindowsSelectorEventLoopPolicy())
 
 
-def get_container_id() -> Optional[str]:
+def get_container_id() -> str | None:
     """
     获取容器id
 
     :return:
     """
-    if not os.path.exists("/proc/self/mountinfo"):
+    if not Path.exists(Path("/proc/self/mountinfo")):
         return None
 
-    with open("/proc/self/mountinfo", "r", encoding="utf-8") as f:
+    with open("/proc/self/mountinfo", encoding="utf-8") as f:
         for line in f.readlines():
             if "/resolv.conf" not in line:
                 continue

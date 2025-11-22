@@ -1,8 +1,4 @@
-from typing import Any
-from typing import Dict
-from typing import List
-from typing import Optional
-from typing import Union
+from typing import Any, Union
 
 import aiomysql
 
@@ -33,7 +29,7 @@ class MysqlUtil:
         self.echo = echo
         self.pool_recycle = pool_recycle
 
-        self.pool: Optional[aiomysql.Pool] = None
+        self.pool: aiomysql.Pool | None = None
 
     async def open(self):
         if self.pool:
@@ -51,69 +47,59 @@ class MysqlUtil:
             pool_recycle=self.pool_recycle,
         )
 
-    async def fetchone(
-        self, sql: str, args: Optional[Union[list, tuple]] = None
-    ) -> Dict[str, Any]:
+    async def fetchone(self, sql: str, args: Union[list, tuple] | None = None) -> dict[str, Any]:
         """
         查询单条数据
         :param sql: sql 语句
         :param args: list 或 tuple 类型的参数
         :return: 单条结果
         """
-        async with self.pool.acquire() as conn:
-            async with conn.cursor(aiomysql.DictCursor) as cur:
-                await cur.execute(sql, args)
-                return await cur.fetchone()
+        async with self.pool.acquire() as conn, conn.cursor(aiomysql.DictCursor) as cur:
+            await cur.execute(sql, args)
+            return await cur.fetchone()
 
-    async def fetchall(
-        self, sql: str, args: Optional[Union[list, tuple]] = None
-    ) -> List[Dict[str, Any]]:
+    async def fetchall(self, sql: str, args: Union[list, tuple] | None = None) -> list[dict[str, Any]]:
         """
         查询多条数据
         :param sql: sql 语句
         :param args: list 或 tuple 类型的参数
         :return: 多条结果集
         """
-        async with self.pool.acquire() as conn:
-            async with conn.cursor(aiomysql.DictCursor) as cur:
-                await cur.execute(sql, args)
-                return await cur.fetchall()
+        async with self.pool.acquire() as conn, conn.cursor(aiomysql.DictCursor) as cur:
+            await cur.execute(sql, args)
+            return await cur.fetchall()
 
-    async def execute(self, sql: str, args: Optional[Union[list, tuple]] = None) -> int:
+    async def execute(self, sql: str, args: Union[list, tuple] | None = None) -> int:
         """
         执行增删改操作
         :param sql: sql 语句
         :param args: list 或 tuple 类型的参数
         :return: 受影响的行数
         """
-        async with self.pool.acquire() as conn:
-            async with conn.cursor(aiomysql.DictCursor) as cur:
-                try:
-                    row = await cur.execute(sql, args)
-                    await conn.commit()
-                    return row
-                except Exception as e:
-                    await conn.rollback()
-                    raise e
+        async with self.pool.acquire() as conn, conn.cursor(aiomysql.DictCursor) as cur:
+            try:
+                row = await cur.execute(sql, args)
+                await conn.commit()
+                return row
+            except Exception as e:
+                await conn.rollback()
+                raise e
 
-    async def executemany(
-        self, sql: str, args: Optional[Union[list, tuple]] = None
-    ) -> int:
+    async def executemany(self, sql: str, args: Union[list, tuple] | None = None) -> int:
         """
         批量执行增删改操作
         :param sql: sql 语句
         :param args: ist 或 tuple 类型的参数
         :return: 受影响的行数
         """
-        async with self.pool.acquire() as conn:
-            async with conn.cursor(aiomysql.DictCursor) as cur:
-                try:
-                    row = await cur.executemany(sql, args)
-                    await conn.commit()
-                    return row
-                except Exception as e:
-                    await conn.rollback()
-                    raise e
+        async with self.pool.acquire() as conn, conn.cursor(aiomysql.DictCursor) as cur:
+            try:
+                row = await cur.executemany(sql, args)
+                await conn.commit()
+                return row
+            except Exception as e:
+                await conn.rollback()
+                raise e
 
     async def close(self):
         if self.pool:

@@ -1,12 +1,14 @@
-from playwright.async_api import Browser
-from playwright.async_api import BrowserContext
-from playwright.async_api import Cookie
-from playwright.async_api import Download
-from playwright.async_api import Page
-from playwright.async_api import Playwright
-from playwright.async_api import Response as PlaywrightResponse
-from playwright.async_api import ViewportSize
-from playwright.async_api import async_playwright
+from playwright.async_api import (
+    Browser,
+    BrowserContext,
+    Cookie,
+    Download,
+    Page,
+    Playwright,
+    Response as PlaywrightResponse,
+    ViewportSize,
+    async_playwright,
+)
 
 from maize.downloader.base.base_browser_downloader import BaseBrowserDownloader
 

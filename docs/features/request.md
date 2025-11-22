@@ -36,14 +36,14 @@ class MySpider(Spider):
     async def start_requests(self) -> AsyncGenerator[Request, Any]:
         # 生成初始请求
         yield Request(url="http://www.example.com")
-    
+
     async def parse(self, response: Response):
         # 下发新请求
         yield Request(
             url="http://www.example.com/detail",
             callback=self.parse_detail
         )
-    
+
     async def parse_detail(self, response: Response):
         print(response.text)
 ```
@@ -223,12 +223,12 @@ class MySpider(Spider):
     async def parse(self, response: Response):
         """解析列表页"""
         items = response.xpath('//div[@class="item"]')
-        
+
         for item in items:
             title = item.xpath('.//h3/text()').get()
             price = item.xpath('.//span[@class="price"]/text()').get()
             detail_url = item.xpath('.//a/@href').get()
-            
+
             # 通过 meta 传递数据到下一个解析函数
             yield Request(
                 url=response.urljoin(detail_url),
@@ -238,16 +238,16 @@ class MySpider(Spider):
                     'price': price
                 }
             )
-    
+
     async def parse_detail(self, response: Response):
         """解析详情页"""
         # 从 meta 中获取之前传递的数据
         title = response.request.meta.get('title')
         price = response.request.meta.get('price')
-        
+
         # 提取详情
         description = response.xpath('//div[@class="desc"]/text()').get()
-        
+
         yield {
             'title': title,
             'price': price,
@@ -266,14 +266,14 @@ class MySpider(Spider):
             callback=self.parse,
             error_callback=self.handle_error  # 设置错误回调
         )
-    
+
     async def parse(self, response: Response):
         print(response.text)
-    
+
     async def handle_error(self, request: Request):
         """处理请求失败"""
         self.logger.error(f"请求失败: {request.url}")
-        
+
         # 可以选择重新发起请求
         if request.current_retry_count < 3:
             yield Request(
@@ -348,7 +348,7 @@ hash_value = request.hash
 async def start_requests(self):
     """批量生成请求"""
     base_url = "http://www.example.com/page"
-    
+
     for page in range(1, 101):
         yield Request(
             url=f"{base_url}/{page}",
@@ -364,13 +364,13 @@ async def parse(self, response: Response):
     """解析页面，提取链接"""
     # 提取所有详情页链接
     links = response.xpath('//a[@class="detail"]/@href').getall()
-    
+
     for link in links:
         yield Request(
             url=response.urljoin(link),
             callback=self.parse_detail
         )
-    
+
     # 提取下一页链接
     next_page = response.xpath('//a[@class="next"]/@href').get()
     if next_page:
@@ -387,13 +387,13 @@ class MySpider(Spider):
     def __init__(self):
         super().__init__()
         self.visited_urls = set()
-    
+
     async def parse(self, response: Response):
         links = response.xpath('//a/@href').getall()
-        
+
         for link in links:
             url = response.urljoin(link)
-            
+
             # 简单的去重逻辑
             if url not in self.visited_urls:
                 self.visited_urls.add(url)
@@ -413,4 +413,3 @@ class MySpider(Spider):
 - [Response 详解](response.md) - 响应的处理方法
 - [Spider 进阶](spider.md) - 学习更多爬虫特性
 - [配置说明](settings.md) - 详细的配置选项
-

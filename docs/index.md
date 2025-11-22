@@ -112,7 +112,7 @@ if __name__ == "__main__":
         log_level="DEBUG",
         downloader="maize.HTTPXDownloader"
     )
-    
+
     SimpleSpider().run(settings=settings)
 ```
 
@@ -225,7 +225,7 @@ from maize import Field, Item
 
 class MyItem(Item):
     __table_name__ = "my_table"  # 数据库表名（可选）
-    
+
     title = Field()
     url = Field()
     content = Field()
@@ -257,4 +257,3 @@ class MyItem(Item):
 - [Response 详解](features/response.md)：响应处理方法
 - [Pipeline 管道](features/pipeline.md)：数据管道使用
 - [下载器](features/downloader.md)：下载器配置与自定义
-

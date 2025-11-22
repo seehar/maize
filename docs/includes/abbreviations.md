@@ -24,4 +24,3 @@
 *[DB]: Database
 *[Redis]: Remote Dictionary Server
 *[MySQL]: My Structured Query Language
-

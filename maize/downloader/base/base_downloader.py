@@ -1,19 +1,12 @@
 import asyncio
-from abc import ABC
-from abc import ABCMeta
-from abc import abstractmethod
+from abc import ABC, ABCMeta, abstractmethod
 from contextlib import asynccontextmanager
-from typing import TYPE_CHECKING
-from typing import Any
-from typing import Final
-from typing import Optional
-from typing import Union
+from typing import TYPE_CHECKING, Any, Final, Union
 
 from maize.common.http import Response
 from maize.common.http.request import Request
 from maize.common.model.download_response_model import DownloadResponse
 from maize.utils.log_util import get_logger
-
 
 if TYPE_CHECKING:
     from maize.core.crawler import Crawler
@@ -41,11 +34,10 @@ class ActiveRequestManager:
 
 
 class DownloaderMeta(ABCMeta):
-    def __subclasscheck__(self, subclass):
+    def __subclasscheck__(cls, subclass):
         required_method = ("fetch", "download", "create_instance", "close", "idle")
         return all(
-            hasattr(subclass, method) and callable(getattr(subclass, method, None))
-            for method in required_method
+            hasattr(subclass, method) and callable(getattr(subclass, method, None)) for method in required_method
         )
 
 
@@ -55,9 +47,7 @@ class BaseDownloader(ABC, metaclass=DownloaderMeta):
         self._active = ActiveRequestManager()
         self._max_retry_count: int = self.crawler.settings.request.max_retry_count
 
-        self.logger = get_logger(
-            crawler.settings, self.__class__.__name__, crawler.settings.log_level
-        )
+        self.logger = get_logger(crawler.settings, self.__class__.__name__, crawler.settings.log_level)
 
     @classmethod
     def create_instance(cls, *args, **kwargs):
@@ -83,9 +73,7 @@ class BaseDownloader(ABC, metaclass=DownloaderMeta):
         """
         raise NotImplementedError
 
-    async def _download_retry(
-        self, request: Request, exception: Exception
-    ) -> Optional[Request]:
+    async def _download_retry(self, request: Request, exception: Exception) -> Request | None:
         """
         下载重试
         :param request: 请求
@@ -100,9 +88,7 @@ class BaseDownloader(ABC, metaclass=DownloaderMeta):
             request.retry()
             return request
 
-        self.logger.error(
-            f"Max retry count reached ({self._max_retry_count}). Skipping request: {request.url}"
-        )
+        self.logger.error(f"Max retry count reached ({self._max_retry_count}). Skipping request: {request.url}")
         await self.process_error_request(request)
         return None
 
@@ -118,9 +104,7 @@ class BaseDownloader(ABC, metaclass=DownloaderMeta):
         return len(self._active)
 
     async def close(self):
-        self.logger.info(
-            f"{self.crawler.spider} <downloader class: {type(self).__name__}> closed"
-        )
+        self.logger.info(f"{self.crawler.spider} <downloader class: {type(self).__name__}> closed")
 
     async def process_error_request(self, request: Request):
         """

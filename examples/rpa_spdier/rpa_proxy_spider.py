@@ -2,20 +2,11 @@ import typing
 
 from playwright.async_api import Page
 
-from maize import Request
-from maize import Response
-from maize import Spider
+from maize import Request, Response, Spider, SpiderSettings
+from maize.common.constant import RPADriverTypeEnum, SpiderDownloaderEnum
 
 
 class RpaJdSpider(Spider):
-    custom_settings = {
-        "CONCURRENCY": 1,
-        "DOWNLOADER": "maize.downloader.playwright_downloader.PlaywrightDownloader",
-        "USE_SESSION": False,
-        "RPA_DRIVER_TYPE": "chromium",
-        "PROXY_TUNNEL": "172.19.214.194:7890",
-    }
-
     async def start_requests(self) -> typing.AsyncGenerator[Request, typing.Any]:
         yield Request("https://icanhazip.com")
 
@@ -24,4 +15,11 @@ class RpaJdSpider(Spider):
 
 
 if __name__ == "__main__":
-    RpaJdSpider().run()
+    spider_settings = SpiderSettings()
+    spider_settings.concurrency = 1
+    spider_settings.downloader = SpiderDownloaderEnum.PLAYWRIGHT.value
+    spider_settings.request.use_session = False
+    spider_settings.rpa.driver_type = RPADriverTypeEnum.CHROMIUM.value
+    spider_settings.proxy.proxy_url = "172.19.214.194:7890"
+
+    RpaJdSpider().run(spider_settings)

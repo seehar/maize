@@ -1,19 +1,15 @@
-# -*- encoding: utf-8 -*-
 """
 @author: seehar
 @time: 2024/2/22 10:55
 @file: decorator_entry.py.py
 @desc: 装饰器启动入口
 """
+
 import asyncio
+from collections.abc import Callable
 from typing import TYPE_CHECKING
-from typing import Callable
-from typing import List
-from typing import Optional
-from typing import Type
 
 from maize import CrawlerProcess
-
 
 if TYPE_CHECKING:
     from maize import Spider
@@ -21,19 +17,17 @@ if TYPE_CHECKING:
 
 class SpiderEntry:
     def __init__(self):
-        self.spider_list: List[Type["Spider"]] = []
+        self.spider_list: list[type[Spider]] = []
 
-    def register(
-        self, *, settings: Optional[dict] = None
-    ) -> Callable[[Type["Spider"]], Type["Spider"]]:
-        def wrapper(spider: Type["Spider"]) -> Type["Spider"]:
+    def register(self, *, settings: dict | None = None) -> Callable[[type["Spider"]], type["Spider"]]:
+        def wrapper(spider: type["Spider"]) -> type["Spider"]:
             if settings:
                 if hasattr(spider, "custom_settings"):
-                    custom_settings: dict = getattr(spider, "custom_settings")
+                    custom_settings: dict = spider.custom_settings
                     custom_settings.update(settings)
-                    setattr(spider, "custom_settings", custom_settings)
+                    spider.custom_settings = custom_settings
                 else:
-                    setattr(spider, "custom_settings", settings)
+                    spider.custom_settings = settings
 
             self.spider_list.append(spider)
             return spider
@@ -49,5 +43,5 @@ class SpiderEntry:
     def run(self):
         asyncio.run(self.run_async())
 
-    def get_spider_list(self) -> List[Type["Spider"]]:
+    def get_spider_list(self) -> list[type["Spider"]]:
         return self.spider_list

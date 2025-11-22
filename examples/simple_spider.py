@@ -1,6 +1,4 @@
-from maize import Response
-from maize import Spider
-from maize import SpiderSettings
+from maize import Response, Spider, SpiderSettings
 
 
 class BaiduSpider(Spider):

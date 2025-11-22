@@ -1,11 +1,8 @@
+from collections.abc import AsyncGenerator
 from typing import Any
-from typing import AsyncGenerator
 
-from maize import Request
-from maize import Spider
-from maize import SpiderEntry
+from maize import Request, Spider, SpiderEntry
 from maize.common.constant.setting_constant import SpiderDownloaderEnum
-
 
 spider_entry = SpiderEntry()
 

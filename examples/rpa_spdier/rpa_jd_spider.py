@@ -2,29 +2,24 @@ import typing
 
 from playwright.async_api import Page
 
-from maize import Request
-from maize import Response
-from maize import Spider
+from maize import Request, Response, Spider, SpiderSettings
+from maize.common.constant import RPADriverTypeEnum, SpiderDownloaderEnum
 
 
 class RpaJdSpider(Spider):
-    custom_settings = {
-        "CONCURRENCY": 1,
-        "DOWNLOADER": "maize.downloader.playwright_downloader.PlaywrightDownloader",
-        # .\chrome.exe --remote-debugging-port=9222
-        "RPA_ENDPOINT_URL": "http://localhost:9222",
-        "USE_SESSION": False,
-        "RPA_DRIVER_TYPE": "chromium",
-    }
-
     async def start_requests(self) -> typing.AsyncGenerator[Request, typing.Any]:
-        # cookie_str = ""
-        # cookies = CookieUtil.str_cookies_to_list(cookie_str, ".jd.com")
         yield Request("https://item.jd.com/10075424349847.html")
 
     async def parse(self, response: Response[None, Page]):
-        print(response.text)
+        self.logger.info(response.text)
 
 
 if __name__ == "__main__":
-    RpaJdSpider().run()
+    spider_settings = SpiderSettings()
+    spider_settings.concurrency = 1
+    spider_settings.downloader = SpiderDownloaderEnum.PLAYWRIGHT.value
+    spider_settings.rpa.endpoint_url = "http://localhost:9222"
+    spider_settings.request.use_session = False
+    spider_settings.rpa.driver_type = RPADriverTypeEnum.CHROMIUM.value
+
+    RpaJdSpider().run(spider_settings)

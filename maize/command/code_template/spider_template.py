@@ -1,9 +1,7 @@
+from collections.abc import AsyncGenerator
 from typing import Any
-from typing import AsyncGenerator
 
-from maize import Request
-from maize import Response
-from maize import Spider
+from maize import Request, Response, Spider
 
 
 class SpiderTemplate(Spider):

@@ -268,11 +268,11 @@ class CacheSpider(Spider):
     def __init__(self):
         super().__init__()
         self.redis = None
-    
+
     async def open(self, settings: SpiderSettings):
         """爬虫启动时初始化 Redis"""
         await super().open(settings)
-        
+
         self.redis = RedisUtil(
             host=settings.redis.host,
             port=settings.redis.port,
@@ -281,30 +281,30 @@ class CacheSpider(Spider):
         )
         await self.redis.open()
         self.logger.info("Redis 连接已创建")
-    
+
     async def close(self):
         """爬虫关闭时清理资源"""
         if self.redis:
             await self.redis.close()
             self.logger.info("Redis 连接已关闭")
-        
+
         await super().close()
-    
+
     async def start_requests(self) -> AsyncGenerator[Request, Any]:
         urls = [
             "http://example.com/page1",
             "http://example.com/page2",
             "http://example.com/page3",
         ]
-        
+
         for url in urls:
             yield Request(url=url)
-    
+
     async def parse(self, response: Response):
         # 尝试从缓存获取
         cache_key = f"page:{response.url}"
         cached_data = await self.redis.get(cache_key)
-        
+
         if cached_data:
             self.logger.info(f"从缓存获取: {response.url}")
             data = ujson.loads(cached_data)
@@ -315,14 +315,14 @@ class CacheSpider(Spider):
                 'title': response.xpath('//title/text()').get(),
                 'url': response.url
             }
-            
+
             # 存入缓存（1小时过期）
             await self.redis.set(
                 cache_key,
                 ujson.dumps(data),
                 ex=3600
             )
-        
+
         yield data
 ```
 
@@ -333,36 +333,36 @@ class DeduplicationSpider(Spider):
     def __init__(self):
         super().__init__()
         self.redis = None
-    
+
     async def open(self, settings: SpiderSettings):
         await super().open(settings)
         self.redis = RedisUtil(url=settings.redis.url)
         await self.redis.open()
-    
+
     async def close(self):
         if self.redis:
             await self.redis.close()
         await super().close()
-    
+
     async def start_requests(self):
         yield Request(url="http://example.com")
-    
+
     async def parse(self, response: Response):
         # 提取链接
         links = response.xpath('//a/@href').getall()
-        
+
         for link in links:
             url = response.urljoin(link)
-            
+
             # 使用 Redis 去重
             is_new = await self.redis.nx_set(f"visited:{url}", "1", ex=86400)
-            
+
             if is_new:
                 self.logger.info(f"新 URL: {url}")
                 yield Request(url=url, callback=self.parse_detail)
             else:
                 self.logger.debug(f"已访问: {url}")
-    
+
     async def parse_detail(self, response: Response):
         # 处理详情页
         pass
@@ -375,46 +375,46 @@ class TaskQueueSpider(Spider):
     def __init__(self):
         super().__init__()
         self.redis = None
-    
+
     async def open(self, settings: SpiderSettings):
         await super().open(settings)
         self.redis = RedisUtil(url=settings.redis.url)
         await self.redis.open()
-    
+
     async def start_requests(self):
         # 从 Redis 队列获取任务
         while True:
             # 从左侧弹出任务
             task = await self.redis.client.lpop("task_queue")
-            
+
             if not task:
                 self.logger.info("任务队列为空")
                 break
-            
+
             task_data = ujson.loads(task)
             yield Request(
                 url=task_data['url'],
                 meta={'task_id': task_data['id']}
             )
-    
+
     async def parse(self, response: Response):
         task_id = response.meta['task_id']
-        
+
         # 处理数据
         result = {
             'task_id': task_id,
             'title': response.xpath('//title/text()').get()
         }
-        
+
         # 将结果推送到结果队列
         await self.redis.client.rpush(
             "result_queue",
             ujson.dumps(result)
         )
-        
+
         # 标记任务完成
         await self.redis.set(f"task:{task_id}:status", "completed", ex=86400)
-        
+
         yield result
 ```
 
@@ -427,23 +427,23 @@ import asyncio
 class DistributedLockExample:
     def __init__(self, redis: RedisUtil):
         self.redis = redis
-    
+
     async def acquire_lock(self, lock_name: str, timeout: int = 10) -> bool:
         """获取分布式锁"""
         return await self.redis.nx_set(lock_name, "locked", ex=timeout)
-    
+
     async def release_lock(self, lock_name: str):
         """释放分布式锁"""
         await self.redis.delete(lock_name)
-    
+
     async def with_lock(self, lock_name: str):
         """使用分布式锁的上下文"""
         lock_acquired = await self.acquire_lock(lock_name)
-        
+
         if not lock_acquired:
             print(f"无法获取锁: {lock_name}")
             return False
-        
+
         try:
             # 执行需要加锁的操作
             print(f"已获取锁: {lock_name}")
@@ -459,10 +459,10 @@ class DistributedLockExample:
 async def main():
     redis = RedisUtil(host="localhost", port=6379)
     await redis.open()
-    
+
     lock_example = DistributedLockExample(redis)
     await lock_example.with_lock("my_resource_lock")
-    
+
     await redis.close()
 ```
 
@@ -602,4 +602,3 @@ if value:
 - [MysqlUtil](mysql_util.md) - MySQL 工具类使用
 - [配置说明](settings.md) - Redis 配置选项
 - [Spider 进阶](spider.md) - 在爬虫中使用 Redis
-

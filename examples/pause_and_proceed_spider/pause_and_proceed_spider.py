@@ -1,21 +1,13 @@
+from collections.abc import AsyncGenerator
 from typing import Any
-from typing import AsyncGenerator
 
 from examples.baidu_spider.items import BaiduItem
-from maize import Request
-from maize import Response
-from maize import Spider
+from maize import Request, Response, Spider, SpiderSettings
 
 
 class PauseAndProceedSpider(Spider):
-    custom_settings = {
-        "LOGGER_HANDLER": "examples.baidu_spider.logger_util.InterceptHandler",
-        "REQUEST_TIMEOUT": 1,
-        "CONCURRENCY": 1,
-    }
-
     async def start_requests(self) -> AsyncGenerator[Request, Any]:
-        for i in range(2):
+        for _i in range(2):
             yield Request(
                 url="http://www.baidu.com",
                 priority=1,
@@ -26,11 +18,9 @@ class PauseAndProceedSpider(Spider):
         li_list = response.xpath("//li[contains(@class, 'hotsearch-item')]")
         for li in li_list:
             item = BaiduItem()
-            item["title"] = li.xpath(
-                ".//span[@class='title-content-title']/text()"
-            ).get()
-            item["url"] = li.xpath("./a/@href").get()
-            self.logger.info(item.to_dict())
+            item.title = li.xpath(".//span[@class='title-content-title']/text()").get()
+            item.url = li.xpath("./a/@href").get()
+            self.logger.info(item.model_dump())
             yield item
 
         if li_list:
@@ -70,11 +60,9 @@ class PauseAndProceedSpider(Spider):
         li_list = response.xpath("//li[contains(@class, 'hotsearch-item')]")
         for li in li_list:
             item = BaiduItem()
-            item["title"] = li.xpath(
-                ".//span[@class='title-content-title']/text()"
-            ).get()
-            item["url"] = li.xpath("./a/@href").get()
-            self.logger.info(item.to_dict())
+            item.title = li.xpath(".//span[@class='title-content-title']/text()").get()
+            item.url = li.xpath("./a/@href").get()
+            self.logger.info(item.model_dump())
             yield item
 
     async def parse_bing(self, response: Response):
@@ -82,7 +70,7 @@ class PauseAndProceedSpider(Spider):
         await self.proceed_spider()
         self.logger.warning(f"爬虫已继续 {self.gte_priority=}")
 
-        for i in range(2):
+        for _i in range(2):
             url = "http://www.baidu.com"
             yield Request(url=url, callback=self.parse_detail, priority=1)
 
@@ -96,4 +84,8 @@ class PauseAndProceedSpider(Spider):
 
 
 if __name__ == "__main__":
-    PauseAndProceedSpider().run()
+    spider_settings = SpiderSettings()
+    spider_settings.logger_handler = "examples.baidu_spider.logger_util.InterceptHandler"
+    spider_settings.request.request_timeout = 1
+    spider_settings.concurrency = 1
+    PauseAndProceedSpider().run(spider_settings)

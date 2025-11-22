@@ -5,9 +5,7 @@
 import pytest
 
 from maize.settings import SpiderSettings
-from maize.utils.log_util import get_logger
-from maize.utils.log_util import get_spider_settings
-from maize.utils.log_util import set_spider_settings
+from maize.utils.log_util import get_logger, get_spider_settings, set_spider_settings
 
 
 def test_set_and_get_spider_settings():
@@ -48,7 +46,7 @@ def test_get_logger_without_settings_raises_error():
     # 创建一个新的测试场景，不设置上下文
     try:
         # 尝试不传入 settings 且上下文中也没有
-        logger = get_logger(name="ErrorLogger")
+        get_logger(name="ErrorLogger")
         # 如果上下文中已经有 settings，则跳过这个测试
         if get_spider_settings() is not None:
             pytest.skip("Context already has settings")

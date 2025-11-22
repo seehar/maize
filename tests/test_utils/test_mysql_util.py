@@ -8,9 +8,7 @@ from maize.utils.mysql_util import MysqlUtil
 class TestMysqlUtil:
     @staticmethod
     async def get_mysql_instance() -> MysqlUtil:
-        mysql_util = MysqlUtil(
-            host="localhost", user="root", password="123456", db="maize"
-        )
+        mysql_util = MysqlUtil(host="localhost", user="root", password="123456", db="maize")
         await mysql_util.open()
         return mysql_util
 

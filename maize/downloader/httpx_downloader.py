@@ -8,7 +8,6 @@ from maize.common.http import Response
 from maize.common.http.request import Request
 from maize.common.model.download_response_model import DownloadResponse
 
-
 if typing.TYPE_CHECKING:
     from maize.core.crawler import Crawler
 
@@ -17,8 +16,8 @@ class HTTPXDownloader(BaseDownloader):
     def __init__(self, crawler: "Crawler"):
         super().__init__(crawler)
 
-        self._timeout: typing.Optional[httpx.Timeout] = None
-        self.httpx_proxy: typing.Optional[Proxy] = None
+        self._timeout: httpx.Timeout | None = None
+        self.httpx_proxy: Proxy | None = None
 
     async def open(self):
         await super().open()
@@ -36,9 +35,7 @@ class HTTPXDownloader(BaseDownloader):
 
         self._timeout = httpx.Timeout(timeout=request_timeout)
 
-    async def download(
-        self, request: Request
-    ) -> typing.Union[DownloadResponse, Request]:
+    async def download(self, request: Request) -> typing.Union[DownloadResponse, Request]:
         await self.random_wait()
         try:
             proxies = self._get_proxy(request)
@@ -47,9 +44,7 @@ class HTTPXDownloader(BaseDownloader):
                 proxy=proxies,
                 max_redirects=request.max_redirects,
             ) as client:
-                self.logger.debug(
-                    rf"request downloading: {request.url}, method: {request.method}"
-                )
+                self.logger.debug(rf"request downloading: {request.url}, method: {request.method}")
                 headers = await request.get_headers()
                 response = await client.request(
                     request.method,
@@ -71,7 +66,7 @@ class HTTPXDownloader(BaseDownloader):
         structure_response = self.structure_response(request, response, body)
         return DownloadResponse(response=structure_response)
 
-    def _get_proxy(self, request: Request) -> typing.Optional[Proxy]:
+    def _get_proxy(self, request: Request) -> Proxy | None:
         if not request.proxy:
             return self.httpx_proxy
 
@@ -82,9 +77,7 @@ class HTTPXDownloader(BaseDownloader):
         return Proxy(url=proxy_url)
 
     @staticmethod
-    def structure_response(
-        request: Request, response: httpx.Response, body: bytes
-    ) -> Response[None, httpx.Response]:
+    def structure_response(request: Request, response: httpx.Response, body: bytes) -> Response[None, httpx.Response]:
         return Response[None, httpx.Response](
             url=request.url,
             headers=dict(response.headers),

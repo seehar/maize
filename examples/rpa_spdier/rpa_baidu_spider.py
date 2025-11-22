@@ -4,23 +4,12 @@ from urllib.parse import urlencode
 
 from playwright.async_api import Page
 
-from maize import Request
-from maize import Response
-from maize import Spider
+from maize import Request, Response, Spider, SpiderSettings
+from maize.common.constant import SpiderDownloaderEnum
 from maize.downloader.playwright_downloader import PlaywrightDownloader
 
 
 class RpaBaiduSpider(Spider):
-    custom_settings = {
-        "CONCURRENCY": 1,
-        "DOWNLOADER": "maize.downloader.playwright_downloader.PlaywrightDownloader",
-        # "DOWNLOADER": "maize.downloader.patchright_downloader.PatchrightDownloader",
-        "LOGGER_HANDLER": "examples.baidu_spider.logger_util.InterceptHandler",
-        "USE_SESSION": True,
-        "RPA_HEADLESS": False,
-        "RPA_SKIP_RESOURCE_TYPES": ["image", "media", "font", "stylesheet"],
-    }
-
     async def start_requests(self) -> typing.AsyncGenerator[Request, typing.Any]:
         for _ in range(1):
             keyword_encode = urlencode({"search_query": "#CoupleVlog"})
@@ -29,7 +18,7 @@ class RpaBaiduSpider(Spider):
     async def parse(self, response: Response[PlaywrightDownloader, Page]):
         self.logger.info(f"原始响应URL:{response.url}")
         self.logger.info(f"响应内容长度:{len(response.text)}")
-        self.logger.info(f"-" * 100)
+        self.logger.info("-" * 100)
 
         try:
             # 使用新的with操作模式获取页面进行操作
@@ -44,17 +33,13 @@ class RpaBaiduSpider(Spider):
                 # 检查是否在百度页面
                 if "baidu.com" in page.url:
                     # 示例：在搜索框中输入内容
-                    search_input = await page.query_selector(
-                        "//textarea[@id='chat-textarea']"
-                    )
+                    search_input = await page.query_selector("//textarea[@id='chat-textarea']")
                     if search_input:
                         await search_input.fill("Playwright并发测试")
                         self.logger.info("成功在搜索框中输入内容")
 
                         # 点击搜索按钮
-                        search_btn = await page.query_selector(
-                            "//button[@id='chat-submit-button']"
-                        )
+                        search_btn = await page.query_selector("//button[@id='chat-submit-button']")
                         if search_btn:
                             await search_btn.click()
                             await page.wait_for_load_state()
@@ -71,8 +56,16 @@ class RpaBaiduSpider(Spider):
         except Exception as e:
             self.logger.error(f"操作页面时出错:{e}")
         finally:
-            self.logger.info(f"-" * 100)
+            self.logger.info("-" * 100)
 
 
 if __name__ == "__main__":
-    RpaBaiduSpider().run()
+    spider_settings = SpiderSettings()
+    spider_settings.concurrency = 1
+    spider_settings.downloader = SpiderDownloaderEnum.PLAYWRIGHT.value
+    spider_settings.logger_handler = "examples.baidu_spider.logger_util.InterceptHandler"
+    spider_settings.request.use_session = True
+    spider_settings.rpa.headless = False
+    spider_settings.rpa.skip_resource_types = ["image", "media", "font", "stylesheet"]
+
+    RpaBaiduSpider().run(spider_settings)

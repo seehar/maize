@@ -1,17 +1,13 @@
 import time
 from asyncio import Queue
 from typing import TYPE_CHECKING
-from typing import List
-from typing import Tuple
 
 from maize.common.model.pipeline_model import PipelineProcessResult
 from maize.utils.log_util import get_logger
 from maize.utils.project_util import load_class
 
-
 if TYPE_CHECKING:
-    from maize import BasePipeline
-    from maize import Item
+    from maize import BasePipeline, Item
     from maize.settings import SpiderSettings
 
 
@@ -23,7 +19,7 @@ class PipelineScheduler:
     def __init__(self, settings: "SpiderSettings"):
         self.settings = settings
         self.logger = get_logger(settings, self.__class__.__name__)
-        self.item_pipelines: List["BasePipeline"] = []
+        self.item_pipelines: list[BasePipeline] = []
 
         # item
         pipeline_settings = settings.pipeline
@@ -37,12 +33,8 @@ class PipelineScheduler:
         # error item
         self.error_item_max_retry_count = pipeline_settings.error_max_retry_count
         error_item_max_cache_count = pipeline_settings.error_max_cache_count
-        self.error_item_retry_batch_max_size = (
-            pipeline_settings.error_retry_batch_max_size
-        )
-        self.error_item_handle_batch_max_size = (
-            pipeline_settings.error_handle_batch_max_size
-        )
+        self.error_item_retry_batch_max_size = pipeline_settings.error_retry_batch_max_size
+        self.error_item_handle_batch_max_size = pipeline_settings.error_handle_batch_max_size
         self.error_item_handle_interval = pipeline_settings.error_handle_interval
         self.error_item_queue = Queue(maxsize=error_item_max_cache_count)
         self._error_last_handle_item_time = 0
@@ -78,9 +70,7 @@ class PipelineScheduler:
             retry_result, retry_error_process_result = await self._retry_error_items()
             close_process_result.add(retry_error_process_result)
             if not retry_result:
-                self.logger.info(
-                    f"任务重试完成，剩余错误任务: {self.retry_item_queue.qsize()}"
-                )
+                self.logger.info(f"任务重试完成，剩余错误任务: {self.retry_item_queue.qsize()}")
                 break
 
         # 处理超过重试次数的 item
@@ -97,9 +87,7 @@ class PipelineScheduler:
         pipeline_process_result = PipelineProcessResult()
         await self.item_queue.put(item)
         current_time = int(time.time())
-        if (
-            (current_time - self.item_handle_interval) > self._last_handle_item_time
-        ) or self.item_queue.full():
+        if ((current_time - self.item_handle_interval) > self._last_handle_item_time) or self.item_queue.full():
             self._last_handle_item_time = current_time
             process_result = await self._process_item()
             retry_process_result = await self.process_retry_items()
@@ -154,7 +142,7 @@ class PipelineScheduler:
             if self.error_item_queue.empty():
                 break
 
-            error_item: "Item" = await self.error_item_queue.get()
+            error_item: Item = await self.error_item_queue.get()
             batch_items.append(error_item)
 
         if not batch_items:
@@ -184,7 +172,7 @@ class PipelineScheduler:
             process_result.add(retry_result)
         return process_result
 
-    async def _retry_error_items(self) -> Tuple[bool, PipelineProcessResult]:
+    async def _retry_error_items(self) -> tuple[bool, PipelineProcessResult]:
         """
         处理错误的 item，全部重试完成后停止
 
@@ -197,7 +185,7 @@ class PipelineScheduler:
             if self.retry_item_queue.empty():
                 break
 
-            error_item: "Item" = await self.retry_item_queue.get()
+            error_item: Item = await self.retry_item_queue.get()
             error_item.retry()
             batch_items.append(error_item)
 
@@ -215,7 +203,7 @@ class PipelineScheduler:
                 process_result.success_count += len(batch_items)
         return True, process_result
 
-    async def _enqueue_retry_items(self, items: List["Item"]):
+    async def _enqueue_retry_items(self, items: list["Item"]):
         """
         入队需要重试的 item
 

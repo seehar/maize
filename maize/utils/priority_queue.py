@@ -1,6 +1,4 @@
-from asyncio import PriorityQueue
-from asyncio import TimeoutError
-from asyncio import wait_for
+from asyncio import PriorityQueue, TimeoutError, wait_for
 
 
 class SpiderPriorityQueue(PriorityQueue):
@@ -27,6 +25,5 @@ class SpiderPriorityQueue(PriorityQueue):
 
         if item.priority >= gte_priority:
             return item
-        else:
-            await self.put(item)
-            return None
+        await self.put(item)
+        return None

@@ -10,7 +10,7 @@
 ## 📋 目录
 
 - [🔥 高优先级](#-高优先级)
-- [🌟 中优先级](#-中优先级)  
+- [🌟 中优先级](#-中优先级)
 - [💡 低优先级](#-低优先级)
 - [📚 文档完善](#-文档完善)
 - [🧪 测试覆盖](#-测试覆盖)
@@ -67,11 +67,11 @@ class DownloaderMiddleware:
     async def process_request(self, request: Request, spider: Spider):
         """请求发送前处理"""
         pass
-    
+
     async def process_response(self, request: Request, response: Response, spider: Spider):
         """响应返回后处理"""
         return response
-    
+
     async def process_exception(self, request: Request, exception: Exception, spider: Spider):
         """异常处理"""
         pass
@@ -127,12 +127,12 @@ class DownloaderMiddleware:
 class DuplicationFilter:
     def __init__(self, settings: SpiderSettings):
         self.backend = self._create_backend(settings.deduplication.backend)
-    
+
     async def is_duplicate(self, request: Request) -> bool:
         """检查请求是否重复"""
         key = self._get_key(request)
         return await self.backend.exists(key)
-    
+
     async def mark_seen(self, request: Request):
         """标记请求已访问"""
         key = self._get_key(request)
@@ -283,10 +283,10 @@ settings = SpiderSettings(
    ```bash
    # 创建新项目（脚手架）
    maize startproject myproject
-   
+
    # 生成爬虫模板
    maize genspider myspider example.com
-   
+
    # 生成 Pipeline/Middleware 模板
    maize genpipeline mypipeline
    maize genmiddleware mymiddleware
@@ -296,13 +296,13 @@ settings = SpiderSettings(
    ```bash
    # 交互式 Shell
    maize shell
-   
+
    # 测试单个 URL
    maize fetch http://example.com
-   
+
    # 解析响应（类似 Scrapy shell）
    maize parse http://example.com --spider=MySpider
-   
+
    # 查看配置
    maize settings
    ```
@@ -311,13 +311,13 @@ settings = SpiderSettings(
    ```bash
    # 列出所有爬虫
    maize list
-   
+
    # 运行爬虫（支持参数）
    maize crawl myspider -a arg1=value1
-   
+
    # 检查代码风格
    maize check
-   
+
    # 版本信息
    maize version
    ```
@@ -347,15 +347,15 @@ settings = SpiderSettings(
    ```python
    from maize import Field, Item
    from pydantic import validator, EmailStr, HttpUrl
-   
+
    class ProductItem(Item):
        __table_name__ = "products"
-       
+
        name: str = Field(min_length=1, max_length=200)
        price: float = Field(gt=0, description="价格必须大于0")
        url: HttpUrl = Field()
        email: EmailStr = Field()
-       
+
        @validator('price')
        def validate_price(cls, v):
            if v > 100000:
@@ -528,7 +528,7 @@ settings = SpiderSettings(
    ```python
    class IncrementalSpider(Spider):
        incremental_key = 'last_update'
-       
+
        async def should_crawl(self, item_data):
            last_crawl_time = await self.get_last_crawl_time()
            return item_data['update_time'] > last_crawl_time
@@ -1016,4 +1016,3 @@ yield GraphQLRequest(
 **最后更新：** 2025-01-18
 **维护者：** seehar
 **版本：** v0.3.13
-

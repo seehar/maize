@@ -1,8 +1,6 @@
 import pytest
 
-from maize.utils.tools import SingletonType
-from maize.utils.tools import retry
-from maize.utils.tools import retry_asyncio
+from maize.utils.tools import SingletonType, retry, retry_asyncio
 
 
 class Demo:

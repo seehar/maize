@@ -1,7 +1,7 @@
 import ujson
 
-from maize.settings.spider_settings import PipelineSettings
-from maize.settings.spider_settings import SpiderSettings
+from maize import Field
+from maize.settings.spider_settings import PipelineSettings, SpiderSettings
 
 
 class TestSpiderSettings:
@@ -21,7 +21,7 @@ class TestSpiderSettings:
 
     def test_from_base_model(self):
         class CustomPipelineSettings(PipelineSettings):
-            pipelines: list[str] = ["custom.Pipeline1", "custom.Pipeline2"]
+            pipelines: list[str] = Field(default=["custom.Pipeline1", "custom.Pipeline2"])
 
         class CustomSpiderSettings(SpiderSettings):
             concurrency: int = 5
@@ -33,7 +33,7 @@ class TestSpiderSettings:
 
     def test_from_base_model_from_dict(self):
         class CustomPipelineSettings(PipelineSettings):
-            pipelines: list[str] = ["custom.Pipeline1", "custom.Pipeline2"]
+            pipelines: list[str] = Field(default=["custom.Pipeline1", "custom.Pipeline2"])
 
         class CustomSpiderSettings(SpiderSettings):
             concurrency: int = 5

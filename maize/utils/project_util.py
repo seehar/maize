@@ -1,10 +1,8 @@
-import os
 import sys
+from collections.abc import Callable
 from importlib import import_module
-from typing import TYPE_CHECKING
-from typing import Callable
-from typing import Union
-
+from pathlib import Path
+from typing import TYPE_CHECKING, Union
 
 if TYPE_CHECKING:
     from maize.settings import SpiderSettings
@@ -16,7 +14,7 @@ def _get_closest(path: str = ".") -> str:
     :param path:
     :return:
     """
-    return os.path.abspath(path)
+    return str(Path(path).resolve())
 
 
 def _init_env():
@@ -26,7 +24,7 @@ def _init_env():
     """
     closest = _get_closest()
     if closest:
-        project_dir = os.path.dirname(closest)
+        project_dir = str(Path(closest).parent)
         sys.path.append(project_dir)
 
 
@@ -59,6 +57,4 @@ def load_class(_path: Union[str, Callable]):
     try:
         return getattr(module, class_name)
     except AttributeError:
-        raise NameError(
-            f"Module {module_name!r} does not define any object class named {class_name!r}"
-        )
+        raise NameError(f"Module {module_name!r} does not define any object class named {class_name!r}") from None

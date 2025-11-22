@@ -83,14 +83,14 @@ from loguru import logger as loguru_logger
 
 class InterceptHandler(logging.Handler):
     """拦截 logging 日志并转发到 loguru"""
-    
+
     def __init__(self):
         super().__init__()
         self.logger = loguru_logger
-        
+
         # 移除默认处理器
         self.logger.remove()
-        
+
         # 添加控制台输出
         self.logger.add(
             sys.stdout,
@@ -101,7 +101,7 @@ class InterceptHandler(logging.Handler):
                    "<level>{message}</level>",
             colorize=True,
         )
-        
+
         # 添加文件输出
         self.logger.add(
             "logs/spider_{time:YYYY-MM-DD}.log",
@@ -111,7 +111,7 @@ class InterceptHandler(logging.Handler):
             format="{time:YYYY-MM-DD HH:mm:ss.SSS} | {level: <8} | {name}:{function}:{line} | {message}",
             encoding="utf-8",
         )
-    
+
     def emit(self, record: logging.LogRecord):
         """将 logging 记录转发到 loguru"""
         # 获取对应的 loguru 级别
@@ -119,13 +119,13 @@ class InterceptHandler(logging.Handler):
             level = self.logger.level(record.levelname).name
         except ValueError:
             level = record.levelno
-        
+
         # 获取调用者信息
         frame, depth = logging.currentframe(), 2
         while frame.f_code.co_filename == logging.__file__:
             frame = frame.f_back
             depth += 1
-        
+
         # 记录日志
         self.logger.opt(depth=depth, exception=record.exc_info).log(
             level, record.getMessage()
@@ -231,12 +231,12 @@ from loguru import logger as loguru_logger
 
 class DevelopmentHandler(logging.Handler):
     """开发环境日志配置"""
-    
+
     def __init__(self):
         super().__init__()
         self.logger = loguru_logger
         self.logger.remove()
-        
+
         # 控制台输出 - 彩色、详细
         self.logger.add(
             sys.stdout,
@@ -247,7 +247,7 @@ class DevelopmentHandler(logging.Handler):
                    "<level>{message}</level>",
             colorize=True,
         )
-    
+
     def emit(self, record: logging.LogRecord):
         logger_opt = self.logger.opt(depth=6, exception=record.exc_info)
         logger_opt.log(record.levelname, record.getMessage())
@@ -264,12 +264,12 @@ from loguru import logger as loguru_logger
 
 class ProductionHandler(logging.Handler):
     """生产环境日志配置"""
-    
+
     def __init__(self):
         super().__init__()
         self.logger = loguru_logger
         self.logger.remove()
-        
+
         # 控制台输出 - 简洁、INFO 及以上
         self.logger.add(
             sys.stdout,
@@ -277,7 +277,7 @@ class ProductionHandler(logging.Handler):
             format="{time:YYYY-MM-DD HH:mm:ss} | {level: <8} | {message}",
             colorize=False,
         )
-        
+
         # 文件输出 - 详细、按日期轮转
         self.logger.add(
             "logs/spider_{time:YYYY-MM-DD}.log",
@@ -288,7 +288,7 @@ class ProductionHandler(logging.Handler):
             format="{time:YYYY-MM-DD HH:mm:ss.SSS} | {level: <8} | {name}:{function}:{line} | {message}",
             encoding="utf-8",
         )
-        
+
         # 错误日志单独记录
         self.logger.add(
             "logs/error_{time:YYYY-MM-DD}.log",
@@ -298,7 +298,7 @@ class ProductionHandler(logging.Handler):
             format="{time:YYYY-MM-DD HH:mm:ss.SSS} | {level: <8} | {name}:{function}:{line} | {message}\n{exception}",
             encoding="utf-8",
         )
-    
+
     def emit(self, record: logging.LogRecord):
         logger_opt = self.logger.opt(depth=6, exception=record.exc_info)
         logger_opt.log(record.levelname, record.getMessage())
@@ -316,20 +316,20 @@ from loguru import logger as loguru_logger
 
 class SmartHandler(logging.Handler):
     """根据环境变量自动选择配置"""
-    
+
     def __init__(self):
         super().__init__()
         self.logger = loguru_logger
         self.logger.remove()
-        
+
         # 获取环境变量
         env = os.getenv("ENVIRONMENT", "development")
-        
+
         if env == "production":
             self._setup_production()
         else:
             self._setup_development()
-    
+
     def _setup_development(self):
         """开发环境配置"""
         self.logger.add(
@@ -338,7 +338,7 @@ class SmartHandler(logging.Handler):
             format="<green>{time:HH:mm:ss.SSS}</green> | <level>{level: <8}</level> | <cyan>{message}</cyan>",
             colorize=True,
         )
-    
+
     def _setup_production(self):
         """生产环境配置"""
         self.logger.add(
@@ -346,7 +346,7 @@ class SmartHandler(logging.Handler):
             level="INFO",
             format="{time:YYYY-MM-DD HH:mm:ss} | {level: <8} | {message}",
         )
-        
+
         self.logger.add(
             "logs/spider_{time:YYYY-MM-DD}.log",
             rotation="00:00",
@@ -354,7 +354,7 @@ class SmartHandler(logging.Handler):
             level="INFO",
             encoding="utf-8",
         )
-    
+
     def emit(self, record: logging.LogRecord):
         logger_opt = self.logger.opt(depth=6, exception=record.exc_info)
         logger_opt.log(record.levelname, record.getMessage())
@@ -454,20 +454,20 @@ class MySpider(Spider):
     async def parse(self, response: Response):
         # DEBUG: 调试信息
         self.logger.debug(f"响应头: {response.headers}")
-        
+
         # INFO: 正常流程
         self.logger.info(f"正在处理: {response.url}")
-        
+
         # WARNING: 潜在问题
         if response.status != 200:
             self.logger.warning(f"异常状态码: {response.status}")
-        
+
         # ERROR: 错误但可继续
         try:
             data = response.json()
         except Exception as e:
             self.logger.error(f"JSON 解析失败: {e}")
-        
+
         # CRITICAL: 严重错误
         if critical_error:
             self.logger.critical("数据库连接失败，程序无法继续")
@@ -532,7 +532,7 @@ def analyze_log(log_file):
     """分析日志文件"""
     levels = Counter()
     errors = []
-    
+
     with open(log_file, 'r', encoding='utf-8') as f:
         for line in f:
             # 提取日志级别
@@ -540,11 +540,11 @@ def analyze_log(log_file):
             if match:
                 level = match.group(1)
                 levels[level] += 1
-                
+
                 # 收集错误信息
                 if level in ('ERROR', 'CRITICAL'):
                     errors.append(line.strip())
-    
+
     print(f"日志统计: {dict(levels)}")
     print(f"\n错误日志 ({len(errors)} 条):")
     for error in errors[:10]:  # 显示前10条
@@ -601,4 +601,3 @@ self.logger.add("logs/spider.log", filter=spider_filter)
 
 - [配置说明](settings.md) - 日志配置选项
 - [Spider 进阶](spider.md) - 在爬虫中使用日志
-
