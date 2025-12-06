@@ -108,6 +108,7 @@ ignore = [
 [tool.ruff.lint.per-file-ignores]
 "__init__.py" = ["F401", "E402"]  # allow unused imports and import not at top
 "tests/**/*.py" = ["PLR2004", "ARG001", "S101"]  # allow magic values, unused args, and asserts in tests
+"scripts/**/*.py" = ["PLC0415"]  # allow imports inside functions for verification scripts
 
 [tool.ruff.lint.isort]
 known-first-party = ["maize"]
@@ -127,7 +128,6 @@ known-third-party = [
     "pytest",
     "nox",
 ]
-sections = {future = [], stdlib = [], thirdparty = [], firstparty = [], localfolder = []}
 
 [tool.ruff.format]
 # Ruff 格式化配置（兼容 Black）

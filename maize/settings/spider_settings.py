@@ -155,6 +155,32 @@ class MySQLSettings(BaseModel):
     password: str = Field(default="", description="MySQL 密码")
 
 
+class MiddlewareSettings(BaseModel):
+    """中间件配置"""
+
+    model_config = {"arbitrary_types_allowed": True}
+
+    downloader_middlewares: dict[str | type, int] = Field(
+        default_factory=dict,
+        description="下载器中间件配置，格式: {'middleware.path': priority} 或 {MiddlewareClass: priority}",
+    )
+
+    spider_middlewares: dict[str | type, int] = Field(
+        default_factory=dict,
+        description="爬虫中间件配置，格式: {'middleware.path': priority} 或 {MiddlewareClass: priority}",
+    )
+
+    pipeline_middlewares: dict[str | type, int] = Field(
+        default_factory=dict,
+        description="管道中间件配置，格式: {'middleware.path': priority} 或 {MiddlewareClass: priority}",
+    )
+
+    enable_builtin_middlewares: bool = Field(
+        default=True,
+        description="是否启用内置中间件",
+    )
+
+
 class SpiderSettings(BaseSettings):
     """爬虫配置主类"""
 
@@ -182,6 +208,7 @@ class SpiderSettings(BaseSettings):
     redis: RedisSettings = Field(default_factory=RedisSettings, description="Redis 配置")
     proxy: ProxySettings = Field(default_factory=ProxySettings, description="代理配置")
     mysql: MySQLSettings = Field(default_factory=MySQLSettings, description="MySQL 配置")
+    middleware: MiddlewareSettings = Field(default_factory=MiddlewareSettings, description="中间件配置")
 
     # 支持 .env, yml, toml 等格式
     model_config = SettingsConfigDict(
@@ -231,20 +258,15 @@ class SpiderSettings(BaseSettings):
         :param settings: 要合并的 Settings 实例
         :return: 当前实例
         """
-        updated_data = {}
-        new_values = settings.model_dump()
-        current_values = self.model_dump()
+        # 获取所有字段名
+        field_names: list[str] = list(self.__class__.model_fields.keys())
+        for field_name in field_names:
+            new_value = getattr(settings, field_name)
+            current_value = getattr(self, field_name)
 
-        # 只更新与当前值不同的字段
-        for field_name, new_value in new_values.items():
-            if new_value != current_values.get(field_name):
-                updated_data[field_name] = new_value
-
-        # 创建更新后的实例
-        updated_self = self.model_copy(update=updated_data)
-
-        # 使用 __dict__.update() 直接更新当前实例的字段，保持模型实例类型
-        self.__dict__.update(updated_self.__dict__)
+            # 只更新与当前值不同的字段，保留原始对象类型
+            if new_value != current_value:
+                setattr(self, field_name, new_value)
 
         return self
 

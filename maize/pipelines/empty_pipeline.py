@@ -14,7 +14,7 @@ class EmptyPipeline(BasePipeline):
         pass
 
     async def process_item(self, items: list["Item"]) -> bool:
-        pass
+        return True
 
     async def process_error_item(self, items: list["Item"]):
         pass

@@ -50,12 +50,16 @@ class Crawler:
         :return:
         """
         try:
-            custom_settings: dict | None = spider.custom_settings
+            custom_settings = spider.custom_settings
         except AttributeError:
             custom_settings = None
 
         if custom_settings:
-            self.settings.merge_settings_from_dict(custom_settings)
+            # 支持 SpiderSettings 类型和 dict 类型
+            if hasattr(custom_settings, "model_dump"):
+                self.settings.merge_settings(custom_settings)
+            else:
+                self.settings.merge_settings_from_dict(custom_settings)
 
     def idle(self) -> bool:
         return self.spider.idle()

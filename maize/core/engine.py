@@ -21,6 +21,10 @@ from maize.exceptions.spider_exception import (
     OutputException,
     StartRequestsNotImplementedException,
 )
+from maize.middlewares.middleware_manager import (
+    DownloaderMiddlewareManager,
+    SpiderMiddlewareManager,
+)
 
 try:
     from maize.utils.redis_util import RedisUtil
@@ -63,6 +67,10 @@ class Engine:
         self._single_task_requests_running = False
         self.running = False
 
+        # 中间件管理器
+        self.downloader_middleware_manager: DownloaderMiddlewareManager | None = None
+        self.spider_middleware_manager: SpiderMiddlewareManager | None = None
+
         # 分布式
         self.is_distributed = self.settings.is_distributed
         self.__redis_util = None
@@ -100,6 +108,17 @@ class Engine:
         self.scheduler = Scheduler()
         if self.scheduler.open:
             self.scheduler.open()
+
+        # 初始化中间件管理器
+        self.downloader_middleware_manager = DownloaderMiddlewareManager(
+            self.crawler, self.settings.middleware.downloader_middlewares
+        )
+        await self.downloader_middleware_manager.open()
+
+        self.spider_middleware_manager = SpiderMiddlewareManager(
+            self.crawler, self.settings.middleware.spider_middlewares
+        )
+        await self.spider_middleware_manager.open()
 
         downloader_cls = load_class(self.settings.downloader)
         self.downloader = downloader_cls(self.crawler)
@@ -161,15 +180,28 @@ class Engine:
         普通爬虫的 start_requests 处理逻辑
         :return:
         """
+        # Apply spider middleware to start_requests
+        if self.spider_middleware_manager:
+            start_requests = self.spider_middleware_manager.process_start_requests(self.start_requests, self.spider)
+        else:
+            start_requests = self.start_requests
+
         while self.start_requests_running:
             if request := await self._get_next_request():
                 await self._crawl(request)
                 continue
 
             try:
-                start_request: Request = await anext(self.start_requests)
+                start_request: Request = await anext(start_requests)
             except StopAsyncIteration:
                 self.start_requests = None
+                # 生成器已耗尽，等待所有任务完成
+                if not self._idle():
+                    await asyncio.sleep(0.1)
+                    continue
+
+                self.start_requests_running = False
+                self.logger.info("All start requests have been processed.")
             except Exception as e:
                 # 1. 发起请求的 task 全部运行完毕
                 # 2. 调度器是否空闲
@@ -230,65 +262,135 @@ class Engine:
         self.task_manager.create_task(crawl_task())
 
     async def _fetch(self, request: Request) -> AsyncGenerator[Union[Request, Item], Any] | None:
-        async def _success(
-            _response: Response,
-        ) -> AsyncGenerator[Union[Request, Item], Any] | None:
-            callback: Callable = request.callback or self.spider.parse
-            if _output := callback(_response):
-                try:
-                    if iscoroutine(_output):
-                        await _output
-                        await self.spider.stats_collector.record_parse_success()
-                    else:
-                        transform_output = transform(_output)
-                        await self.spider.stats_collector.record_parse_success()
-                        return transform_output
-                except Exception as e:
-                    self.logger.error(f"Error during callback: {e}")
-                    await self.spider.stats_collector.record_parse_fail()
+        # Apply downloader middleware process_request
+        request_or_response = await self._process_request_middleware(request)
+        if request_or_response is None:
+            return None
+        if isinstance(request_or_response, Response):
+            return await self._handle_success_response(request_or_response, request)
+        request = request_or_response
 
-            if self.__redis_util:
-                self.logger.debug(f"redis delete {self.__redis_key_running}:{request.hash}")
-                await self.__redis_util.delete(f"{self.__redis_key_running}:{request.hash}")
+        # Download and process result
+        download_result = await self._do_download(request)
+        if download_result is None or isinstance(download_result, Request):
+            if isinstance(download_result, Request):
+                await self.enqueue_request(download_result)
             return None
 
-        async def _error(
-            _request: Request,
-        ) -> AsyncGenerator[Union[Request, Item], Any] | None:
-            error_callback: Callable = request.error_callback
-            if not error_callback:
+        if download_result.response is None:
+            await self.spider.stats_collector.record_download_fail(download_result.reason)
+            return await self._handle_error_response(request)
+
+        # Apply downloader middleware process_response
+        response = await self._process_response_middleware(request, download_result.response)
+        if response is None:
+            return None
+
+        await self.spider.stats_collector.record_download_success(response.status)
+        return await self._handle_success_response(response, request)
+
+    async def _process_request_middleware(self, request: Request) -> Request | Response | None:
+        """处理请求中间件"""
+        if not self.downloader_middleware_manager:
+            return request
+        result = await self.downloader_middleware_manager.process_request(request, self.spider)
+        if result is None:
+            return None
+        if result.__class__.__name__ == "Response":
+            return result
+        return result
+
+    async def _do_download(self, request: Request):
+        """执行下载"""
+        try:
+            return await self.downloader.fetch(request)
+        except Exception as e:
+            if not self.downloader_middleware_manager:
+                raise
+            result = await self.downloader_middleware_manager.process_exception(request, e, self.spider)
+            if result is None:
+                raise
+            if result.__class__.__name__ == "Request":
+                await self.enqueue_request(result)
+                return None
+            if result.__class__.__name__ == "Response":
+                return type("DownloadResult", (), {"response": result, "reason": None})()
+            return None
+
+    async def _process_response_middleware(self, request: Request, response: Response) -> Response | None:
+        """处理响应中间件"""
+        if not self.downloader_middleware_manager:
+            return response
+        result = await self.downloader_middleware_manager.process_response(request, response, self.spider)
+        if result is None:
+            return None
+        if result.__class__.__name__ == "Request":
+            await self.enqueue_request(result)
+            return None
+        return result
+
+    async def _handle_success_response(
+        self, response: Response, request: Request
+    ) -> AsyncGenerator[Union[Request, Item], Any] | None:
+        """处理成功的响应"""
+        # Apply spider middleware process_spider_input
+        if self.spider_middleware_manager:
+            try:
+                should_continue = await self.spider_middleware_manager.process_spider_input(response, self.spider)
+                if not should_continue:
+                    return None
+            except Exception as e:
+                self.logger.error(f"Error in spider middleware process_spider_input: {e}")
                 return None
 
-            if _error_output := error_callback(_request):
-                try:
-                    if iscoroutine(_error_output):
-                        await _error_output
-                        await self.spider.stats_collector.record_parse_fail()
-                    else:
-                        transform_output = transform(_error_output)
-                        await self.spider.stats_collector.record_parse_fail()
-                        return transform_output
-                except Exception as e:
-                    self.logger.error(f"Error during error_callback: {e}")
+        callback: Callable = request.callback or self.spider.parse
+        if _output := callback(response):
+            try:
+                if iscoroutine(_output):
+                    await _output
+                    await self.spider.stats_collector.record_parse_success()
+                else:
+                    transform_output = transform(_output)
 
-            if self.__redis_util:
-                self.logger.debug(f"redis delete {self.__redis_key_running}:{request.hash}")
-                await self.__redis_util.delete(f"{self.__redis_key_running}:{request.hash}")
+                    # Apply spider middleware process_spider_output
+                    if self.spider_middleware_manager:
+                        transform_output = self.spider_middleware_manager.process_spider_output(
+                            response, transform_output, self.spider
+                        )
+
+                    await self.spider.stats_collector.record_parse_success()
+                    return transform_output
+            except Exception as e:
+                self.logger.error(f"Error during callback: {e}")
+                await self.spider.stats_collector.record_parse_fail()
+
+        if self.__redis_util:
+            self.logger.debug(f"redis delete {self.__redis_key_running}:{request.hash}")
+            await self.__redis_util.delete(f"{self.__redis_key_running}:{request.hash}")
+        return None
+
+    async def _handle_error_response(self, request: Request) -> AsyncGenerator[Union[Request, Item], Any] | None:
+        """处理错误的响应"""
+        error_callback: Callable = request.error_callback
+        if not error_callback:
             return None
 
-        download_result = await self.downloader.fetch(request)
-        if isinstance(download_result, Request):
-            await self.enqueue_request(download_result)
-            return None
+        if _error_output := error_callback(request):
+            try:
+                if iscoroutine(_error_output):
+                    await _error_output
+                    await self.spider.stats_collector.record_parse_fail()
+                else:
+                    transform_output = transform(_error_output)
+                    await self.spider.stats_collector.record_parse_fail()
+                    return transform_output
+            except Exception as e:
+                self.logger.error(f"Error during error_callback: {e}")
 
-        if download_result is None or download_result.response is None:
-            # 下载失败
-            await self.spider.stats_collector.record_download_fail(download_result.reason)
-            return await _error(request)
-
-        # 下载成功
-        await self.spider.stats_collector.record_download_success(download_result.response.status)
-        return await _success(download_result.response)
+        if self.__redis_util:
+            self.logger.debug(f"redis delete {self.__redis_key_running}:{request.hash}")
+            await self.__redis_util.delete(f"{self.__redis_key_running}:{request.hash}")
+        return None
 
     async def enqueue_request(self, request: Request):
         if self.__redis_util:
@@ -338,5 +440,9 @@ class Engine:
 
     async def close_spider(self):
         self.logger.info("Closing spider")
+        if self.downloader_middleware_manager:
+            await self.downloader_middleware_manager.close()
+        if self.spider_middleware_manager:
+            await self.spider_middleware_manager.close()
         await self.downloader.close()
         await self.processor.close()

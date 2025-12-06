@@ -1,1 +1,1 @@
-from .spider_settings import SpiderSettings
+from .spider_settings import MiddlewareSettings, SpiderSettings

@@ -8,7 +8,7 @@ from maize.utils.project_util import load_class
 if TYPE_CHECKING:
     from maize.settings import SpiderSettings
 
-LOG_FORMAT = "%(asctime)s | %(threadName)s | %(filename)s:%(lineno)d:%(funcName)s | %(levelname)s - %(message)s"
+LOG_FORMAT = "%(asctime)s | %(threadName)s | %(module)s.%(funcName)s:%(lineno)d | %(levelname)s - %(message)s"
 
 # 使用 ContextVar 存储当前的 spider_settings
 _current_settings: ContextVar[Optional["SpiderSettings"]] = ContextVar("spider_settings", default=None)

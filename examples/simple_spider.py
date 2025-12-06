@@ -1,10 +1,12 @@
-from maize import Response, Spider, SpiderSettings
+from collections.abc import AsyncGenerator
+from typing import Any
+
+from maize import Request, Response, Spider, SpiderSettings
 
 
 class BaiduSpider(Spider):
-    def __init__(self):
-        super().__init__()
-        self.start_url = "http://www.baidu.com"
+    async def start_requests(self) -> AsyncGenerator[Request, Any]:
+        yield Request(url="http://www.baidu.com")
 
     def parse(self, response: Response):
         self.logger.info(f"响应状态码: {response.status}")
