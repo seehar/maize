@@ -125,7 +125,6 @@ from typing import Any, AsyncGenerator
 
 from maize import Request, Response, Spider, SpiderEntry
 
-
 spider_entry = SpiderEntry()
 
 

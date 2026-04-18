@@ -1,16 +1,10 @@
-"""
-Item 验证中间件
-
-在 Item 进入管道前验证它们
-"""
-
 from typing import TYPE_CHECKING
 
 from maize.middlewares.base_middleware import PipelineMiddleware
 
 if TYPE_CHECKING:
+    from maize.aio.classic.spider.spider import Spider
     from maize.common.items import Item
-    from maize.spider.spider import Spider
 
 
 class ItemValidationMiddleware(PipelineMiddleware):

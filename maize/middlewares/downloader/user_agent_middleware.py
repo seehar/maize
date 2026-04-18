@@ -10,8 +10,8 @@ from typing import TYPE_CHECKING
 from maize.middlewares.base_middleware import DownloaderMiddleware
 
 if TYPE_CHECKING:
+    from maize.aio.classic.spider.spider import Spider
     from maize.common.http.request import Request
-    from maize.spider.spider import Spider
 
 
 # 默认 User-Agent 列表

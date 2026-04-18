@@ -4,8 +4,8 @@ import typing
 from playwright.async_api import Page
 
 from maize import Request, Response, Spider, SpiderSettings
+from maize.aio.classic.downloader.patchright_downloader import PatchrightDownloader
 from maize.common.constant import SpiderDownloaderEnum
-from maize.downloader.patchright_downloader import PatchrightDownloader
 
 
 class RpaBaiduSpider(Spider):

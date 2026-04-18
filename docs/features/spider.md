@@ -132,7 +132,7 @@ class Settings(SpiderSettings):
 
     # 数据管道配置（可选）
     # pipeline = PipelineSettings(
-    #     pipelines=["baidu_spider.pipelines.CustomPipeline"],
+    #     pipeline=["baidu_spider.pipeline.CustomPipeline"],
     #     handle_batch_max_size=100
     # )
 

@@ -8,6 +8,18 @@ from maize.settings import SpiderSettings
 from maize.utils.log_util import get_logger, get_spider_settings, set_spider_settings
 
 
+def test_logger():
+    """测试 logger 缓存机制"""
+    settings = SpiderSettings()
+    set_spider_settings(settings)
+
+    logger = get_logger()
+    logger.debug("debug")
+    logger.info("info")
+    logger.warning("warning")
+    logger.error("error")
+
+
 def test_set_and_get_spider_settings():
     """测试设置和获取 spider settings"""
     settings = SpiderSettings()
@@ -64,20 +76,3 @@ def test_logger_caching():
 
     # 相同名称的 logger 应该返回同一个实例
     assert logger1 is logger2
-
-
-if __name__ == "__main__":
-    # 运行测试
-    test_set_and_get_spider_settings()
-    print("✓ test_set_and_get_spider_settings 通过")
-
-    test_get_logger_with_explicit_settings()
-    print("✓ test_get_logger_with_explicit_settings 通过")
-
-    test_get_logger_from_context()
-    print("✓ test_get_logger_from_context 通过")
-
-    test_logger_caching()
-    print("✓ test_logger_caching 通过")
-
-    print("\n所有测试通过！")

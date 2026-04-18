@@ -15,7 +15,7 @@ class TestSpiderSettings:
         assert isinstance(spider_settings_dict, dict)
 
     def test_from_json(self):
-        json_data = '{"concurrency": 5, "downloader": "custom.Downloader", "pipeline": {"pipelines": ["custom.Pipeline1", "custom.Pipeline2"]}}'
+        json_data = '{"concurrency": 5, "downloader": "custom.Downloader", "pipeline": {"pipeline": ["custom.Pipeline1", "custom.Pipeline2"]}}'
         settings_from_json = SpiderSettings(**ujson.loads(json_data))
         print("From JSON:", settings_from_json.pipeline.pipelines)
 
@@ -59,7 +59,7 @@ class TestSpiderSettings:
                 "concurrency": 10,
                 "downloader": "custom.Downloader",
                 "pipeline": {
-                    "pipelines": ["custom.Pipeline1", "custom.Pipeline2"],
+                    "pipeline": ["custom.Pipeline1", "custom.Pipeline2"],
                 },
             }
         )

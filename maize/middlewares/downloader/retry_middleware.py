@@ -10,9 +10,9 @@ from typing import TYPE_CHECKING
 from maize.middlewares.base_middleware import DownloaderMiddleware
 
 if TYPE_CHECKING:
+    from maize.base.interface.standard_spider_interface import StandardSpiderInterface
     from maize.common.http.request import Request
     from maize.common.http.response import Response
-    from maize.spider.spider import Spider
 
 
 # 应该触发重试的状态码
@@ -130,7 +130,9 @@ class RetryMiddleware(DownloaderMiddleware):
             return self.retry_delay * (2**retry_count)
         return self.retry_delay
 
-    async def _retry_request(self, request: "Request", reason: str, spider: "Spider") -> "Request | None":
+    async def _retry_request(
+        self, request: "Request", reason: str, spider: "StandardSpiderInterface"
+    ) -> "Request | None":
         """
         如果在重试限制内则创建重试请求
 
@@ -158,7 +160,7 @@ class RetryMiddleware(DownloaderMiddleware):
         return request
 
     async def process_response(
-        self, request: "Request", response: "Response", spider: "Spider"
+        self, request: "Request", response: "Response", spider: "StandardSpiderInterface"
     ) -> "Response | Request | None":
         """
         检查响应状态码，如果需要则重试
@@ -174,7 +176,9 @@ class RetryMiddleware(DownloaderMiddleware):
 
         return response
 
-    async def process_exception(self, request: "Request", exception: Exception, spider: "Spider") -> "Request | None":
+    async def process_exception(
+        self, request: "Request", exception: Exception, spider: "StandardSpiderInterface"
+    ) -> "Request | None":
         """
         如果异常匹配重试条件则重试请求
 

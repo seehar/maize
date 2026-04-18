@@ -6,7 +6,7 @@ from maize.utils.log_util import get_logger
 if TYPE_CHECKING:
     from playwright.async_api import BrowserContext, Page
 
-    from maize.core.crawler import Crawler
+    from maize.aio.classic.crawler.crawler import Crawler
 
 
 class PagePool:

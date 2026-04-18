@@ -10,8 +10,8 @@ from maize.common.constant import LogLevelEnum
 from maize.middlewares.base_middleware import SpiderMiddleware
 
 if TYPE_CHECKING:
+    from maize.aio.classic.spider.spider import Spider
     from maize.common.http.response import Response
-    from maize.spider.spider import Spider
 
 
 # 被认为是成功的状态码

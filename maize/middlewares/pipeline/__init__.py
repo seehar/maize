@@ -1,5 +1,5 @@
 """
-Built-in pipeline middlewares for Maize framework.
+Built-in pipeline middleware for Maize framework.
 """
 
 from maize.middlewares.pipeline.cleaner import ItemCleanerMiddleware

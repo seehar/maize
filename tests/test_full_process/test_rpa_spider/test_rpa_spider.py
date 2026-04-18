@@ -6,8 +6,8 @@ import pytest
 from playwright.async_api import Page
 
 from maize import Request, Response, Spider, SpiderSettings
+from maize.aio.classic.downloader.playwright_downloader import PlaywrightDownloader
 from maize.common.constant.setting_constant import SpiderDownloaderEnum
-from maize.downloader.playwright_downloader import PlaywrightDownloader
 
 
 @pytest.skip(reason="rpa spider", allow_module_level=True)

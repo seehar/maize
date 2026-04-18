@@ -1,5 +1,5 @@
 """
-Built-in spider middlewares for Maize framework.
+Built-in spider middleware for Maize framework.
 """
 
 from maize.middlewares.spider.depth_middleware import DepthMiddleware

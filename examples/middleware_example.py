@@ -13,9 +13,9 @@ from collections.abc import AsyncGenerator
 from typing import Any
 
 from maize import Item, Request, Response, Spider
+from maize.aio.classic.crawler.crawler import CrawlerProcess
 from maize.common.constant import LogLevelEnum
 from maize.common.items.field import Field
-from maize.core.crawler import CrawlerProcess
 from maize.middlewares import (
     DownloaderMiddleware,
     PipelineMiddleware,

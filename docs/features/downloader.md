@@ -127,7 +127,6 @@ settings = SpiderSettings(
 ```python
 from maize import Spider, SpiderSettings
 
-
 if __name__ == "__main__":
     settings = SpiderSettings(
         project_name="我的爬虫",
@@ -176,7 +175,7 @@ import typing
 from maize import BaseDownloader, Request, Response
 
 if typing.TYPE_CHECKING:
-    from maize.core.crawler import Crawler
+    from maize.aio.standard.crawler.crawler import Crawler
 
 
 class CustomDownloader(BaseDownloader):
@@ -248,9 +247,9 @@ class CustomDownloader(BaseDownloader):
 
     @staticmethod
     def structure_response(
-        request: Request,
-        response: typing.Any,
-        body: bytes
+            request: Request,
+            response: typing.Any,
+            body: bytes
     ) -> Response:
         """
         构造 maize Response 对象（必须实现）
@@ -301,7 +300,7 @@ import requests
 from maize import BaseDownloader, Request, Response
 
 if typing.TYPE_CHECKING:
-    from maize.core.crawler import Crawler
+    from maize.aio.standard.crawler.crawler import Crawler
 
 
 class RequestsDownloader(BaseDownloader):
@@ -376,9 +375,9 @@ class RequestsDownloader(BaseDownloader):
 
     @staticmethod
     def structure_response(
-        request: Request,
-        response: requests.Response,
-        body: bytes
+            request: Request,
+            response: requests.Response,
+            body: bytes
     ) -> Response:
         return Response(
             url=response.url,

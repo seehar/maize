@@ -53,7 +53,7 @@ def test_manager_imports():
 
 
 def test_downloader_middleware_imports():
-    """Test that downloader middlewares can be imported"""
+    """Test that downloader middleware can be imported"""
     print("✓ Testing downloader middleware imports...")
     try:
         from maize.middlewares.downloader import (
@@ -63,15 +63,15 @@ def test_downloader_middleware_imports():
         )
 
         assert all([DefaultHeadersMiddleware, RetryMiddleware, UserAgentMiddleware])
-        print("  ✓ All downloader middlewares imported successfully")
+        print("  ✓ All downloader middleware imported successfully")
         return True
     except ImportError as e:
-        print(f"  ✗ Failed to import downloader middlewares: {e}")
+        print(f"  ✗ Failed to import downloader middleware: {e}")
         return False
 
 
 def test_spider_middleware_imports():
-    """Test that spider middlewares can be imported"""
+    """Test that spider middleware can be imported"""
     print("✓ Testing spider middleware imports...")
     try:
         from maize.middlewares.spider import (
@@ -80,15 +80,15 @@ def test_spider_middleware_imports():
         )
 
         assert all([DepthMiddleware, HttpErrorMiddleware])
-        print("  ✓ All spider middlewares imported successfully")
+        print("  ✓ All spider middleware imported successfully")
         return True
     except ImportError as e:
-        print(f"  ✗ Failed to import spider middlewares: {e}")
+        print(f"  ✗ Failed to import spider middleware: {e}")
         return False
 
 
 def test_pipeline_middleware_imports():
-    """Test that pipeline middlewares can be imported"""
+    """Test that pipeline middleware can be imported"""
     print("✓ Testing pipeline middleware imports...")
     try:
         from maize.middlewares.pipeline import (
@@ -97,15 +97,15 @@ def test_pipeline_middleware_imports():
         )
 
         assert all([ItemCleanerMiddleware, ItemValidationMiddleware])
-        print("  ✓ All pipeline middlewares imported successfully")
+        print("  ✓ All pipeline middleware imported successfully")
         return True
     except ImportError as e:
-        print(f"  ✗ Failed to import pipeline middlewares: {e}")
+        print(f"  ✗ Failed to import pipeline middleware: {e}")
         return False
 
 
 def test_main_package_import():
-    """Test that middlewares can be imported from main package"""
+    """Test that middleware can be imported from main package"""
     print("✓ Testing main package imports...")
     try:
         from maize.middlewares import (
@@ -158,7 +158,7 @@ def test_settings_integration():
 
 
 def test_middleware_instantiation():
-    """Test that middlewares can be instantiated"""
+    """Test that middleware can be instantiated"""
     print("✓ Testing middleware instantiation...")
     try:
         from maize.middlewares.downloader import UserAgentMiddleware

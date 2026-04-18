@@ -4,13 +4,15 @@
 为所有请求添加默认的 HTTP 请求头
 """
 
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Optional
 
 from maize.middlewares.base_middleware import DownloaderMiddleware
 
 if TYPE_CHECKING:
+    from maize.aio.classic.crawler.crawler import Crawler
+    from maize.aio.classic.spider.spider import Spider
     from maize.common.http.request import Request
-    from maize.spider.spider import Spider
+    from maize.settings.spider_settings import SpiderSettings
 
 
 DEFAULT_HEADERS = {
@@ -36,7 +38,7 @@ class DefaultHeadersMiddleware(DownloaderMiddleware):
     async def close(self):
         pass
 
-    def __init__(self, settings=None, default_headers=None):
+    def __init__(self, settings: Optional["SpiderSettings"] = None, default_headers: dict[str, str] | None = None):
         """
         初始化默认请求头中间件
 
@@ -47,7 +49,7 @@ class DefaultHeadersMiddleware(DownloaderMiddleware):
         self.default_headers = default_headers or DEFAULT_HEADERS.copy()
 
     @classmethod
-    def from_crawler(cls, crawler):
+    def from_crawler(cls, crawler: "Crawler") -> "DefaultHeadersMiddleware":
         """
         从 crawler 创建中间件实例
 

@@ -10,8 +10,8 @@ from typing import TYPE_CHECKING
 from maize.middlewares.base_middleware import PipelineMiddleware
 
 if TYPE_CHECKING:
+    from maize.aio.classic.spider.spider import Spider
     from maize.common.items import Item
-    from maize.spider.spider import Spider
 
 
 class ItemCleanerMiddleware(PipelineMiddleware):

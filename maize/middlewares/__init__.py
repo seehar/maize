@@ -11,7 +11,7 @@ Middleware Types:
     - PipelineMiddleware: Process items before/after pipeline processing
 
 Example:
-    >>> from maize.middlewares import DownloaderMiddleware
+    >>> from maize.middleware import DownloaderMiddleware
     >>>
     >>> class MyMiddleware(DownloaderMiddleware):
     ...     async def process_request(self, request, spider):
@@ -27,7 +27,7 @@ from maize.middlewares.base_middleware import (
     SpiderMiddleware,
 )
 
-# Import built-in middlewares
+# Import built-in middleware
 from maize.middlewares.downloader import (
     DefaultHeadersMiddleware,
     RetryMiddleware,

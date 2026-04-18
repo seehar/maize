@@ -1,5 +1,5 @@
 """
-Built-in downloader middlewares for Maize framework.
+Built-in downloader middleware for Maize framework.
 """
 
 from maize.middlewares.downloader.default_headers_middleware import DefaultHeadersMiddleware

@@ -2,7 +2,7 @@ import typing
 from collections.abc import AsyncGenerator
 from typing import Any
 
-from maize import Request, Spider, SpiderSettings
+from maize import Request, Spider
 from tests.test_full_process.test_spider.items import BaiduItem
 
 if typing.TYPE_CHECKING:
@@ -13,8 +13,8 @@ class BaiduSpider(Spider):
     async def start_requests(self) -> AsyncGenerator[Request, Any]:
         yield Request(url="http://www.baidu.com")
 
-    async def open(self, settings: "SpiderSettings"):
-        await super().open(settings)
+    async def open(self):
+        await super().open()
         print("custom open")
 
     async def close(self):

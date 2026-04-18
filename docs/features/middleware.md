@@ -164,18 +164,19 @@ class MyPipelineMiddleware(PipelineMiddleware):
 ```python
 from maize import Spider
 
+
 class MySpider(Spider):
     custom_settings = {
         'middleware': {
             'downloader_middlewares': {
-                'myproject.middlewares.CustomMiddleware': 100,
-                'maize.middlewares.downloader.RetryMiddleware': 200,
+                'myproject.middleware.CustomMiddleware': 100,
+                'maize.middleware.downloader.RetryMiddleware': 200,
             },
             'spider_middlewares': {
-                'myproject.middlewares.DepthMiddleware': 100,
+                'myproject.middleware.DepthMiddleware': 100,
             },
             'pipeline_middlewares': {
-                'myproject.middlewares.ValidationMiddleware': 100,
+                'myproject.middleware.ValidationMiddleware': 100,
             },
         }
     }
@@ -224,7 +225,7 @@ middleware:
 custom_settings = {
     'middleware': {
         'downloader_middlewares': {
-            'maize.middlewares.downloader.UserAgentMiddleware': 100,
+            'maize.middleware.downloader.UserAgentMiddleware': 100,
         }
     },
     'user_agent_list': [
@@ -243,7 +244,7 @@ custom_settings = {
 custom_settings = {
     'middleware': {
         'downloader_middlewares': {
-            'maize.middlewares.downloader.DefaultHeadersMiddleware': 50,
+            'maize.middleware.downloader.DefaultHeadersMiddleware': 50,
         }
     },
     'default_headers': {
@@ -261,7 +262,7 @@ custom_settings = {
 custom_settings = {
     'middleware': {
         'downloader_middlewares': {
-            'maize.middlewares.downloader.RetryMiddleware': 200,
+            'maize.middleware.downloader.RetryMiddleware': 200,
         }
     },
     'request': {
@@ -283,7 +284,7 @@ custom_settings = {
 custom_settings = {
     'middleware': {
         'spider_middlewares': {
-            'maize.middlewares.spider.DepthMiddleware': 100,
+            'maize.middleware.spider.DepthMiddleware': 100,
         }
     },
     'max_depth': 3,
@@ -299,7 +300,7 @@ custom_settings = {
 custom_settings = {
     'middleware': {
         'spider_middlewares': {
-            'maize.middlewares.spider.HttpErrorMiddleware': 50,
+            'maize.middleware.spider.HttpErrorMiddleware': 50,
         }
     },
     'http_error_allowed_codes': [200, 201, 202],
@@ -317,7 +318,7 @@ custom_settings = {
 custom_settings = {
     'middleware': {
         'pipeline_middlewares': {
-            'maize.middlewares.pipeline.ItemValidationMiddleware': 100,
+            'maize.middleware.pipeline.ItemValidationMiddleware': 100,
         }
     },
     'required_fields': ['title', 'url', 'content'],
@@ -333,7 +334,7 @@ custom_settings = {
 custom_settings = {
     'middleware': {
         'pipeline_middlewares': {
-            'maize.middlewares.pipeline.ItemCleanerMiddleware': 50,
+            'maize.middleware.pipeline.ItemCleanerMiddleware': 50,
         }
     },
     'strip_whitespace': True,
@@ -395,7 +396,7 @@ class MySpider(Spider):
     custom_settings = {
         'middleware': {
             'downloader_middlewares': {
-                'myproject.middlewares.ProxyMiddleware': 100,
+                'myproject.middleware.ProxyMiddleware': 100,
             }
         },
         'proxy_list': [

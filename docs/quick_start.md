@@ -441,7 +441,7 @@ class MySpider(Spider):
 创建自定义数据管道：
 
 ```python
-# pipelines.py
+# pipeline.py
 from typing import List
 
 from maize import BasePipeline, Item
@@ -476,7 +476,7 @@ class CustomPipeline(BasePipeline):
 ```python
 settings = SpiderSettings()
 settings.pipeline.pipelines = [
-    "your_module.pipelines.CustomPipeline"
+    "your_module.pipeline.CustomPipeline"
 ]
 ```
 

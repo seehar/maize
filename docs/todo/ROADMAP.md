@@ -213,34 +213,6 @@ settings = SpiderSettings(
    - HTTP 状态码分布
    - 响应时间分布
    - 错误类型统计
-   - 内存使用情况
-   - CPU 使用率
-
-2. **实时监控 API**
-   ```python
-   # 提供 HTTP API 查看实时统计
-   GET /api/stats
-   {
-       "requests": {
-           "total": 1000,
-           "success": 950,
-           "failed": 50,
-           "rate": 10.5  # 请求/秒
-       },
-       "items": {
-           "scraped": 800,
-           "dropped": 20
-       },
-       "downloader": {
-           "active": 10,
-           "idle": 0
-       }
-   }
-   ```
-
-3. **集成 Prometheus/Grafana**
-   - 导出 Prometheus 格式的指标
-   - 提供预制的 Grafana Dashboard
 
 4. **邮件/钉钉/企业微信告警**
    - 爬虫异常告警
@@ -332,53 +304,6 @@ settings = SpiderSettings(
 
 ## 🌟 中优先级
 
-### 6. 数据验证系统
-
-**状态：** ❌ 未实现
-
-**重要性：** ⭐⭐⭐⭐
-
-**描述：**
-当前的 Item 系统比较简单，缺少数据验证能力。应该增强 Item 的验证功能。
-
-**需要实现的功能：**
-
-1. **字段验证器**
-   ```python
-   from maize import Field, Item
-   from pydantic import validator, EmailStr, HttpUrl
-
-   class ProductItem(Item):
-       __table_name__ = "products"
-
-       name: str = Field(min_length=1, max_length=200)
-       price: float = Field(gt=0, description="价格必须大于0")
-       url: HttpUrl = Field()
-       email: EmailStr = Field()
-
-       @validator('price')
-       def validate_price(cls, v):
-           if v > 100000:
-               raise ValueError('价格过高')
-           return v
-   ```
-
-2. **自动类型转换**
-   - 字符串转数字
-   - 日期时间解析
-   - JSON 字符串解析
-
-3. **必填字段检查**
-   - 自动检查必填字段
-   - 缺失字段时的处理策略
-
-4. **数据清洗集成**
-   - 去除空白字符
-   - HTML 标签清理
-   - 标准化处理
-
----
-
 ### 7. 分布式爬虫增强
 
 **状态：** ⚠️ 基础实现，需要增强
@@ -466,21 +391,21 @@ settings = SpiderSettings(
 1. **PostgreSQL Pipeline**
    ```python
    settings.pipeline.pipelines = [
-       "maize.pipelines.PostgresqlPipeline"
+       "maize.pipeline.PostgresqlPipeline"
    ]
    ```
 
 2. **MongoDB Pipeline**
    ```python
    settings.pipeline.pipelines = [
-       "maize.pipelines.MongoPipeline"
+       "maize.pipeline.MongoPipeline"
    ]
    ```
 
 3. **Elasticsearch Pipeline**
    ```python
    settings.pipeline.pipelines = [
-       "maize.pipelines.ElasticsearchPipeline"
+       "maize.pipeline.ElasticsearchPipeline"
    ]
    ```
 
@@ -488,15 +413,15 @@ settings = SpiderSettings(
    - 实时数据流处理
    ```python
    settings.pipeline.pipelines = [
-       "maize.pipelines.KafkaPipeline"
+       "maize.pipeline.KafkaPipeline"
    ]
    ```
 
 5. **CSV/Excel Pipeline**
    ```python
    settings.pipeline.pipelines = [
-       "maize.pipelines.CsvPipeline",
-       "maize.pipelines.ExcelPipeline"
+       "maize.pipeline.CsvPipeline",
+       "maize.pipeline.ExcelPipeline"
    ]
    ```
 

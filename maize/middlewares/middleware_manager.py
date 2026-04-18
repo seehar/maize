@@ -17,11 +17,11 @@ from maize.utils.log_util import get_logger
 from maize.utils.project_util import load_class
 
 if TYPE_CHECKING:
+    from maize.aio.classic.crawler.crawler import Crawler
+    from maize.base.interface.standard_spider_interface import StandardSpiderInterface
     from maize.common.http.request import Request
     from maize.common.http.response import Response
     from maize.common.items import Item
-    from maize.core.crawler import Crawler
-    from maize.spider.spider import Spider
 
 
 class MiddlewareManager:
@@ -105,7 +105,9 @@ class DownloaderMiddlewareManager(MiddlewareManager):
     在下载前处理请求，在下载后处理响应
     """
 
-    async def process_request(self, request: "Request", spider: "Spider") -> "Request | Response | None":
+    async def process_request(
+        self, request: "Request", spider: "StandardSpiderInterface"
+    ) -> "Request | Response | None":
         """
         通过所有下载器中间件处理请求
 
@@ -146,7 +148,7 @@ class DownloaderMiddlewareManager(MiddlewareManager):
         return request
 
     async def process_response(
-        self, request: "Request", response: "Response", spider: "Spider"
+        self, request: "Request", response: "Response", spider: "StandardSpiderInterface"
     ) -> "Response | Request | None":
         """
         通过所有下载器中间件处理响应
@@ -187,7 +189,7 @@ class DownloaderMiddlewareManager(MiddlewareManager):
         return response
 
     async def process_exception(
-        self, request: "Request", exception: Exception, spider: "Spider"
+        self, request: "Request", exception: Exception, spider: "StandardSpiderInterface"
     ) -> "Request | Response | None":
         """
         通过所有下载器中间件处理异常
@@ -227,7 +229,7 @@ class SpiderMiddlewareManager(MiddlewareManager):
     处理爬虫输入/输出和起始请求
     """
 
-    async def process_spider_input(self, response: "Response", spider: "Spider") -> bool:
+    async def process_spider_input(self, response: "Response", spider: "StandardSpiderInterface") -> bool:
         """
         在传递给爬虫回调前处理响应
 
@@ -256,7 +258,7 @@ class SpiderMiddlewareManager(MiddlewareManager):
         return True
 
     async def process_spider_output(
-        self, response: "Response", result: AsyncGenerator, spider: "Spider"
+        self, response: "Response", result: AsyncGenerator, spider: "StandardSpiderInterface"
     ) -> AsyncGenerator:
         """
         处理爬虫回调返回的结果
@@ -285,7 +287,7 @@ class SpiderMiddlewareManager(MiddlewareManager):
             yield item
 
     async def process_spider_exception(
-        self, response: "Response", exception: Exception, spider: "Spider"
+        self, response: "Response", exception: Exception, spider: "StandardSpiderInterface"
     ) -> AsyncGenerator | None:
         """
         处理爬虫回调中的异常
@@ -313,7 +315,9 @@ class SpiderMiddlewareManager(MiddlewareManager):
 
         return None
 
-    async def process_start_requests(self, start_requests: AsyncGenerator, spider: "Spider") -> AsyncGenerator:
+    async def process_start_requests(
+        self, start_requests: AsyncGenerator, spider: "StandardSpiderInterface"
+    ) -> AsyncGenerator:
         """
         处理起始请求生成器
 
@@ -347,7 +351,7 @@ class PipelineMiddlewareManager(MiddlewareManager):
     在管道处理前后处理 Item
     """
 
-    async def process_item_before(self, item: "Item", spider: "Spider") -> "Item | None":
+    async def process_item_before(self, item: "Item", spider: "StandardSpiderInterface") -> "Item | None":
         """
         在 Item 进入管道前处理
 
@@ -377,7 +381,7 @@ class PipelineMiddlewareManager(MiddlewareManager):
 
         return item
 
-    async def process_item_after(self, item: "Item", spider: "Spider") -> "Item | None":
+    async def process_item_after(self, item: "Item", spider: "StandardSpiderInterface") -> "Item | None":
         """
         在 Item 离开管道后处理
 

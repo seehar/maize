@@ -89,8 +89,8 @@ class Settings(SpiderSettings):
 # 在创建 settings 对象后配置
 settings = Settings()
 settings.pipeline.pipelines = [
-    "my_project.pipelines.CustomPipeline",
-    "my_project.pipelines.MysqlPipeline",
+    "my_project.pipeline.CustomPipeline",
+    "my_project.pipeline.MysqlPipeline",
 ]
 ```
 
@@ -104,7 +104,7 @@ settings = SpiderSettings(
     project_name="我的爬虫"
 )
 settings.pipeline.pipelines = [
-    "my_project.pipelines.CustomPipeline"
+    "my_project.pipeline.CustomPipeline"
 ]
 ```
 
@@ -114,7 +114,7 @@ settings.pipeline.pipelines = [
 class MySpider(Spider):
     custom_settings = {
         "pipeline": {
-            "pipelines": ["my_project.pipelines.CustomPipeline"],
+            "pipeline": ["my_project.pipeline.CustomPipeline"],
             "handle_batch_max_size": 50,
         }
     }
@@ -445,10 +445,10 @@ retry_count = item.__retry_count__
 ```python
 settings = SpiderSettings()
 settings.pipeline.pipelines = [
-    "my_project.pipelines.DataCleaningPipeline",  # 1. 数据清洗
-    "my_project.pipelines.DataValidationPipeline",  # 2. 数据验证
-    "my_project.pipelines.MysqlPipeline",  # 3. 保存到 MySQL
-    "my_project.pipelines.RedisPipeline",  # 4. 保存到 Redis
+    "my_project.pipeline.DataCleaningPipeline",  # 1. 数据清洗
+    "my_project.pipeline.DataValidationPipeline",  # 2. 数据验证
+    "my_project.pipeline.MysqlPipeline",  # 3. 保存到 MySQL
+    "my_project.pipeline.RedisPipeline",  # 4. 保存到 Redis
 ]
 ```
 

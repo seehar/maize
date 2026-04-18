@@ -61,7 +61,7 @@ settings.request.max_retry_count = 3
 settings.request.random_wait_time = (1, 3)  # 随机等待1-3秒
 
 # 配置数据管道
-settings.pipeline.pipelines = ["my_project.pipelines.CustomPipeline"]
+settings.pipeline.pipelines = ["my_project.pipeline.CustomPipeline"]
 settings.pipeline.handle_batch_max_size = 100
 settings.pipeline.handle_interval = 5
 
@@ -123,7 +123,7 @@ class MySpider(Spider):
             "max_retry_count": 3,
         },
         "pipeline": {
-            "pipelines": ["my_project.pipelines.CustomPipeline"],
+            "pipeline": ["my_project.pipeline.CustomPipeline"],
             "handle_batch_max_size": 50,
         }
     }
@@ -194,7 +194,7 @@ request:
 
 pipeline:
   pipelines:
-    - my_project.pipelines.CustomPipeline
+    - my_project.pipeline.CustomPipeline
   handle_batch_max_size: 100
   handle_interval: 5
 
@@ -300,8 +300,8 @@ settings.request.random_wait_time = (1, 3)  # 每次请求前随机等待1-3秒
 ```python
 settings = SpiderSettings()
 settings.pipeline.pipelines = [
-    "my_project.pipelines.CustomPipeline",
-    "my_project.pipelines.MysqlPipeline"
+    "my_project.pipeline.CustomPipeline",
+    "my_project.pipeline.MysqlPipeline"
 ]
 settings.pipeline.handle_batch_max_size = 100
 settings.pipeline.handle_interval = 5

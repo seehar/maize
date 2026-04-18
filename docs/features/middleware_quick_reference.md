@@ -7,11 +7,12 @@
 ```python
 from maize import Spider
 
+
 class MySpider(Spider):
     custom_settings = {
         'middleware': {
             'downloader_middlewares': {
-                'maize.middlewares.downloader.UserAgentMiddleware': 100,
+                'maize.middleware.downloader.UserAgentMiddleware': 100,
             }
         }
     }
