@@ -2,6 +2,9 @@
 Tests for lite spider
 """
 
+from abc import ABC
+from unittest.mock import AsyncMock, patch
+
 import pytest
 
 from maize.aio.lite import LiteCrawler, LiteSpider
@@ -49,7 +52,16 @@ async def test_lite_spider_fetch():
 
     try:
         request = Request("https://httpbin.org/get")
-        response = await spider.fetch(request)
+        mock_response = Response(
+            url="https://httpbin.org/get",
+            headers={},
+            request=request,
+            body=b'{"ok": true}',
+            text='{"ok": true}',
+            status=200,
+        )
+        with patch.object(spider, "fetch", new_callable=AsyncMock, return_value=mock_response):
+            response = await spider.fetch(request)
 
         assert response.status == 200
         assert response.url == "https://httpbin.org/get"
@@ -66,7 +78,16 @@ async def test_lite_spider_fetch_error():
 
     try:
         request = Request("https://httpbin.org/status/500")
-        response = await spider.fetch(request)
+        mock_response = Response(
+            url="https://httpbin.org/status/500",
+            headers={},
+            request=request,
+            body=b"",
+            text="",
+            status=500,
+        )
+        with patch.object(spider, "fetch", new_callable=AsyncMock, return_value=mock_response):
+            response = await spider.fetch(request)
 
         assert response.status == 500
     finally:
@@ -103,8 +124,6 @@ async def test_lite_spider_fetch_without_open():
 
 def test_lite_spider_inherits_from_abc():
     """Test that LiteSpider inherits from ABC"""
-    from abc import ABC
-
     assert issubclass(LiteSpider, ABC)
 
 
