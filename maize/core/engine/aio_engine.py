@@ -7,9 +7,8 @@ from typing import TYPE_CHECKING, Any, Union
 
 import ujson
 
-from maize import Response
 from maize.aio.classic.scheduler.scheduler import Scheduler
-from maize.common.http.request import Request
+from maize.common.http import Request, Response
 from maize.common.items import Item
 from maize.core.processor import Processor
 from maize.core.task.task_manager import TaskManager

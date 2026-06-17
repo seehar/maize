@@ -189,7 +189,14 @@ if __name__ == "__main__":
 
 ### Spider（爬虫）
 
-`Spider` 是爬虫的核心类，需要继承并实现 `start_requests` 和 `parse` 方法：
+maize 提供两种爬虫模式：
+
+- **Classic Spider**：完整功能，支持中间件、管道、调度器
+- **Lite Spider**：轻量级，内置并发、重试、代理，无中间件
+
+详见 [Lite 轻量爬虫](features/lite_spider.md)。
+
+### Request（请求）
 
 - **start_requests**：生成初始请求
 - **parse**：解析响应，可以 yield Request（新请求）或 Item（数据）
@@ -249,9 +256,9 @@ class MyItem(Item):
 
 ## 下一步
 
-- [快速上手](quick_start.md)：了解更多使用示例
-- [Spider 进阶](features/spider.md)：学习高级特性
-- [配置说明](features/settings.md)：详细的配置选项
+- [Lite 轻量爬虫](features/lite_spider.md) - 快速上手轻量级爬虫
+- [Spider 进阶](features/spider.md) - Classic Spider 高级特性
+- [配置说明](features/settings.md) - 详细的配置选项
 - [Request 详解](features/request.md)：请求参数说明
 - [Response 详解](features/response.md)：响应处理方法
 - [Pipeline 管道](features/pipeline.md)：数据管道使用

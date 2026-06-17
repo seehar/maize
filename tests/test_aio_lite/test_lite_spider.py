@@ -4,15 +4,15 @@ Tests for lite spider
 
 import pytest
 
-from maize.aio.lite import LiteCrawler, LiteCrawlerProcess, LiteSettings, LiteSpider
+from maize.aio.lite import LiteCrawler, LiteSpider
 from maize.common.http import Request, Response
 
 
 class SampleLiteSpider(LiteSpider):
     """Sample spider for testing"""
 
-    def __init__(self):
-        super().__init__()
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
         self.responses_handled = 0
 
     async def start_requests(self):
@@ -22,14 +22,12 @@ class SampleLiteSpider(LiteSpider):
         self.responses_handled += 1
 
 
-@pytest.mark.asyncio
-async def test_lite_spider_crawl():
-    """Test that lite spider can crawl and handle responses"""
+def test_lite_spider_run():
+    """Test that lite spider run() method works synchronously"""
     spider = SampleLiteSpider()
-    await spider.crawl()
+    spider.run()
 
     assert spider.responses_handled == 1
-    assert spider._session is None  # Session should be closed
 
 
 @pytest.mark.asyncio
@@ -75,79 +73,14 @@ async def test_lite_spider_fetch_error():
         await spider.close()
 
 
-def test_lite_settings_defaults():
-    """Test LiteSettings default values"""
-    settings = LiteSettings()
-
-    assert settings.request_timeout == 30.0
-    assert settings.max_retries == 3
-    assert settings.follow_redirects is True
-    assert settings.max_redirects == 10
-    assert settings.verify_ssl is True
-    assert settings.log_level == "INFO"
-
-
-def test_lite_settings_custom():
-    """Test LiteSettings with custom values"""
-    settings = LiteSettings(
-        request_timeout=60.0,
-        max_retries=5,
-        follow_redirects=False,
-        max_redirects=20,
-        verify_ssl=False,
-        log_level="DEBUG",
-    )
-
-    assert settings.request_timeout == 60.0
-    assert settings.max_retries == 5
-    assert settings.follow_redirects is False
-    assert settings.max_redirects == 20
-    assert settings.verify_ssl is False
-    assert settings.log_level == "DEBUG"
-
-
-def test_lite_crawler_init():
-    """Test LiteCrawler initialization"""
-    crawler = LiteCrawler(SampleLiteSpider)
-
-    assert crawler.spider_cls == SampleLiteSpider
-    assert crawler.spider is None
-    assert crawler.settings is not None
-
-
 @pytest.mark.asyncio
 async def test_lite_crawler_crawl():
     """Test LiteCrawler crawl method"""
-    crawler = LiteCrawler(SampleLiteSpider)
+    spider = SampleLiteSpider()
+    crawler = LiteCrawler(spider)
     await crawler.crawl()
 
-    assert crawler.spider is not None
-    assert crawler.spider.responses_handled == 1
-
-
-def test_lite_crawler_process_init():
-    """Test LiteCrawlerProcess initialization"""
-    process = LiteCrawlerProcess()
-
-    assert len(process.crawlers) == 0
-    assert process.settings is not None
-
-
-@pytest.mark.asyncio
-async def test_lite_crawler_process_crawl():
-    """Test LiteCrawlerProcess crawl method"""
-    process = LiteCrawlerProcess()
-    await process.crawl(SampleLiteSpider)
-
-    assert len(process.crawlers) == 1
-
-
-def test_lite_crawler_process_run():
-    """Test LiteCrawlerProcess run method (sync)"""
-    process = LiteCrawlerProcess()
-    process.run(SampleLiteSpider)  # Synchronous run with spider
-
-    assert len(process.crawlers) == 1
+    assert spider.responses_handled == 1
 
 
 def test_lite_spider_logger():
@@ -162,61 +95,84 @@ def test_lite_spider_logger():
 async def test_lite_spider_fetch_without_open():
     """Test lite spider fetch without open raises RuntimeError"""
     spider = SampleLiteSpider()
-    # Don't call open(), so _session is None
-
     request = Request("https://httpbin.org/get")
 
     with pytest.raises(RuntimeError, match="Session not initialized"):
         await spider.fetch(request)
 
 
-@pytest.mark.asyncio
-async def test_lite_spider_start_requests_raises():
-    """Test that start_requests is abstract in LiteSpider"""
-    # Can't instantiate abstract class, so we test the method exists and is abstract
-    assert LiteSpider.start_requests.__isabstractmethod__ is True
+def test_lite_spider_inherits_from_abc():
+    """Test that LiteSpider inherits from ABC"""
+    from abc import ABC
+
+    assert issubclass(LiteSpider, ABC)
 
 
-def test_lite_spider_set_crawler():
-    """Test set_crawler method"""
+def test_lite_spider_with_custom_concurrency():
+    """Test lite spider with custom concurrency"""
+    spider = SampleLiteSpider(concurrency=10)
+
+    assert spider.concurrency == 10
+
+
+def test_lite_spider_with_custom_retry():
+    """Test lite spider with custom retry"""
+    spider = SampleLiteSpider(retry=5)
+
+    assert spider.retry == 5
+
+
+def test_lite_spider_with_custom_proxy():
+    """Test lite spider with custom proxy"""
+    spider = SampleLiteSpider(proxy="http://127.0.0.1:7890")
+
+    assert spider.proxy == "http://127.0.0.1:7890"
+
+
+def test_lite_spider_with_custom_timeout():
+    """Test lite spider with custom timeout"""
+    spider = SampleLiteSpider(timeout=60.0)
+
+    assert spider.timeout == 60.0
+
+
+def test_lite_crawler_with_custom_concurrency():
+    """Test LiteCrawler with custom concurrency"""
     spider = SampleLiteSpider()
-    crawler = LiteCrawler(SampleLiteSpider)
+    crawler = LiteCrawler(spider, concurrency=20)
 
-    spider.set_crawler(crawler)
-
-    assert spider._crawler is crawler
+    assert crawler.concurrency == 20
 
 
-def test_lite_crawler_idle():
-    """Test LiteCrawler idle method"""
-    crawler = LiteCrawler(SampleLiteSpider)
+@pytest.mark.asyncio
+async def test_lite_spider_on_start_hook():
+    """Test on_start hook is called"""
+    started = False
 
-    assert crawler.idle() is True
+    class HookedSpider(SampleLiteSpider):
+        async def on_start(self) -> None:
+            nonlocal started
+            started = True
 
+    spider = HookedSpider()
+    crawler = LiteCrawler(spider)
+    await crawler.crawl()
 
-def test_lite_crawler_process_run_no_spider():
-    """Test LiteCrawlerProcess run method without spider"""
-    process = LiteCrawlerProcess()
-
-    # This should just run without error (idle loop)
-    asyncio_run = False
-    try:
-        process.run()  # No spider provided
-        asyncio_run = True
-    except Exception:
-        # This may fail if no spiders added, which is expected
-        pass
-
-    # If no exception, we just verify it runs
-    assert asyncio_run or len(process.crawlers) == 0
+    assert started is True
 
 
-def test_lite_crawler_process_start():
-    """Test LiteCrawlerProcess start method"""
-    process = LiteCrawlerProcess()
+@pytest.mark.asyncio
+async def test_lite_spider_on_close_hook():
+    """Test on_close hook is called"""
+    closed = False
 
-    # Add a spider first
-    process.crawlers.append(LiteCrawler(SampleLiteSpider, process.settings))
+    class HookedSpider(SampleLiteSpider):
+        async def on_close(self) -> None:
+            nonlocal closed
+            closed = True
 
-    # start() should be callable (but will fail without open)
-    # We just verify the method exists and is callable
+    spider = HookedSpider()
+    crawler = LiteCrawler(spider)
+    await crawler.crawl()
+
+    assert closed is True

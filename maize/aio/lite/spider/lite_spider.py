@@ -1,51 +1,126 @@
 import asyncio
 import logging
 import typing
-from abc import abstractmethod
 from collections.abc import AsyncGenerator
-from typing import TYPE_CHECKING
 
 import aiohttp
 
+from maize.aio.lite.crawler import LiteCrawler
 from maize.base.interface.lite_spider_interface import LiteSpiderInterface
 from maize.common.http import Request, Response
 
-if TYPE_CHECKING:
-    pass
-
-
-# 创建简单的 logger
-_logger = logging.getLogger("maize.lite")
-
 
 class LiteSpider(LiteSpiderInterface):
-    """Lite 版本的爬虫 - 简化实现，内置简单 HTTP 下载"""
+    """
+    Lite 爬虫 - 轻量级异步爬虫，内置并发控制、失败重试、代理支持。
 
-    def __init__(self):
+    与 Classic 爬虫相比，Lite 版本更加轻量，适合简单抓取场景。
+    使用方式：继承此类，实现 ``start_requests`` 和 ``parse`` 方法。
+
+    :param concurrency: 最大并发数，默认 5
+    :param retry: 请求失败重试次数，默认 3
+    :param proxy: 代理地址，默认 None
+    :param timeout: 请求超时时间（秒），默认 30.0
+    """
+
+    def __init__(
+        self,
+        concurrency: int | None = None,
+        retry: int | None = None,
+        proxy: str | None = None,
+        timeout: float | None = None,
+    ):
         super().__init__()
+        self._concurrency = concurrency
+        self._retry = retry
+        self._proxy = proxy
+        self._timeout = timeout
+
         self._session: aiohttp.ClientSession | None = None
-        self._crawler: LiteCrawler | None = None
         self._logger = logging.getLogger(f"maize.lite.{self.__class__.__name__}")
 
     @property
+    def concurrency(self) -> int:
+        """最大并发数"""
+        return self._concurrency if self._concurrency is not None else 5
+
+    @property
+    def retry(self) -> int:
+        """请求失败重试次数"""
+        return self._retry if self._retry is not None else 3
+
+    @property
+    def proxy(self) -> str | None:
+        """代理地址"""
+        return self._proxy
+
+    @property
+    def timeout(self) -> float:
+        """请求超时时间（秒）"""
+        return self._timeout if self._timeout is not None else 30.0
+
+    @property
     def logger(self) -> logging.Logger:
-        """返回爬虫的 logger"""
+        """日志记录器"""
         return self._logger
 
     async def open(self) -> None:
-        """爬虫启动时调用，可用于初始化资源"""
-        self._session = aiohttp.ClientSession()
+        """
+        初始化资源。
+
+        创建 aiohttp ClientSession，子类可重写 ``on_start`` 做额外初始化。
+        """
+        timeout = aiohttp.ClientTimeout(total=self.timeout)
+        self._session = aiohttp.ClientSession(timeout=timeout)
 
     async def close(self) -> None:
-        """爬虫关闭时调用，可用于清理资源"""
+        """
+        清理资源。
+
+        关闭 aiohttp ClientSession，子类可重写 ``on_close`` 做额外清理。
+        """
         if self._session:
             await self._session.close()
             self._session = None
 
+    async def on_start(self) -> None:
+        """爬虫启动前调用，可在此处初始化数据库连接等资源"""
+
+    async def on_close(self) -> None:
+        """爬虫关闭后调用，可在此处清理数据库连接等资源"""
+
+    async def start_requests(self) -> AsyncGenerator[Request, typing.Any]:
+        """
+        生成起始请求。
+
+        :returns: 生成器 yields Request 对象
+        :raises NotImplementedError: 子类必须实现此方法
+        """
+        raise NotImplementedError
+
+    async def parse(self, response: Response) -> None:
+        """
+        解析响应。
+
+        :param response: HTTP 响应对象
+        :raises NotImplementedError: 子类必须实现此方法
+        """
+        raise NotImplementedError
+
     async def fetch(self, request: Request) -> Response:
-        """执行 HTTP 请求"""
+        """
+        执行 HTTP 请求。
+
+        使用 aiohttp 发起请求，支持代理、重试、超时等功能。
+        请求失败时返回 status=0 的 Response 对象。
+
+        :param request: 请求对象
+        :returns: 响应对象
+        """
         if not self._session:
             raise RuntimeError("Session not initialized. Did you call open()?")
+
+        request_proxy = request.proxy or self.proxy
 
         try:
             headers = await request.get_headers()
@@ -57,6 +132,7 @@ class LiteSpider(LiteSpiderInterface):
                 json=request.json,
                 params=request.params,
                 cookies=request.cookies,
+                proxy=request_proxy,
                 allow_redirects=request.follow_redirects,
                 max_redirects=request.max_redirects,
             ) as response:
@@ -79,105 +155,19 @@ class LiteSpider(LiteSpiderInterface):
                 request=request,
             )
 
-    @abstractmethod
-    async def start_requests(self) -> AsyncGenerator[Request, typing.Any]:
-        """生成初始请求 - 子类必须实现"""
-        ...
+    def run(self) -> None:
+        """
+        快捷运行方法。
 
-    @abstractmethod
-    async def parse(self, response: Response) -> None:
-        """解析响应 - 子类必须实现"""
-        ...
-
-    async def crawl(self) -> None:
-        """执行爬虫的主要逻辑"""
-        await self.open()
-
-        try:
-            async for request in self.start_requests():
-                response = await self.fetch(request)
-                await self.parse(response)
-        finally:
-            await self.close()
-
-    def set_crawler(self, crawler: "LiteCrawler") -> None:
-        """设置爬虫运行器"""
-        self._crawler = crawler
-
-
-class LiteCrawler:
-    """Lite 版本的爬虫运行器"""
-
-    def __init__(self, spider_cls: type[LiteSpider], settings: "LiteSettings | None" = None):
-        self.spider_cls = spider_cls
-        self.spider: LiteSpider | None = None
-        self.settings = settings or LiteSettings()
-
-    async def crawl(self) -> None:
-        """运行爬虫"""
-        spider = self.spider_cls()
-        self.spider = spider
-        await spider.open()
-
-        try:
-            async for request in spider.start_requests():
-                response = await spider.fetch(request)
-                await spider.parse(response)
-        finally:
-            await spider.close()
-
-    @staticmethod
-    def idle() -> bool:
-        """检查爬虫是否空闲"""
-        return True
-
-
-class LiteCrawlerProcess:
-    """Lite 版本的爬虫进程管理器 - 管理多个爬虫"""
-
-    def __init__(self, settings: "LiteSettings | None" = None):
-        self.crawlers: list[LiteCrawler] = []
-        self.settings = settings or LiteSettings()
-
-    async def crawl(self, spider_cls: type[LiteSpider]) -> None:
-        """添加并运行一个爬虫"""
-        crawler = LiteCrawler(spider_cls, self.settings)
-        self.crawlers.append(crawler)
-        await crawler.crawl()
-
-    async def start(self) -> None:
-        """启动所有爬虫（Lite 版本串行执行）"""
-        for crawler in self.crawlers:
-            await crawler.crawl()
-
-    def run(self, spider_cls: type[LiteSpider] | None = None) -> None:
-        """同步运行入口"""
-        if spider_cls:
-            asyncio.run(self.crawl(spider_cls))
-        else:
-            asyncio.run(self._run())
+        同步入口，内部创建事件循环执行爬虫。
+        适用于简单场景，复杂场景请自行管理事件循环。
+        """
+        asyncio.run(self._run())
 
     async def _run(self) -> None:
-        """异步运行（启动所有已添加的爬虫）"""
-        for crawler in self.crawlers:
-            await crawler.crawl()
-
-
-class LiteSettings:
-    """Lite 版本的设置 - 简化版"""
-
-    def __init__(
-        self,
-        request_timeout: float = 30.0,
-        max_retries: int = 3,
-        follow_redirects: bool = True,
-        max_redirects: int = 10,
-        verify_ssl: bool = True,
-        log_level: str = "INFO",
-    ):
-        self.request_timeout = request_timeout
-        self.max_retries = max_retries
-        self.follow_redirects = follow_redirects
-        self.max_redirects = max_redirects
-        self.verify_ssl = verify_ssl
-        self.log_level = log_level
+        """内部异步运行逻辑，创建 LiteCrawler 并执行爬虫流程"""
+        crawler = LiteCrawler(
+            spider=self,
+            concurrency=self.concurrency,
+        )
+        await crawler.crawl()

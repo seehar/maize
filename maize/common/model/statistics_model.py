@@ -1,4 +1,4 @@
-from maize import Field
+from maize.common.items.field import Field
 from maize.common.model.base_model import BaseModel
 
 
