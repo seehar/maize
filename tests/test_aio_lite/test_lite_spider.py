@@ -9,6 +9,7 @@ import pytest
 
 from maize.aio.lite import LiteCrawler, LiteSpider
 from maize.common.http import Request, Response
+from maize.common.items import Item
 
 
 class SampleLiteSpider(LiteSpider):
@@ -195,3 +196,190 @@ async def test_lite_spider_on_close_hook():
     await crawler.crawl()
 
     assert closed is True
+
+
+@pytest.mark.asyncio
+async def test_crawl_with_mock_parse_yields_request():
+    """Test parse yielding a Request causes it to be re-fetched"""
+
+    class FollowSpider(LiteSpider):
+        def __init__(self):
+            super().__init__()
+            self.responses_handled = 0
+            self.urls_fetched = []
+
+        async def start_requests(self):
+            yield Request("https://example.com/page1")
+
+        async def parse(self, response):
+            self.responses_handled += 1
+            self.urls_fetched.append(response.url)
+            if response.url == "https://example.com/page1":
+                yield Request("https://example.com/page2")
+
+    spider = FollowSpider()
+
+    request1 = Request("https://example.com/page1")
+    request2 = Request("https://example.com/page2")
+    resp1 = Response(url="https://example.com/page1", headers={}, body=b"page1", status=200, request=request1)
+    resp2 = Response(url="https://example.com/page2", headers={}, body=b"page2", status=200, request=request2)
+    fetch_mock = AsyncMock(side_effect=[resp1, resp2])
+
+    with patch.object(spider, "fetch", fetch_mock):
+        crawler = LiteCrawler(spider, concurrency=2)
+        await crawler.crawl()
+
+    assert spider.responses_handled == 2
+    assert "https://example.com/page2" in spider.urls_fetched
+
+
+@pytest.mark.asyncio
+async def test_crawl_parse_yields_item():
+    """Test parse yielding Item collects it in crawler.items"""
+
+    class ItemSpider(LiteSpider):
+        async def start_requests(self):
+            yield Request("https://example.com/data")
+
+        async def parse(self, response):
+            yield Item()
+
+    spider = ItemSpider()
+    request = Request("https://example.com/data")
+    resp = Response(url="https://example.com/data", headers={}, body=b"ok", status=200, request=request)
+
+    with patch.object(spider, "fetch", new_callable=AsyncMock, return_value=resp):
+        crawler = LiteCrawler(spider)
+        await crawler.crawl()
+
+    assert len(crawler.items) == 1
+    assert isinstance(crawler.items[0], Item)
+
+
+@pytest.mark.asyncio
+async def test_crawl_mixed_parse_output():
+    """Test parse yielding both Request and Item"""
+    tracked: list[str] = []
+
+    class MixedSpider(LiteSpider):
+        def __init__(self):
+            super().__init__()
+            self.seen_urls = []
+
+        async def start_requests(self):
+            yield Request("https://example.com/page1")
+
+        async def parse(self, response):
+            self.seen_urls.append(response.url)
+            tracked.append("page")
+            if response.url == "https://example.com/page1":
+                yield Request("https://example.com/page2")
+                tracked.append("forward")
+
+    spider = MixedSpider()
+    req1 = Request("https://example.com/page1")
+    req2 = Request("https://example.com/page2")
+    resp1 = Response(url="https://example.com/page1", headers={}, body=b"1", status=200, request=req1)
+    resp2 = Response(url="https://example.com/page2", headers={}, body=b"2", status=200, request=req2)
+
+    with patch.object(spider, "fetch", AsyncMock(side_effect=[resp1, resp2])):
+        crawler = LiteCrawler(spider, concurrency=2)
+        await crawler.crawl()
+
+    assert len(spider.seen_urls) == 2
+    assert tracked.count("page") == 2
+    assert tracked.count("forward") == 1
+
+
+@pytest.mark.asyncio
+async def test_should_retry_on_status_0():
+    """Test retry on connection failure (status=0)"""
+    spider = SampleLiteSpider(retry=3)
+    request = Request("https://example.com/fail")
+    fail_resp = Response(url="https://example.com/fail", headers={}, body=b"", status=0, request=request)
+    ok_resp = Response(url="https://example.com/fail", headers={}, body=b"ok", status=200, request=request)
+
+    with patch.object(spider, "fetch", AsyncMock(side_effect=[fail_resp, fail_resp, ok_resp])):
+        crawler = LiteCrawler(spider)
+        response = await crawler._fetch_with_retry(request)
+
+    assert response.status == 200
+
+
+@pytest.mark.asyncio
+async def test_should_retry_on_status_500():
+    """Test retry on server error (500)"""
+    spider = SampleLiteSpider(retry=2)
+    request = Request("https://example.com/err")
+    err_resp = Response(url="https://example.com/err", headers={}, body=b"", status=500, request=request)
+    ok_resp = Response(url="https://example.com/err", headers={}, body=b"ok", status=200, request=request)
+
+    with patch.object(spider, "fetch", AsyncMock(side_effect=[err_resp, ok_resp])):
+        crawler = LiteCrawler(spider)
+        response = await crawler._fetch_with_retry(request)
+
+    assert response.status == 200
+
+
+@pytest.mark.asyncio
+async def test_should_retry_on_status_429():
+    """Test retry on rate limit (429)"""
+    spider = SampleLiteSpider(retry=2)
+    request = Request("https://example.com/rate")
+    limit_resp = Response(url="https://example.com/rate", headers={}, body=b"", status=429, request=request)
+    ok_resp = Response(url="https://example.com/rate", headers={}, body=b"ok", status=200, request=request)
+
+    with patch.object(spider, "fetch", AsyncMock(side_effect=[limit_resp, ok_resp])):
+        crawler = LiteCrawler(spider)
+        response = await crawler._fetch_with_retry(request)
+
+    assert response.status == 200
+
+
+@pytest.mark.asyncio
+async def test_no_retry_on_4xx_normal():
+    """Test no retry on normal client errors (400, 404)"""
+    spider = SampleLiteSpider(retry=3)
+    request = Request("https://example.com/404")
+    resp = Response(url="https://example.com/404", headers={}, body=b"", status=404, request=request)
+
+    fetches = []
+
+    async def fetch_side_effect(req):
+        fetches.append(req)
+        return resp
+
+    with patch.object(spider, "fetch", fetch_side_effect):
+        crawler = LiteCrawler(spider)
+        response = await crawler._fetch_with_retry(request)
+
+    assert response.status == 404
+    assert len(fetches) == 1
+
+
+@pytest.mark.asyncio
+async def test_exhausted_retry_returns_last_response():
+    """Test exhausted retry returns the last failed response"""
+    spider = SampleLiteSpider(retry=3)
+    request = Request("https://example.com/fail")
+    fail = Response(url="https://example.com/fail", headers={}, body=b"", status=503, request=request)
+
+    with patch.object(spider, "fetch", AsyncMock(return_value=fail)):
+        crawler = LiteCrawler(spider)
+        response = await crawler._fetch_with_retry(request)
+
+    assert response.status == 503
+
+
+@pytest.mark.asyncio
+async def test_crawl_with_mock_coroutine_parse_backward_compat():
+    """Test backward compatibility: coroutine-style parse still works"""
+    spider = SampleLiteSpider()
+    request = Request("https://example.com/data")
+    resp = Response(url="https://example.com/data", headers={}, body=b"ok", status=200, request=request)
+
+    with patch.object(spider, "fetch", new_callable=AsyncMock, return_value=resp):
+        crawler = LiteCrawler(spider)
+        await crawler.crawl()
+
+    assert spider.responses_handled == 1

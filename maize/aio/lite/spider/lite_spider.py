@@ -98,9 +98,13 @@ class LiteSpider(LiteSpiderInterface):
         """
         raise NotImplementedError
 
-    async def parse(self, response: Response) -> None:
+    async def parse(self, response: Response):
         """
         解析响应。
+
+        两种用法：
+        1. 无需跟进链接：直接 return，与旧版行为一致
+        2. 需要跟进链接或产出数据：yield Request（自动入队继续抓取）或 Item（自动收集）
 
         :param response: HTTP 响应对象
         :raises NotImplementedError: 子类必须实现此方法

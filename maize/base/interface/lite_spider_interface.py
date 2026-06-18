@@ -1,10 +1,11 @@
 from abc import ABC, abstractmethod
 from collections.abc import AsyncGenerator
-from typing import TYPE_CHECKING, Any
+from typing import TYPE_CHECKING, Any, Union
 
 if TYPE_CHECKING:
     from maize.common.http.request import Request
     from maize.common.http.response import Response
+    from maize.common.items import Item
 
 
 class LiteSpiderInterface(ABC):
@@ -35,5 +36,11 @@ class LiteSpiderInterface(ABC):
         """生成起始请求"""
 
     @abstractmethod
-    async def parse(self, response: "Response") -> None:
-        """解析响应"""
+    async def parse(self, response: "Response") -> AsyncGenerator[Union["Request", "Item"], Any] | None:
+        """
+        解析响应。
+
+        两种用法：
+        1. 无需跟进链接：直接 return，与旧版行为一致
+        2. 需要跟进链接或产出数据：yield Request（自动入队继续抓取）或 Item（自动收集）
+        """
