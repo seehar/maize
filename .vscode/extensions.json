@@ -1,9 +1,0 @@
-{
-  "recommendations": [
-    "ms-python.python",
-    "charliermarsh.ruff",
-    "editorconfig.editorconfig",
-    "tamasfe.even-better-toml",
-    "ms-python.vscode-pylance"
-  ]
-}
