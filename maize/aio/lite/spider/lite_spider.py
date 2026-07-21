@@ -8,6 +8,7 @@ import aiohttp
 from maize.aio.lite.crawler import LiteCrawler
 from maize.base.interface.lite_spider_interface import LiteSpiderInterface
 from maize.common.http import Request, Response
+from maize.common.items import Item
 
 
 class LiteSpider(LiteSpiderInterface):
@@ -60,6 +61,27 @@ class LiteSpider(LiteSpiderInterface):
         return self._timeout if self._timeout is not None else 30.0
 
     @property
+    def max_depth(self) -> int:
+        """
+        最大爬取深度，0 表示不限。
+
+        start_requests 产出的请求为 depth=0，parse 中 yield 的 Request
+        每跟进一层 depth + 1。超过 max_depth 的请求会被丢弃。
+        """
+        return 0
+
+    @property
+    def dedup(self) -> bool:
+        """
+        是否启用请求去重，默认 True。
+
+        设为 False 时整个 spider 不做 URL 去重，适合轮询采集、
+        重复抓取同一 URL 监控变化等场景。
+        单个请求仍可用 Request(meta={"dont_filter": True}) 跳过去重。
+        """
+        return True
+
+    @property
     def logger(self) -> logging.Logger:
         """日志记录器"""
         return self._logger
@@ -88,6 +110,16 @@ class LiteSpider(LiteSpiderInterface):
 
     async def on_close(self) -> None:
         """爬虫关闭后调用，可在此处清理数据库连接等资源"""
+
+    async def process_item(self, item: Item) -> None:
+        """
+        处理采集到的数据项。
+
+        在 parse 中 yield Item 后自动调用。子类可重写以实现数据落盘
+        （写文件、写数据库等）。默认空实现，Item 仍会保留在 crawler.items 中。
+
+        :param item: 采集到的数据项
+        """
 
     async def start_requests(self) -> AsyncGenerator[Request, typing.Any]:
         """

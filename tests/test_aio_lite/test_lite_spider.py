@@ -383,3 +383,185 @@ async def test_crawl_with_mock_coroutine_parse_backward_compat():
         await crawler.crawl()
 
     assert spider.responses_handled == 1
+
+
+@pytest.mark.asyncio
+async def test_dedup_drops_duplicate_request():
+    """相同 URL 的重复请求只抓一次（默认 dedup=True）"""
+
+    class DedupSpider(LiteSpider):
+        def __init__(self):
+            super().__init__()
+            self.fetched = []
+
+        async def start_requests(self):
+            yield Request("https://example.com/dup")
+            yield Request("https://example.com/dup")
+            yield Request("https://example.com/other")
+
+        async def parse(self, response):
+            self.fetched.append(response.url)
+
+    spider = DedupSpider()
+    req = Request("https://example.com/dup")
+    req_other = Request("https://example.com/other")
+    resp = Response(url="https://example.com/dup", headers={}, body=b"", status=200, request=req)
+    resp_other = Response(url="https://example.com/other", headers={}, body=b"", status=200, request=req_other)
+
+    with patch.object(spider, "fetch", AsyncMock(side_effect=[resp, resp_other])):
+        crawler = LiteCrawler(spider)
+        await crawler.crawl()
+
+    assert spider.fetched.count("https://example.com/dup") == 1
+    assert "https://example.com/other" in spider.fetched
+
+
+@pytest.mark.asyncio
+async def test_dedup_respects_dont_filter():
+    """meta['dont_filter']=True 的请求跳过去重"""
+
+    class DontFilterSpider(LiteSpider):
+        def __init__(self):
+            super().__init__()
+            self.fetch_count = 0
+
+        async def start_requests(self):
+            yield Request("https://example.com/poll", meta={"dont_filter": True})
+            yield Request("https://example.com/poll", meta={"dont_filter": True})
+
+        async def parse(self, response):
+            self.fetch_count += 1
+
+    spider = DontFilterSpider()
+    req = Request("https://example.com/poll", meta={"dont_filter": True})
+    resp = Response(url="https://example.com/poll", headers={}, body=b"", status=200, request=req)
+
+    with patch.object(spider, "fetch", AsyncMock(side_effect=[resp, resp])):
+        crawler = LiteCrawler(spider)
+        await crawler.crawl()
+
+    assert spider.fetch_count == 2
+
+
+@pytest.mark.asyncio
+async def test_dedup_disabled_globally():
+    """spider.dedup=False 时整个 spider 不去重"""
+
+    class NoDedupSpider(LiteSpider):
+        dedup = False
+
+        def __init__(self):
+            super().__init__()
+            self.fetch_count = 0
+
+        async def start_requests(self):
+            yield Request("https://example.com/repeat")
+            yield Request("https://example.com/repeat")
+
+        async def parse(self, response):
+            self.fetch_count += 1
+
+    spider = NoDedupSpider()
+    req = Request("https://example.com/repeat")
+    resp = Response(url="https://example.com/repeat", headers={}, body=b"", status=200, request=req)
+
+    with patch.object(spider, "fetch", AsyncMock(side_effect=[resp, resp])):
+        crawler = LiteCrawler(spider)
+        await crawler.crawl()
+
+    assert spider.fetch_count == 2
+
+
+@pytest.mark.asyncio
+async def test_max_depth_drops_deep_requests():
+    """max_depth=1 时，depth=2 的请求被丢弃"""
+
+    class DepthSpider(LiteSpider):
+        max_depth = 1
+
+        def __init__(self):
+            super().__init__()
+            self.fetched = []
+
+        async def start_requests(self):
+            yield Request("https://example.com/l0")
+
+        async def parse(self, response):
+            self.fetched.append(response.url)
+            if response.url == "https://example.com/l0":
+                yield Request("https://example.com/l1")  # depth=1, OK
+            elif response.url == "https://example.com/l1":
+                yield Request("https://example.com/l2")  # depth=2, dropped
+
+    spider = DepthSpider()
+    req0 = Request("https://example.com/l0")
+    req1 = Request("https://example.com/l1")
+    resp0 = Response(url="https://example.com/l0", headers={}, body=b"", status=200, request=req0)
+    resp1 = Response(url="https://example.com/l1", headers={}, body=b"", status=200, request=req1)
+
+    with patch.object(spider, "fetch", AsyncMock(side_effect=[resp0, resp1])):
+        crawler = LiteCrawler(spider)
+        await crawler.crawl()
+
+    assert spider.fetched == ["https://example.com/l0", "https://example.com/l1"]
+
+
+@pytest.mark.asyncio
+async def test_process_item_hook_called():
+    """yield Item 时 process_item 被自动调用"""
+
+    class PipelineSpider(LiteSpider):
+        def __init__(self):
+            super().__init__()
+            self.processed = []
+
+        async def start_requests(self):
+            yield Request("https://example.com/data")
+
+        async def parse(self, response):
+            yield Item()
+
+        async def process_item(self, item):
+            self.processed.append(item)
+
+    spider = PipelineSpider()
+    req = Request("https://example.com/data")
+    resp = Response(url="https://example.com/data", headers={}, body=b"", status=200, request=req)
+
+    with patch.object(spider, "fetch", AsyncMock(return_value=resp)):
+        crawler = LiteCrawler(spider)
+        await crawler.crawl()
+
+    assert len(spider.processed) == 1
+    assert len(crawler.items) == 1
+
+
+@pytest.mark.asyncio
+async def test_callback_routing():
+    """Request(callback=custom) 路由到自定义回调，而非 parse"""
+
+    class CallbackSpider(LiteSpider):
+        def __init__(self):
+            super().__init__()
+            self.parse_called = False
+            self.detail_called = False
+
+        async def start_requests(self):
+            yield Request("https://example.com/list", callback=self.parse_detail)
+
+        async def parse(self, response):
+            self.parse_called = True
+
+        async def parse_detail(self, response):
+            self.detail_called = True
+
+    spider = CallbackSpider()
+    req = Request("https://example.com/list", callback=spider.parse_detail)
+    resp = Response(url="https://example.com/list", headers={}, body=b"", status=200, request=req)
+
+    with patch.object(spider, "fetch", AsyncMock(return_value=resp)):
+        crawler = LiteCrawler(spider)
+        await crawler.crawl()
+
+    assert spider.detail_called is True
+    assert spider.parse_called is False

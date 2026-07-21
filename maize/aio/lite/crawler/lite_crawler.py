@@ -31,6 +31,7 @@ class LiteCrawler:
         self.spider = spider
         self.concurrency = concurrency if concurrency is not None else spider.concurrency
         self._items: list[Item] = []
+        self._seen: set[str] = set()
         self._logger = logging.getLogger(f"maize.lite.crawler.{self.__class__.__name__}")
 
     @property
@@ -42,6 +43,33 @@ class LiteCrawler:
     def items(self) -> list[Item]:
         """parse 中 yield 出的 Item 列表"""
         return list(self._items)
+
+    async def _enqueue(self, request: Request, request_queue: asyncio.Queue) -> bool:
+        """
+        入队前的过滤：深度控制 + 去重。
+
+        :returns: True 表示已入队，False 表示被丢弃
+        """
+        # 深度初始化：start_requests 产出的请求默认 depth=0
+        if "_lite_depth" not in request.meta:
+            request.meta["_lite_depth"] = 0
+
+        depth = request.meta["_lite_depth"]
+        max_depth = self.spider.max_depth
+        if max_depth > 0 and depth > max_depth:
+            self.logger.debug(f"Drop request (depth={depth} > max_depth={max_depth}): {request.url}")
+            return False
+
+        # 去重：spider.dedup 全局开关 + dont_filter 单请求逃生口
+        if self.spider.dedup and not request.meta.get("dont_filter", False):
+            req_hash = request.hash
+            if req_hash in self._seen:
+                self.logger.debug(f"Drop duplicate request: {request.url}")
+                return False
+            self._seen.add(req_hash)
+
+        await request_queue.put(request)
+        return True
 
     async def crawl(self) -> None:
         """
@@ -64,7 +92,7 @@ class LiteCrawler:
             nonlocal start_requests_done
             try:
                 async for request in self.spider.start_requests():
-                    await request_queue.put(request)
+                    await self._enqueue(request, request_queue)
             finally:
                 start_requests_done = True
 
@@ -93,6 +121,8 @@ class LiteCrawler:
 
     async def _process(self, request: Request, request_queue: asyncio.Queue) -> None:
         """处理单个请求：fetch + parse + 处理产出"""
+        parent_depth = request.meta.get("_lite_depth", 0)
+
         try:
             response = await self._fetch_with_retry(request)
         except Exception as e:
@@ -100,14 +130,21 @@ class LiteCrawler:
             request_queue.task_done()
             return
 
+        callback = request.callback or self.spider.parse
+
         try:
-            result = self.spider.parse(response)
+            result = callback(response)
             if hasattr(result, "__anext__"):
                 async for output in result:
                     if isinstance(output, Request):
-                        await request_queue.put(output)
+                        output.meta["_lite_depth"] = parent_depth + 1
+                        await self._enqueue(output, request_queue)
                     elif isinstance(output, Item):
                         self._items.append(output)
+                        try:
+                            await self.spider.process_item(output)
+                        except Exception as e:
+                            self.logger.error(f"process_item error for {request.url}: {e}")
             else:
                 await result
         except Exception as e:
