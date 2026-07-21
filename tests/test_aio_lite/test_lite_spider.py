@@ -565,3 +565,221 @@ async def test_callback_routing():
 
     assert spider.detail_called is True
     assert spider.parse_called is False
+
+
+@pytest.mark.asyncio
+async def test_stats_count_succeeded_failed():
+    """stats 正确统计 succeeded / failed / requested / items"""
+
+    class StatsSpider(LiteSpider):
+        async def start_requests(self):
+            yield Request("https://example.com/ok1")
+            yield Request("https://example.com/ok2")
+            yield Request("https://example.com/notfound")
+
+        async def parse(self, response):
+            yield Item()
+
+    spider = StatsSpider()
+    r1 = Request("https://example.com/ok1")
+    r2 = Request("https://example.com/ok2")
+    r3 = Request("https://example.com/notfound")
+    resp1 = Response(url="https://example.com/ok1", headers={}, body=b"", status=200, request=r1)
+    resp2 = Response(url="https://example.com/ok2", headers={}, body=b"", status=200, request=r2)
+    resp3 = Response(url="https://example.com/notfound", headers={}, body=b"", status=404, request=r3)
+
+    with patch.object(spider, "fetch", AsyncMock(side_effect=[resp1, resp2, resp3])):
+        crawler = LiteCrawler(spider)
+        await crawler.crawl()
+
+    assert crawler.stats["requested"] == 3
+    assert crawler.stats["succeeded"] == 2
+    assert crawler.stats["failed"] == 1
+    assert crawler.stats["items"] == 3
+
+
+@pytest.mark.asyncio
+async def test_stats_count_dropped():
+    """stats 正确统计 dropped（去重丢弃）"""
+
+    class DropStatsSpider(LiteSpider):
+        async def start_requests(self):
+            yield Request("https://example.com/dup")
+            yield Request("https://example.com/dup")
+            yield Request("https://example.com/dup")
+
+        async def parse(self, response):
+            pass
+
+    spider = DropStatsSpider()
+    req = Request("https://example.com/dup")
+    resp = Response(url="https://example.com/dup", headers={}, body=b"", status=200, request=req)
+
+    with patch.object(spider, "fetch", AsyncMock(side_effect=[resp])):
+        crawler = LiteCrawler(spider)
+        await crawler.crawl()
+
+    assert crawler.stats["requested"] == 1
+    assert crawler.stats["dropped"] == 2
+
+
+@pytest.mark.asyncio
+async def test_stats_count_retried():
+    """stats 正确统计 retried（500 -> 200 触发一次重试）"""
+
+    class RetryStatsSpider(LiteSpider):
+        def __init__(self):
+            super().__init__(retry=3)
+
+        async def start_requests(self):
+            yield Request("https://example.com/flaky")
+
+        async def parse(self, response):
+            pass
+
+    spider = RetryStatsSpider()
+    req = Request("https://example.com/flaky")
+    resp_fail = Response(url="https://example.com/flaky", headers={}, body=b"", status=500, request=req)
+    resp_ok = Response(url="https://example.com/flaky", headers={}, body=b"", status=200, request=req)
+
+    with patch.object(spider, "fetch", AsyncMock(side_effect=[resp_fail, resp_ok])):
+        crawler = LiteCrawler(spider)
+        await crawler.crawl()
+
+    assert crawler.stats["retried"] == 1
+    assert crawler.stats["succeeded"] == 1
+
+
+@pytest.mark.asyncio
+async def test_priority_queue_orders_requests():
+    """priority 高的请求先出队（priority 数值越小越优先）"""
+
+    class PrioritySpider(LiteSpider):
+        def __init__(self):
+            super().__init__()
+            self.fetched_order = []
+
+        async def start_requests(self):
+            yield Request("https://example.com/low", priority=10)
+            yield Request("https://example.com/high", priority=1)
+            yield Request("https://example.com/mid", priority=5)
+
+        async def parse(self, response):
+            self.fetched_order.append(response.url)
+
+    spider = PrioritySpider()
+    r_low = Request("https://example.com/low", priority=10)
+    r_high = Request("https://example.com/high", priority=1)
+    r_mid = Request("https://example.com/mid", priority=5)
+    resp_low = Response(url="https://example.com/low", headers={}, body=b"", status=200, request=r_low)
+    resp_high = Response(url="https://example.com/high", headers={}, body=b"", status=200, request=r_high)
+    resp_mid = Response(url="https://example.com/mid", headers={}, body=b"", status=200, request=r_mid)
+
+    # 并发=1 保证顺序可预测
+    with patch.object(spider, "fetch", AsyncMock(side_effect=[resp_high, resp_mid, resp_low])):
+        crawler = LiteCrawler(spider, concurrency=1)
+        await crawler.crawl()
+
+    assert spider.fetched_order == ["https://example.com/high", "https://example.com/mid", "https://example.com/low"]
+
+
+@pytest.mark.asyncio
+async def test_priority_queue_tie_breaker():
+    """同 priority 的请求按入队顺序出队，不报错"""
+
+    class TieSpider(LiteSpider):
+        def __init__(self):
+            super().__init__()
+            self.fetched_order = []
+
+        async def start_requests(self):
+            yield Request("https://example.com/a")  # priority=0
+            yield Request("https://example.com/b")  # priority=0
+            yield Request("https://example.com/c")  # priority=0
+
+        async def parse(self, response):
+            self.fetched_order.append(response.url)
+
+    spider = TieSpider()
+    r_a = Request("https://example.com/a")
+    r_b = Request("https://example.com/b")
+    r_c = Request("https://example.com/c")
+    resp_a = Response(url="https://example.com/a", headers={}, body=b"", status=200, request=r_a)
+    resp_b = Response(url="https://example.com/b", headers={}, body=b"", status=200, request=r_b)
+    resp_c = Response(url="https://example.com/c", headers={}, body=b"", status=200, request=r_c)
+
+    with patch.object(spider, "fetch", AsyncMock(side_effect=[resp_a, resp_b, resp_c])):
+        crawler = LiteCrawler(spider, concurrency=1)
+        await crawler.crawl()
+
+    assert spider.fetched_order == ["https://example.com/a", "https://example.com/b", "https://example.com/c"]
+
+
+@pytest.mark.asyncio
+async def test_default_headers_set_on_session():
+    """open() 后 ClientSession 含默认 UA"""
+    spider = SampleLiteSpider()
+    await spider.open()
+    try:
+        # aiohttp ClientSession.headers 是 CIMultiDict
+        assert spider._session.headers.get("User-Agent") == "maize-lite/1.0"
+    finally:
+        await spider.close()
+
+
+@pytest.mark.asyncio
+async def test_custom_default_headers():
+    """子类重写 default_headers 后 UA 被覆盖"""
+
+    class CustomHeaderSpider(LiteSpider):
+        @property
+        def default_headers(self):
+            return {"User-Agent": "my-spider/2.0", "Accept": "application/json"}
+
+        async def start_requests(self):
+            yield Request("https://example.com")
+
+        async def parse(self, response):
+            pass
+
+    spider = CustomHeaderSpider()
+    await spider.open()
+    try:
+        assert spider._session.headers.get("User-Agent") == "my-spider/2.0"
+        assert spider._session.headers.get("Accept") == "application/json"
+    finally:
+        await spider.close()
+
+
+@pytest.mark.asyncio
+async def test_graceful_shutdown_calls_on_close():
+    """正常完成流程下 on_close 被调用，in-flight 请求完成"""
+
+    class ShutdownSpider(LiteSpider):
+        def __init__(self):
+            super().__init__()
+            self.on_close_called = False
+            self.processed = []
+
+        async def start_requests(self):
+            yield Request("https://example.com/p1")
+            yield Request("https://example.com/p2")
+
+        async def parse(self, response):
+            self.processed.append(response.url)
+
+        async def on_close(self):
+            self.on_close_called = True
+
+    spider = ShutdownSpider()
+    r1 = Request("https://example.com/p1")
+    r2 = Request("https://example.com/p2")
+    resp1 = Response(url="https://example.com/p1", headers={}, body=b"", status=200, request=r1)
+    resp2 = Response(url="https://example.com/p2", headers={}, body=b"", status=200, request=r2)
+
+    with patch.object(spider, "fetch", AsyncMock(side_effect=[resp1, resp2])):
+        crawler = LiteCrawler(spider)
+        await crawler.crawl()
+
+    assert spider.on_close_called is True
+    assert len(spider.processed) == 2

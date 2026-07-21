@@ -82,6 +82,18 @@ class LiteSpider(LiteSpiderInterface):
         return True
 
     @property
+    def default_headers(self) -> dict[str, str]:
+        """
+        默认请求头，在 ``open()`` 时合入 ClientSession。
+
+        子类可重写以定制 UA、Accept 等请求头。per-request 的 ``Request.headers``
+        仍优先于 session 级 headers。不引入中间件，保持 Lite 轻量。
+        """
+        return {
+            "User-Agent": "maize-lite/1.0",
+        }
+
+    @property
     def logger(self) -> logging.Logger:
         """日志记录器"""
         return self._logger
@@ -90,10 +102,14 @@ class LiteSpider(LiteSpiderInterface):
         """
         初始化资源。
 
-        创建 aiohttp ClientSession，子类可重写 ``on_start`` 做额外初始化。
+        创建 aiohttp ClientSession，合入 ``default_headers``，
+        子类可重写 ``on_start`` 做额外初始化。
         """
         timeout = aiohttp.ClientTimeout(total=self.timeout)
-        self._session = aiohttp.ClientSession(timeout=timeout)
+        self._session = aiohttp.ClientSession(
+            timeout=timeout,
+            headers=self.default_headers,
+        )
 
     async def close(self) -> None:
         """
@@ -193,12 +209,16 @@ class LiteSpider(LiteSpiderInterface):
 
     def run(self) -> None:
         """
-        快捷运行方法。
+        快捷运行方法（支持优雅关闭）。
 
-        同步入口，内部创建事件循环执行爬虫。
-        适用于简单场景，复杂场景请自行管理事件循环。
+        同步入口，内部创建事件循环执行爬虫。Ctrl+C / SIGTERM 时，
+        ``LiteCrawler`` 会停止接受新请求并等待 in-flight 请求完成后退出，
+        保证 ``on_close`` 钩子被执行以清理资源。
         """
-        asyncio.run(self._run())
+        try:
+            asyncio.run(self._run())
+        except KeyboardInterrupt:
+            self.logger.info("收到中断信号，爬虫已停止")
 
     async def _run(self) -> None:
         """内部异步运行逻辑，创建 LiteCrawler 并执行爬虫流程"""
