@@ -57,7 +57,7 @@ class CustomPipeline(BasePipeline):
         :return: True 表示处理成功，False 表示失败（会触发重试）
         """
         for item in items:
-            print(f"处理数据: {item.to_dict()}")
+            self.logger.info(f"处理数据: {item.to_dict()}")
             # 处理逻辑，如保存到数据库
 
         return True  # 返回 True 表示处理成功
@@ -135,7 +135,7 @@ class ConsolePipeline(BasePipeline):
 
     async def process_item(self, items: List[Item]) -> bool:
         for item in items:
-            print(f"[数据] {item.to_dict()}")
+            self.logger.info(f"[数据] {item.to_dict()}")
         return True
 ```
 

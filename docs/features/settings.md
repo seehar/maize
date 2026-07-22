@@ -22,7 +22,7 @@ maize 支持多种配置方式，按优先级从高到低排列：
 ### 基础配置
 
 ```python
-from maize import Spider, SpiderSettings
+from maize import Spider, SpiderSettings, SpiderDownloaderEnum, LogLevelEnum
 
 
 class MySpider(Spider):
@@ -34,8 +34,8 @@ if __name__ == "__main__":
     settings = SpiderSettings(
         project_name="我的爬虫项目",
         concurrency=10,
-        log_level="INFO",
-        downloader="maize.HTTPXDownloader"
+        log_level=LogLevelEnum.INFO.value,
+        downloader=SpiderDownloaderEnum.HTTPX.value
     )
 
     MySpider().run(settings=settings)
@@ -44,14 +44,14 @@ if __name__ == "__main__":
 ### 嵌套配置
 
 ```python
-from maize import SpiderSettings
+from maize import SpiderSettings, LogLevelEnum
 from maize.settings.spider_settings import RequestSettings, PipelineSettings
 
 
 settings = SpiderSettings(
     project_name="高级爬虫",
     concurrency=20,
-    log_level="DEBUG",
+    log_level=LogLevelEnum.DEBUG.value,
 )
 
 # 配置请求参数
@@ -79,21 +79,21 @@ settings.mysql.password = "password"
 
 ```python
 # settings.py
-from maize import SpiderSettings
+from maize import SpiderSettings, SpiderDownloaderEnum, LogLevelEnum
 
 
 class Settings(SpiderSettings):
     # 基础配置
-    project_name = "我的爬虫项目"
-    concurrency = 10
-    log_level = "INFO"
-    downloader = "maize.AioHttpDownloader"
+    project_name: str = "我的爬虫项目"
+    concurrency: int = 10
+    log_level: str = LogLevelEnum.INFO.value
+    downloader: str = SpiderDownloaderEnum.AIOHTTP.value
 
     # 日志处理器
-    logger_handler = ""
+    logger_handler: str = ""
 
     # 分布式配置
-    is_distributed = False
+    is_distributed: bool = False
 ```
 
 在爬虫中引用：
@@ -109,14 +109,14 @@ if __name__ == "__main__":
 在 Spider 类中直接配置：
 
 ```python
-from maize import Spider
+from maize import Spider, SpiderDownloaderEnum, LogLevelEnum
 
 
 class MySpider(Spider):
     custom_settings = {
         "concurrency": 5,
-        "log_level": "DEBUG",
-        "downloader": "maize.HTTPXDownloader",
+        "log_level": LogLevelEnum.DEBUG.value,
+        "downloader": SpiderDownloaderEnum.HTTPX.value,
         "request": {
             "verify_ssl": False,
             "request_timeout": 30,
@@ -142,7 +142,7 @@ class MySpider(Spider):
 PROJECT_NAME=我的爬虫
 CONCURRENCY=10
 LOG_LEVEL=INFO
-DOWNLOADER=maize.HTTPXDownloader
+DOWNLOADER=maize.AioHttpDownloader
 
 # 请求配置（使用点号分隔嵌套配置）
 REQUEST.VERIFY_SSL=false
@@ -184,7 +184,7 @@ export REQUEST.VERIFY_SSL=false
 project_name: 我的爬虫项目
 concurrency: 10
 log_level: INFO
-downloader: maize.HTTPXDownloader
+downloader: maize.AioHttpDownloader  # 或 maize.HTTPXDownloader / maize.downloader.playwright_downloader.PlaywrightDownloader
 
 request:
   verify_ssl: false
@@ -220,7 +220,7 @@ redis:
 project_name = "我的爬虫项目"
 concurrency = 10
 log_level = "INFO"
-downloader = "maize.HTTPXDownloader"
+downloader = "maize.AioHttpDownloader"  # 或 "maize.HTTPXDownloader" / "maize.downloader.playwright_downloader.PlaywrightDownloader"
 
 [request]
 verify_ssl = false
@@ -255,8 +255,8 @@ password = "your_password"
 |:-----------------|:-------|:-------------------------|:---------------|
 | `project_name`   | `str`  | `"project name"`         | 项目名称           |
 | `concurrency`    | `int`  | `1`                      | 并发数            |
-| `downloader`     | `str`  | `"maize.AioHttpDownloader"` | 下载器类路径         |
-| `log_level`      | `str`  | `"INFO"`                 | 日志级别           |
+| `downloader`     | `str`  | `SpiderDownloaderEnum.AIOHTTP.value` | 下载器类路径         |
+| `log_level`      | `str`  | `LogLevelEnum.INFO.value` | 日志级别           |
 | `logger_handler` | `str`  | `""`                     | 自定义日志处理器类路径    |
 | `is_distributed` | `bool` | `False`                  | 是否使用分布式爬虫      |
 | `maize_cob_api`  | `str`  | `""`                     | maize-cob API 地址 |
@@ -285,7 +285,7 @@ settings.request.random_wait_time = (1, 3)  # 每次请求前随机等待1-3秒
 
 | 配置项                          | 类型           | 默认值                           | 说明                      |
 |:-----------------------------|:-------------|:------------------------------|:------------------------|
-| `pipelines`                  | `List[str]`  | `["maize.BasePipeline"]`      | 数据管道列表                  |
+| `pipelines`                  | `List[str]`  | `[PipelineEnum.EMPTY.value]` | 数据管道列表                  |
 | `max_cache_count`            | `int`        | `5000`                        | item 在内存队列中最大缓存数量       |
 | `handle_batch_max_size`      | `int`        | `1000`                        | item 每批入库的最大数量          |
 | `handle_interval`            | `int`        | `2`                           | item 入库时间间隔（秒）          |
@@ -332,8 +332,9 @@ settings.pipeline.handle_interval = 5
 使用示例：
 
 ```python
+from maize import SpiderDownloaderEnum
 settings = SpiderSettings(
-    downloader="maize.downloader.playwright_downloader.PlaywrightDownloader"
+    downloader=SpiderDownloaderEnum.PLAYWRIGHT.value
 )
 settings.rpa.headless = False  # 显示浏览器窗口
 settings.rpa.driver_type = "chromium"
@@ -416,6 +417,83 @@ settings.mysql.user = "root"
 settings.mysql.password = "password"
 ```
 
+### 中间件配置（MiddlewareSettings）
+
+中间件配置用于 Classic 模式，支持三层中间件：下载器中间件、爬虫中间件、管道中间件。
+
+| 配置项 | 类型 | 默认值 | 说明 |
+|:------|:-----|:------|:-----|
+| `downloader_middlewares` | `dict[str \| type, int]` | `{}` | 下载器中间件，key 为类路径，value 为优先级 |
+| `spider_middlewares` | `dict[str \| type, int]` | `{}` | 爬虫中间件 |
+| `pipeline_middlewares` | `dict[str \| type, int]` | `{}` | 管道中间件 |
+| `enable_builtin_middlewares` | `bool` | `True` | 是否启用内置中间件 |
+
+优先级为整数，数字越小越先执行（`process_response` 等反向方法除外）。建议范围：
+
+| 范围 | 用途 |
+|:----|:----|
+| 0-99 | 系统保留 |
+| 100-299 | 内置中间件 |
+| 300-599 | 第三方中间件 |
+| 600-999 | 自定义中间件 |
+
+使用示例：
+
+```python
+settings = SpiderSettings()
+
+# 方式一：使用类路径字符串
+settings.middleware.downloader_middlewares = {
+    "my_project.middleware.CustomMiddleware": 100,
+    "maize.middleware.downloader.RetryMiddleware": 200,
+}
+
+# 方式二：使用类对象
+from maize.middleware.downloader import RetryMiddleware
+settings.middleware.downloader_middlewares = {
+    RetryMiddleware: 200,
+}
+
+settings.middleware.spider_middlewares = {
+    "maize.middleware.spider.DepthMiddleware": 100,
+}
+
+settings.middleware.pipeline_middlewares = {
+    "maize.middleware.pipeline.ItemValidationMiddleware": 100,
+}
+```
+
+在配置文件中（YAML）：
+
+```yaml
+middleware:
+  downloader_middlewares:
+    myproject.middlewares.CustomMiddleware: 100
+    maize.middleware.downloader.RetryMiddleware: 200
+  spider_middlewares:
+    maize.middleware.spider.DepthMiddleware: 100
+  pipeline_middlewares:
+    maize.middleware.pipeline.ItemValidationMiddleware: 100
+```
+
+在 `custom_settings` 中：
+
+```python
+class MySpider(Spider):
+    custom_settings = {
+        "middleware": {
+            "downloader_middlewares": {
+                "maize.middleware.downloader.UserAgentMiddleware": 100,
+            },
+            "spider_middlewares": {
+                "maize.middleware.spider.DepthMiddleware": 100,
+            },
+        }
+    }
+```
+
+内置中间件详见 [中间件系统](middleware.md)。
+
 ## 最佳实践
 
 ### 1. 开发与生产环境分离
@@ -428,9 +506,9 @@ from maize import SpiderSettings
 
 class Settings(SpiderSettings):
     # 从环境变量读取配置
-    project_name = os.getenv("PROJECT_NAME", "我的爬虫")
-    concurrency = int(os.getenv("CONCURRENCY", "10"))
-    log_level = os.getenv("LOG_LEVEL", "INFO")
+    project_name: str = os.getenv("PROJECT_NAME", "我的爬虫")
+    concurrency: int = int(os.getenv("CONCURRENCY", "10"))
+    log_level: str = os.getenv("LOG_LEVEL", "INFO")
 
 
 # 开发环境：.env.dev
@@ -477,13 +555,13 @@ settings = validate_settings(SpiderSettings())
 
 ```python
 # base_settings.py
-from maize import SpiderSettings
+from maize import SpiderSettings, LogLevelEnum
 
 
 class BaseSettings(SpiderSettings):
     """基础配置，所有爬虫共享"""
-    log_level = "INFO"
-    concurrency = 10
+    log_level: str = LogLevelEnum.INFO.value
+    concurrency: int = 10
 
 
 # spider1_settings.py
@@ -501,3 +579,4 @@ class Spider1Settings(BaseSettings):
 - [Request 详解](request.md) - 请求参数说明
 - [Pipeline 管道](pipeline.md) - 数据管道配置
 - [下载器](downloader.md) - 下载器配置与自定义
+- [中间件系统](middleware.md) - 中间件配置与自定义

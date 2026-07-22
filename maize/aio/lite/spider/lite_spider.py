@@ -9,6 +9,7 @@ from maize.aio.lite.crawler import LiteCrawler
 from maize.base.interface.lite_spider_interface import LiteSpiderInterface
 from maize.common.http import Request, Response
 from maize.common.items import Item
+from maize.utils.log_util import get_logger
 
 
 class LiteSpider(LiteSpiderInterface):
@@ -22,6 +23,7 @@ class LiteSpider(LiteSpiderInterface):
     :param retry: 请求失败重试次数，默认 3
     :param proxy: 代理地址，默认 None
     :param timeout: 请求超时时间（秒），默认 30.0
+    :param log_level: 日志级别，默认 "INFO"
     """
 
     def __init__(
@@ -30,15 +32,17 @@ class LiteSpider(LiteSpiderInterface):
         retry: int | None = None,
         proxy: str | None = None,
         timeout: float | None = None,
+        log_level: str | None = None,
     ):
         super().__init__()
         self._concurrency = concurrency
         self._retry = retry
         self._proxy = proxy
         self._timeout = timeout
+        self._log_level = log_level
 
         self._session: aiohttp.ClientSession | None = None
-        self._logger = logging.getLogger(f"maize.lite.{self.__class__.__name__}")
+        self._logger: logging.Logger = logging.getLogger(f"maize.lite.{self.__class__.__name__}")
 
     @property
     def concurrency(self) -> int:
@@ -104,6 +108,11 @@ class LiteSpider(LiteSpiderInterface):
         }
 
     @property
+    def log_level(self) -> str:
+        """日志级别，默认 INFO"""
+        return self._log_level if self._log_level is not None else "INFO"
+
+    @property
     def logger(self) -> logging.Logger:
         """日志记录器"""
         return self._logger
@@ -113,8 +122,13 @@ class LiteSpider(LiteSpiderInterface):
         初始化资源。
 
         创建 aiohttp ClientSession，合入 ``default_headers``，
+        并通过 ``get_logger`` 初始化日志记录器（支持自定义日志格式和 handler）。
         子类可重写 ``on_start`` 做额外初始化。
         """
+        self._logger = get_logger(
+            name=f"maize.lite.{self.__class__.__name__}",
+            log_level=self.log_level,
+        )
         timeout = aiohttp.ClientTimeout(total=self.timeout)
         self._session = aiohttp.ClientSession(
             timeout=timeout,

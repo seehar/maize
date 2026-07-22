@@ -41,8 +41,8 @@ class BaiduSpider(Spider):
 item = BaiduItem()
 item["url"] = "https://www.baidu.com"
 item["title"] = "百度一下"
-print(item["url"])
-print(item["title"])
+logging.info(item["url"])
+logging.info(item["title"])
 ```
 
 
@@ -52,6 +52,6 @@ print(item["title"])
 item = BaiduItem()
 item.url = "https://www.baidu.com"
 item.title = "百度一下"
-print(item.url)
-print(item.title)
+logging.info(item.url)
+logging.info(item.title)
 ```

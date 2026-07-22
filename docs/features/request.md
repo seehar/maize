@@ -45,7 +45,7 @@ class MySpider(Spider):
         )
 
     async def parse_detail(self, response: Response):
-        print(response.text)
+        self.logger.info(response.text)
 ```
 
 ## 参数详解
@@ -268,7 +268,7 @@ class MySpider(Spider):
         )
 
     async def parse(self, response: Response):
-        print(response.text)
+        self.logger.info(response.text)
 
     async def handle_error(self, request: Request):
         """处理请求失败"""
@@ -320,11 +320,11 @@ yield Request(
 request = Request(url="http://www.example.com", meta={"key": "value"})
 
 # 访问属性
-print(request.url)              # URL
-print(request.method)           # 请求方法
-print(request.priority)         # 优先级
-print(request.meta)             # 自定义数据
-print(request.current_retry_count)  # 当前重试次数
+logging.info(request.url)              # URL
+logging.info(request.method)           # 请求方法
+logging.info(request.priority)         # 优先级
+logging.info(request.meta)             # 自定义数据
+logging.info(request.current_retry_count)  # 当前重试次数
 ```
 
 ### 方法

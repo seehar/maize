@@ -116,14 +116,14 @@ await mysql.close()
 ```python
 # 不带参数的查询
 result = await mysql.fetchone("SELECT * FROM users LIMIT 1")
-print(result)  # {'id': 1, 'name': 'Alice', 'age': 25}
+logging.info(result)  # {'id': 1, 'name': 'Alice', 'age': 25}
 
 # 参数化查询
 user = await mysql.fetchone(
     "SELECT * FROM users WHERE id = %s",
     args=(1,)
 )
-print(user['name'])  # Alice
+logging.info(user['name'])  # Alice
 
 # 使用命名参数
 user = await mysql.fetchone(
@@ -147,7 +147,7 @@ user = await mysql.fetchone(
 # 查询所有用户
 users = await mysql.fetchall("SELECT * FROM users")
 for user in users:
-    print(f"{user['id']}: {user['name']}")
+    logging.info(f"{user['id']}: {user['name']}")
 
 # 带条件的查询
 active_users = await mysql.fetchall(
@@ -179,21 +179,21 @@ rows = await mysql.execute(
     "INSERT INTO users (name, age, email) VALUES (%s, %s, %s)",
     args=('Bob', 30, 'bob@example.com')
 )
-print(f"插入了 {rows} 行")
+logging.info(f"插入了 {rows} 行")
 
 # 更新数据
 rows = await mysql.execute(
     "UPDATE users SET age = %s WHERE name = %s",
     args=(31, 'Bob')
 )
-print(f"更新了 {rows} 行")
+logging.info(f"更新了 {rows} 行")
 
 # 删除数据
 rows = await mysql.execute(
     "DELETE FROM users WHERE age > %s",
     args=(100,)
 )
-print(f"删除了 {rows} 行")
+logging.info(f"删除了 {rows} 行")
 ```
 
 ### executemany() - 批量执行操作
@@ -219,7 +219,7 @@ rows = await mysql.executemany(
     "INSERT INTO users (name, age, email) VALUES (%s, %s, %s)",
     args=users_data
 )
-print(f"批量插入了 {rows} 行")
+logging.info(f"批量插入了 {rows} 行")
 
 # 批量更新
 updates = [
@@ -232,7 +232,7 @@ rows = await mysql.executemany(
     "UPDATE users SET age = %s WHERE name = %s",
     args=updates
 )
-print(f"批量更新了 {rows} 行")
+logging.info(f"批量更新了 {rows} 行")
 ```
 
 ## 完整使用示例
@@ -429,12 +429,12 @@ async def transfer_money(mysql: MysqlUtil, from_user_id: int, to_user_id: int, a
 
                 # 提交事务
                 await conn.commit()
-                print("转账成功")
+                logging.info("转账成功")
 
             except Exception as e:
                 # 回滚事务
                 await conn.rollback()
-                print(f"转账失败，已回滚: {e}")
+                logging.info(f"转账失败，已回滚: {e}")
                 raise
 ```
 
@@ -493,9 +493,9 @@ await mysql.executemany(
 try:
     result = await mysql.fetchone("SELECT * FROM users WHERE id = %s", args=(1,))
     if result:
-        print(result['name'])
+        logging.info(result['name'])
     else:
-        print("用户不存在")
+        logging.info("用户不存在")
 except Exception as e:
     logger.error(f"数据库查询失败: {e}")
     # 进行错误处理

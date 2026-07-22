@@ -49,11 +49,11 @@ class LiteCrawler:
             "items": 0,
         }
         self._domain_semaphores: dict[str, asyncio.Semaphore] = {}
-        self._logger = logging.getLogger(f"maize.lite.crawler.{self.__class__.__name__}")
+        self._logger = spider.logger
 
     @property
     def logger(self) -> logging.Logger:
-        """日志记录器"""
+        """日志记录器（复用 spider 的 logger）"""
         return self._logger
 
     @property

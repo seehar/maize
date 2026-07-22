@@ -56,6 +56,7 @@ nav:
       - 使用前必读: use/before_use.md
       - 配置说明: features/settings.md
   - 核心组件:
+      - Lite 轻量爬虫: features/lite_spider.md
       - Spider 进阶: features/spider.md
       - TaskSpider 任务爬虫: features/task_spider.md
       - Request 请求: features/request.md
@@ -63,11 +64,12 @@ nav:
       - Item 数据项: features/item.md
       - Pipeline 管道: features/pipeline.md
       - Downloader 下载器: features/downloader.md
+      - 中间件系统: features/middleware.md
+      - 中间件速查: features/middleware_quick_reference.md
   - 工具类:
       - MysqlUtil: features/mysql_util.md
       - RedisUtil: features/redis_util.md
       - 日志配置: features/log.md
-
 markdown_extensions:
   - abbr
   - admonition

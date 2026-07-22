@@ -46,18 +46,15 @@ class LoggerManager:
         # 如果没有传入 spider_settings，则从上下文中获取
         if spider_settings is None:
             spider_settings = get_spider_settings()
-            if spider_settings is None:
-                raise ValueError(
-                    "spider_settings is required. Please pass it explicitly or set it using set_spider_settings()"
-                )
 
         key = (name, log_level)
 
         def get_logger_handler():
-            logger_handler_path = spider_settings.logger_handler
-            if logger_handler_path:
-                logger_handler_cls = load_class(logger_handler_path)
-                return logger_handler_cls()
+            if spider_settings is not None:
+                logger_handler_path = spider_settings.logger_handler
+                if logger_handler_path:
+                    logger_handler_cls = load_class(logger_handler_path)
+                    return logger_handler_cls()
             logger_formatter = Formatter(log_format)
             logger_handler = StreamHandler(stream=sys.stdout)
             logger_handler.setFormatter(logger_formatter)

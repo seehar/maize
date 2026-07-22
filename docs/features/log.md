@@ -21,12 +21,12 @@ maize 支持以下日志级别（按严重程度递增）：
 ### 在配置中设置日志级别
 
 ```python
-from maize import SpiderSettings
+from maize import SpiderSettings, LogLevelEnum
 
 
 settings = SpiderSettings(
     project_name="我的爬虫",
-    log_level="INFO"  # 设置日志级别
+    log_level = LogLevelEnum.INFO.value  # 设置日志级别
 )
 ```
 
@@ -34,11 +34,11 @@ settings = SpiderSettings(
 
 ```python
 # settings.py
-from maize import SpiderSettings
+from maize import SpiderSettings, LogLevelEnum
 
 
 class Settings(SpiderSettings):
-    log_level = "DEBUG"  # 开发时使用 DEBUG
+    log_level: str = LogLevelEnum.DEBUG.value  # 开发时使用 DEBUG
 ```
 
 ### 在爬虫中使用日志
@@ -140,14 +140,14 @@ from maize import SpiderSettings
 
 
 class Settings(SpiderSettings):
-    logger_handler = "your_project.logger_util.InterceptHandler"
+    logger_handler: str = "your_project.logger_util.InterceptHandler"
 ```
 
 或使用 SpiderSettings 对象：
 
 ```python
 settings = SpiderSettings(
-    logger_handler="your_project.logger_util.InterceptHandler"
+    logger_handler: str = "your_project.logger_util.InterceptHandler"
 )
 ```
 
@@ -437,13 +437,14 @@ self.logger.info("处理完成", extra={"url": "http://example.com", "items": 10
 ### 1. 开发和生产环境分离
 
 ```python
+from maize import LogLevelEnum
 # 开发环境：详细日志、彩色输出
 if os.getenv("ENV") == "dev":
-    log_level = "DEBUG"
+    log_level = LogLevelEnum.DEBUG.value
     colorize = True
 else:
     # 生产环境：简洁日志、文件输出
-    log_level = "INFO"
+    log_level = LogLevelEnum.INFO.value
     colorize = False
 ```
 
@@ -545,10 +546,10 @@ def analyze_log(log_file):
                 if level in ('ERROR', 'CRITICAL'):
                     errors.append(line.strip())
 
-    print(f"日志统计: {dict(levels)}")
-    print(f"\n错误日志 ({len(errors)} 条):")
+    logging.info(f"日志统计: {dict(levels)}")
+    logging.info(f"\n错误日志 ({len(errors)} 条):")
     for error in errors[:10]:  # 显示前10条
-        print(error)
+        logging.info(error)
 
 
 analyze_log("logs/spider_2024-01-15.log")

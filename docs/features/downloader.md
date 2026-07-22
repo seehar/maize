@@ -38,10 +38,10 @@ maize 内置了 4 种下载器，满足不同的使用场景。
 
 **使用方式：**
 ```python
-from maize import SpiderSettings
+from maize import SpiderSettings, SpiderDownloaderEnum
 
 settings = SpiderSettings(
-    downloader="maize.AioHttpDownloader"  # 默认值，可省略
+    downloader=SpiderDownloaderEnum.AIOHTTP.value  # 默认值，可省略
 )
 ```
 
@@ -57,10 +57,10 @@ settings = SpiderSettings(
 
 **使用方式：**
 ```python
-from maize import SpiderSettings
+from maize import SpiderSettings, SpiderDownloaderEnum
 
 settings = SpiderSettings(
-    downloader="maize.HTTPXDownloader"
+    downloader=SpiderDownloaderEnum.HTTPX.value
 )
 ```
 
@@ -83,10 +83,10 @@ playwright install
 
 **使用方式：**
 ```python
-from maize import SpiderSettings
+from maize import SpiderSettings, SpiderDownloaderEnum
 
 settings = SpiderSettings(
-    downloader="maize.downloader.playwright_downloader.PlaywrightDownloader"
+    downloader=SpiderDownloaderEnum.PLAYWRIGHT.value
 )
 
 # 配置浏览器参数
@@ -113,10 +113,10 @@ pip install maize[rpa]
 
 **使用方式：**
 ```python
-from maize import SpiderSettings
+from maize import SpiderSettings, SpiderDownloaderEnum
 
 settings = SpiderSettings(
-    downloader="maize.downloader.patchright_downloader.PatchrightDownloader"
+    downloader=SpiderDownloaderEnum.PATCHRIGHT.value
 )
 ```
 
@@ -125,12 +125,12 @@ settings = SpiderSettings(
 ### 方式一：使用 SpiderSettings
 
 ```python
-from maize import Spider, SpiderSettings
+from maize import Spider, SpiderSettings, SpiderDownloaderEnum
 
 if __name__ == "__main__":
     settings = SpiderSettings(
         project_name="我的爬虫",
-        downloader="maize.HTTPXDownloader"  # 指定下载器
+        downloader=SpiderDownloaderEnum.HTTPX.value  # 指定下载器
     )
 
     MySpider().run(settings=settings)
@@ -140,22 +140,22 @@ if __name__ == "__main__":
 
 ```python
 # settings.py
-from maize import SpiderSettings
+from maize import SpiderSettings, SpiderDownloaderEnum
 
 
 class Settings(SpiderSettings):
-    downloader = "maize.HTTPXDownloader"
+    downloader = SpiderDownloaderEnum.HTTPX.value
 ```
 
 ### 方式三：使用 custom_settings
 
 ```python
-from maize import Spider
+from maize import Spider, SpiderDownloaderEnum
 
 
 class MySpider(Spider):
     custom_settings = {
-        "downloader": "maize.HTTPXDownloader"
+        "downloader": SpiderDownloaderEnum.HTTPX.value
     }
 
     # ...爬虫实现...
@@ -419,9 +419,10 @@ class RequestsDownloader(BaseDownloader):
 适用于大部分静态或简单动态网页。
 
 ```python
+from maize import SpiderDownloaderEnum
 settings = SpiderSettings(
     concurrency=50,  # 可以设置较高的并发
-    downloader="maize.AioHttpDownloader"
+    downloader=SpiderDownloaderEnum.AIOHTTP.value
 )
 ```
 
@@ -431,9 +432,10 @@ settings = SpiderSettings(
 某些网站只支持或优先使用 HTTP/2。
 
 ```python
+from maize import SpiderDownloaderEnum
 settings = SpiderSettings(
     concurrency=30,
-    downloader="maize.HTTPXDownloader"
+    downloader=SpiderDownloaderEnum.HTTPX.value
 )
 ```
 
@@ -443,9 +445,10 @@ settings = SpiderSettings(
 页面内容由 JavaScript 动态生成，或需要等待 AJAX 请求。
 
 ```python
+from maize import SpiderDownloaderEnum
 settings = SpiderSettings(
     concurrency=5,  # 浏览器并发不宜过高
-    downloader="maize.downloader.playwright_downloader.PlaywrightDownloader"
+    downloader=SpiderDownloaderEnum.PLAYWRIGHT.value
 )
 settings.rpa.headless = True
 settings.rpa.wait_until = "networkidle"
@@ -457,9 +460,10 @@ settings.rpa.wait_until = "networkidle"
 网站有严格的浏览器指纹检测。
 
 ```python
+from maize import SpiderDownloaderEnum
 settings = SpiderSettings(
     concurrency=3,  # 降低并发避免被封
-    downloader="maize.downloader.patchright_downloader.PatchrightDownloader"
+    downloader=SpiderDownloaderEnum.PATCHRIGHT.value
 )
 settings.rpa.use_stealth_js = True
 ```
@@ -483,8 +487,9 @@ settings = SpiderSettings(concurrency=5)   # Playwright/Patchright
 对于需要登录的网站，使用支持会话的下载器：
 
 ```python
+from maize import SpiderDownloaderEnum
 settings = SpiderSettings(
-    downloader="maize.AioHttpDownloader"
+    downloader=SpiderDownloaderEnum.AIOHTTP.value
 )
 settings.request.use_session = True  # 启用会话
 ```

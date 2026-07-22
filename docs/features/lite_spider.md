@@ -35,7 +35,7 @@ class MySpider(LiteSpider):
         yield Request(url="https://example.com")
 
     async def parse(self, response: Response):
-        print(response.text[:100])
+        self.logger.info(response.text[:100])
 
 
 if __name__ == "__main__":
@@ -47,6 +47,10 @@ if __name__ == "__main__":
 LiteSpider 支持通过构造函数参数配置：
 
 ```python
+from maize import LogLevelEnum
+from maize.aio.lite import LiteSpider
+
+
 class MySpider(LiteSpider):
     def __init__(self):
         super().__init__(
@@ -54,6 +58,7 @@ class MySpider(LiteSpider):
             retry=3,            # 重试次数，默认 3
             proxy="http://127.0.0.1:7890",  # 代理，默认 None
             timeout=30.0,       # 请求超时，默认 30 秒
+            log_level=LogLevelEnum.DEBUG.value,  # 日志级别，默认 INFO
         )
 ```
 
@@ -63,6 +68,7 @@ class MySpider(LiteSpider):
 | `retry` | `int` | `3` | 请求失败重试次数 |
 | `proxy` | `str \| None` | `None` | 代理地址 |
 | `timeout` | `float` | `30.0` | 请求超时时间（秒） |
+| `log_level` | `str` | `"INFO"` | 日志级别（DEBUG/INFO/WARNING/ERROR） |
 
 ### 可重写属性
 
@@ -123,7 +129,7 @@ class ExampleSpider(LiteSpider):
 
     async def parse(self, response: Response):
         title = response.xpath("//title/text()").get()
-        print(f"URL: {response.url}, Title: {title}")
+        self.logger.info(f"URL: {response.url}, Title: {title}")
 
 
 if __name__ == "__main__":
@@ -138,17 +144,17 @@ if __name__ == "__main__":
 class MySpider(LiteSpider):
     async def on_start(self) -> None:
         """爬虫启动前调用"""
-        print("爬虫开始运行")
+        self.logger.info("爬虫开始运行")
 
     async def on_close(self) -> None:
         """爬虫关闭后调用"""
-        print("爬虫已关闭")
+        self.logger.info("爬虫已关闭")
 
     async def start_requests(self):
         yield Request(url="https://example.com")
 
     async def parse(self, response: Response):
-        print(response.text)
+        self.logger.info(response.text)
 ```
 
 ## 使用代理
@@ -163,7 +169,7 @@ class ProxySpider(LiteSpider):
         yield Request(url="https://example.com")
 
     async def parse(self, response: Response):
-        print(response.text)
+        self.logger.info(response.text)
 ```
 
 ## 请求去重
@@ -246,7 +252,7 @@ per-request 的 `Request.headers` 仍优先于 session 级 headers。
 ```python
 crawler = LiteCrawler(spider)
 await crawler.crawl()
-print(crawler.stats)
+crawler.logger.info(crawler.stats)
 # {'requested': 10, 'succeeded': 8, 'failed': 2, 'retried': 1, 'dropped': 3, 'items': 8}
 ```
 
@@ -296,9 +302,9 @@ class ErrorHandlingSpider(LiteSpider):
 
     async def parse(self, response):
         if response.status == 200:
-            print(f"成功: {response.url}")
+            self.logger.info(f"成功: {response.url}")
         else:
-            print(f"失败: {response.status}")
+            self.logger.info(f"失败: {response.status}")
 ```
 
 ### 自定义重试策略
@@ -384,7 +390,7 @@ class MySpider(LiteSpider):
         yield Request(url="https://example.com")
 
     async def parse(self, response: Response):
-        print(response.text)
+        self.logger.info(response.text)
 
 
 async def main():

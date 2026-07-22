@@ -110,17 +110,17 @@ class BaiduSpider(Spider):
 #### 3. 配置文件（settings.py）
 
 ```python
-from maize import SpiderSettings
+from maize import SpiderSettings, SpiderDownloaderEnum, LogLevelEnum
 
 
 class Settings(SpiderSettings):
     # 基础配置
-    project_name = "百度爬虫"
-    concurrency = 5  # 并发数
-    log_level = "INFO"  # 日志级别
+    project_name: str = "百度爬虫"
+    concurrency: int = 5  # 并发数
+    log_level: str = LogLevelEnum.INFO.value  # 日志级别
 
     # 下载器配置
-    downloader = "maize.HTTPXDownloader"
+    downloader: str = SpiderDownloaderEnum.HTTPX.value
 
     # 请求配置（可选）
     # request = RequestSettings(
@@ -310,7 +310,7 @@ class MySpider(Spider):
         )
 
     async def parse(self, response: Response):
-        print(response.text)
+        self.logger.info(response.text)
 
     async def handle_error(self, request: Request):
         """处理请求失败"""
@@ -330,11 +330,13 @@ class MySpider(Spider):
 在 Spider 类中使用 `custom_settings` 进行个性化配置：
 
 ```python
+from maize import Spider, SpiderDownloaderEnum, LogLevelEnum
+
 class MySpider(Spider):
     custom_settings = {
         "concurrency": 10,
-        "log_level": "DEBUG",
-        "downloader": "maize.HTTPXDownloader",
+        "log_level": LogLevelEnum.DEBUG.value,
+        "downloader": SpiderDownloaderEnum.HTTPX.value,
         "request": {
             "verify_ssl": False,
             "request_timeout": 30,
@@ -346,7 +348,7 @@ class MySpider(Spider):
         yield Request(url="http://www.example.com")
 
     async def parse(self, response: Response):
-        print(response.text)
+        self.logger.info(response.text)
 ```
 
 ## 爬虫生命周期
@@ -380,7 +382,7 @@ class MySpider(Spider):
         yield Request(url="http://www.example.com")
 
     async def parse(self, response: Response):
-        print(response.text)
+        self.logger.info(response.text)
 ```
 
 ## 暂停和继续爬虫

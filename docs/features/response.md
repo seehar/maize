@@ -36,17 +36,17 @@ from maize import Response, Spider
 class MySpider(Spider):
     async def parse(self, response: Response):
         # 获取基础信息
-        print(f"URL: {response.url}")
-        print(f"状态码: {response.status}")
-        print(f"编码: {response.encoding}")
+        self.logger.info(f"URL: {response.url}")
+        self.logger.info(f"状态码: {response.status}")
+        self.logger.info(f"编码: {response.encoding}")
 
         # 获取响应头
         content_type = response.headers.get("Content-Type")
-        print(f"内容类型: {content_type}")
+        self.logger.info(f"内容类型: {content_type}")
 
         # 获取原始请求
-        print(f"请求方法: {response.request.method}")
-        print(f"请求URL: {response.request.url}")
+        self.logger.info(f"请求方法: {response.request.method}")
+        self.logger.info(f"请求URL: {response.request.url}")
 ```
 
 ## 响应内容
@@ -62,8 +62,8 @@ class MySpider(Spider):
 async def parse(self, response: Response):
     # 获取文本内容
     html = response.text
-    print(f"响应内容长度: {len(html)}")
-    print(f"前100个字符: {html[:100]}")
+    self.logger.info(f"响应内容长度: {len(html)}")
+    self.logger.info(f"前100个字符: {html[:100]}")
 ```
 
 **编码处理：**
@@ -96,7 +96,7 @@ async def parse(self, response: Response):
 
     # 获取文件大小
     size = len(response.body)
-    print(f"文件大小: {size} bytes")
+    self.logger.info(f"文件大小: {size} bytes")
 ```
 
 ## 数据提取方法
@@ -115,11 +115,11 @@ async def parse(self, response: Response):
 async def parse(self, response: Response):
     # 提取单个元素
     title = response.xpath('//title/text()').get()
-    print(f"标题: {title}")
+    self.logger.info(f"标题: {title}")
 
     # 提取所有匹配元素
     links = response.xpath('//a/@href').getall()
-    print(f"找到 {len(links)} 个链接")
+    self.logger.info(f"找到 {len(links)} 个链接")
 
     # 提取带默认值
     author = response.xpath('//meta[@name="author"]/@content').get(default="未知作者")
@@ -133,7 +133,7 @@ async def parse(self, response: Response):
     for item in items:
         title = item.xpath('.//h3/text()').get()
         price = item.xpath('.//span[@class="price"]/text()').get()
-        print(f"{title}: {price}")
+        self.logger.info(f"{title}: {price}")
 
     # 使用 XPath 函数
     normalized_text = response.xpath('normalize-space(//p[@class="desc"]/text())').get()
@@ -254,7 +254,7 @@ async def parse(self, response: Response):
     items = data.get('data', [])
 
     for item in items:
-        print(f"ID: {item['id']}, Name: {item['name']}")
+        self.logger.info(f"ID: {item['id']}, Name: {item['name']}")
 ```
 
 **错误处理：**
@@ -328,8 +328,8 @@ async def parse(self, response: Response):
     session_id = cookies.get('sessionid')
     user_id = cookies.get('user_id')
 
-    print(f"Session ID: {session_id}")
-    print(f"User ID: {user_id}")
+    self.logger.info(f"Session ID: {session_id}")
+    self.logger.info(f"User ID: {user_id}")
 ```
 
 ### cookie_list - Cookie 列表
@@ -358,13 +358,13 @@ async def parse(self, response: Response):
     cookie_list = response.cookie_list
 
     for cookie in cookie_list:
-        print(f"Name: {cookie['name']}")
-        print(f"Value: {cookie['value']}")
-        print(f"Domain: {cookie['domain']}")
-        print(f"Path: {cookie['path']}")
-        print(f"Secure: {cookie.get('secure', False)}")
-        print(f"HttpOnly: {cookie.get('httponly', False)}")
-        print("-" * 50)
+        self.logger.info(f"Name: {cookie['name']}")
+        self.logger.info(f"Value: {cookie['value']}")
+        self.logger.info(f"Domain: {cookie['domain']}")
+        self.logger.info(f"Path: {cookie['path']}")
+        self.logger.info(f"Secure: {cookie.get('secure', False)}")
+        self.logger.info(f"HttpOnly: {cookie.get('httponly', False)}")
+        self.logger.info("-" * 50)
 
     # 查找特定 Cookie
     session_cookies = [c for c in cookie_list if c['name'] == 'sessionid']
@@ -503,6 +503,9 @@ class ApiSpider(Spider):
 ### 示例3：处理 Cookie
 
 ```python
+from maize import Request, Response, Spider
+from maize.common.constant import Method
+
 class LoginSpider(Spider):
     async def start_requests(self):
         # 登录

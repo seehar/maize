@@ -135,7 +135,7 @@ await redis.set("token", "xyz789", px=5000)  # 5秒后过期
 # 仅当键不存在时设置（相当于 SETNX）
 success = await redis.set("lock_key", "locked", nx=True)
 if success:
-    print("获取锁成功")
+    logging.info("获取锁成功")
 
 # 仅当键存在时更新
 success = await redis.set("username", "bob", xx=True)
@@ -157,11 +157,11 @@ lock_acquired = await redis.nx_set("my_lock", "locked", ex=10)
 if lock_acquired:
     try:
         # 执行需要加锁的操作
-        print("已获取锁，执行任务...")
+        logging.info("已获取锁，执行任务...")
     finally:
         await redis.delete("my_lock")
 else:
-    print("锁已被占用")
+    logging.info("锁已被占用")
 ```
 
 ### get() - 获取值
@@ -178,15 +178,15 @@ else:
 # 获取值
 username = await redis.get("username")
 if username:
-    print(f"用户名: {username}")
+    logging.info(f"用户名: {username}")
 else:
-    print("用户名不存在")
+    logging.info("用户名不存在")
 
 # 获取数字类型（需要转换）
 count_str = await redis.get("visit_count")
 if count_str:
     count = int(count_str)
-    print(f"访问次数: {count}")
+    logging.info(f"访问次数: {count}")
 ```
 
 ### delete() - 删除键
@@ -202,11 +202,11 @@ if count_str:
 ```python
 # 删除单个键
 deleted = await redis.delete("session_id")
-print(f"删除了 {deleted} 个键")
+logging.info(f"删除了 {deleted} 个键")
 
 # 删除多个键
 deleted = await redis.delete("key1", "key2", "key3")
-print(f"删除了 {deleted} 个键")
+logging.info(f"删除了 {deleted} 个键")
 ```
 
 ## 高级操作
@@ -441,18 +441,18 @@ class DistributedLockExample:
         lock_acquired = await self.acquire_lock(lock_name)
 
         if not lock_acquired:
-            print(f"无法获取锁: {lock_name}")
+            self.logger.info(f"无法获取锁: {lock_name}")
             return False
 
         try:
             # 执行需要加锁的操作
-            print(f"已获取锁: {lock_name}")
+            self.logger.info(f"已获取锁: {lock_name}")
             await asyncio.sleep(2)  # 模拟操作
-            print("操作完成")
+            self.logger.info("操作完成")
             return True
         finally:
             await self.release_lock(lock_name)
-            print(f"已释放锁: {lock_name}")
+            self.logger.info(f"已释放锁: {lock_name}")
 
 
 # 使用示例
@@ -524,7 +524,7 @@ await pipe.execute()
 try:
     value = await redis.get("key")
     if value:
-        print(value)
+        logging.info(value)
 except Exception as e:
     logger.error(f"Redis 操作失败: {e}")
     # 降级处理或重试

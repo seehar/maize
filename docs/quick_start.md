@@ -1,6 +1,36 @@
 # 快速上手
 
-## 创建第一个爬虫
+maize 提供两种爬虫模式：**Lite**（轻量开箱即用）和 **Classic**（完整中间件/管道/调度器）。
+如果只需简单抓取，推荐从 Lite 开始；如需中间件、多管道、分布式等高级功能，使用 Classic。
+
+## Lite 爬虫：5 分钟上手
+
+Lite 爬虫无需配置文件，构造函数参数即用，内置并发、重试、代理、请求去重、深度控制。
+
+```python
+from maize.aio.lite import LiteSpider, Request, Response
+
+class BaiduLiteSpider(LiteSpider):
+    def __init__(self):
+        super().__init__(concurrency=5, retry=3)
+
+    async def start_requests(self):
+        yield Request(url="http://www.baidu.com")
+
+    async def parse(self, response: Response):
+        self.logger.info(f"状态码: {response.status}")
+        self.logger.info(f"标题: {response.xpath('//title/text()').get()}")
+
+if __name__ == "__main__":
+    BaiduLiteSpider().run()
+```
+
+Lite 爬虫支持递归跟进、`process_item` 钩子、优先级队列、域名级限流等，
+详见 [Lite 轻量爬虫](features/lite_spider.md)。
+
+---
+
+## Classic 爬虫入门
 
 > 以百度爬虫为例，实现一个最小的爬虫项目
 
@@ -17,8 +47,8 @@ class BaiduSpider(Spider):
         yield Request(url="http://www.baidu.com")
 
     async def parse(self, response: Response):
-        print(f"响应状态码: {response.status}")
-        print(f"页面标题: {response.xpath('//title/text()').get()}")
+        self.logger.info(f"响应状态码: {response.status}")
+        self.logger.info(f"页面标题: {response.xpath('//title/text()').get()}")
 
 
 if __name__ == '__main__':
@@ -41,7 +71,7 @@ class BaiduSpider(Spider):
         yield Request(url="http://www.baidu.com")
 
     async def parse(self, response: Response):
-        print(f"parse: {response}")
+        self.logger.info(f"parse: {response}")
 
 
 async def main():
@@ -78,7 +108,7 @@ class MultiPageSpider(Spider):
         yield Request(url="http://www.example.com/detail", callback=self.parse_detail)
 
     async def parse_detail(self, response: Response):
-        print(f"详情页: {response.url}")
+        self.logger.info(f"详情页: {response.url}")
 ```
 
 ### 批量下发任务
@@ -105,7 +135,7 @@ maize 提供了三种配置方式，优先级从高到低为：**代码配置 > 
 推荐使用 `SpiderSettings` 对象进行配置，可以获得更好的代码提示：
 
 ```python
-from maize import Spider, SpiderSettings
+from maize import Spider, SpiderSettings, SpiderDownloaderEnum, LogLevelEnum
 
 
 class MySpider(Spider):
@@ -117,8 +147,8 @@ if __name__ == "__main__":
     settings = SpiderSettings(
         project_name="我的爬虫",
         concurrency=10,  # 并发数
-        log_level="DEBUG",  # 日志级别
-        downloader="maize.HTTPXDownloader",  # 使用 HTTPX 下载器
+        log_level = LogLevelEnum.DEBUG.value,  # 日志级别
+        downloader=SpiderDownloaderEnum.HTTPX.value,  # 使用 HTTPX 下载器
     )
 
     # 配置请求相关参数
@@ -135,14 +165,14 @@ if __name__ == "__main__":
 
 ```python
 # settings.py
-from maize import SpiderSettings
+from maize import SpiderSettings, SpiderDownloaderEnum, LogLevelEnum
 
 
 class Settings(SpiderSettings):
-    project_name = "我的爬虫项目"
-    concurrency = 10
-    log_level = "INFO"
-    downloader = "maize.AioHttpDownloader"
+    project_name: str = "我的爬虫项目"
+    concurrency: int = 10
+    log_level: str = LogLevelEnum.INFO.value
+    downloader: str = SpiderDownloaderEnum.AIOHTTP.value
 
     # 也可以使用嵌套配置
     # request = RequestSettings(
@@ -173,11 +203,12 @@ my_project/
 在 Spider 类中使用 `custom_settings` 进行配置：
 
 ```python
+from maize import SpiderDownloaderEnum, LogLevelEnum
 class MySpider(Spider):
     custom_settings = {
         "concurrency": 5,
-        "log_level": "DEBUG",
-        "downloader": "maize.HTTPXDownloader",
+        "log_level": LogLevelEnum.DEBUG.value,
+        "downloader": SpiderDownloaderEnum.HTTPX.value,
     }
 
     # ...爬虫实现...
@@ -233,21 +264,21 @@ maize 内置了多种下载器，可根据需求选择。
 ### 配置下载器
 
 ```python
-from maize import SpiderSettings
+from maize import SpiderSettings, SpiderDownloaderEnum
 
 # 使用 AioHttp 下载器（默认）
 settings = SpiderSettings(
-    downloader="maize.AioHttpDownloader"
+    downloader=SpiderDownloaderEnum.AIOHTTP.value
 )
 
 # 使用 HTTPX 下载器
 settings = SpiderSettings(
-    downloader="maize.HTTPXDownloader"
+    downloader=SpiderDownloaderEnum.HTTPX.value
 )
 
 # 使用 Playwright 下载器（需要安装 maize[rpa]）
 settings = SpiderSettings(
-    downloader="maize.downloader.playwright_downloader.PlaywrightDownloader"
+    downloader=SpiderDownloaderEnum.PLAYWRIGHT.value
 )
 ```
 
@@ -340,7 +371,7 @@ settings = SpiderSettings(
 
 # 或在 settings.py 中
 class Settings(SpiderSettings):
-    logger_handler = "your_module.logger_util.InterceptHandler"
+    logger_handler: str = "your_module.logger_util.InterceptHandler"
 ```
 
 ## 数据提取
@@ -397,7 +428,7 @@ async def parse(self, response: Response):
     data = response.json()
     items = data.get('items', [])
     for item in items:
-        print(item['name'])
+        self.logger.info(item['name'])
 ```
 
 ## 数据存储
@@ -449,11 +480,11 @@ from maize import BasePipeline, Item
 class CustomPipeline(BasePipeline):
     async def open(self):
         """管道初始化时调用"""
-        print("Pipeline 已启动")
+        self.logger.info("Pipeline 已启动")
 
     async def close(self):
         """管道关闭时调用"""
-        print("Pipeline 已关闭")
+        self.logger.info("Pipeline 已关闭")
 
     async def process_item(self, items: List[Item]) -> bool:
         """
@@ -461,13 +492,13 @@ class CustomPipeline(BasePipeline):
         返回 True 表示处理成功，False 表示失败（会重试）
         """
         for item in items:
-            print(f"保存数据: {item.to_dict()}")
+            self.logger.info(f"保存数据: {item.to_dict()}")
         return True
 
     async def process_error_item(self, items: List[Item]):
         """处理超过重试次数的数据"""
         for item in items:
-            print(f"失败的数据: {item.to_dict()}")
+            self.logger.info(f"失败的数据: {item.to_dict()}")
 ```
 
 在配置中注册：
@@ -496,7 +527,7 @@ class MySpider(Spider):
         )
 
     async def parse(self, response: Response):
-        print(response.text)
+        self.logger.info(response.text)
 
     async def error_handler(self, request: Request):
         """处理请求失败的情况"""
