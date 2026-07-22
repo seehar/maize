@@ -5,6 +5,7 @@ Tests for lite spider
 import asyncio
 import contextlib
 import logging
+import signal
 from abc import ABC
 from unittest.mock import AsyncMock, patch
 from urllib.parse import urlparse
@@ -1083,13 +1084,9 @@ async def test_sigint_no_deadlock():
         # 在 crawl 开始后触发 stop_event（模拟 SIGINT）
         async def trigger_stop():
             await fetch_event.wait()
-            # 直接调用 crawler 内部 signal handler 逻辑
-            # 找到 crawl() 中注册的 signal handler 并触发
-            crawler._logger.info("test: simulating SIGINT")
             # 通过发送真实信号来触发
-            import signal as sig_mod
-
-            sig_mod.raise_signal(sig_mod.SIGINT)
+            crawler._logger.info("test: simulating SIGINT")
+            signal.raise_signal(signal.SIGINT)
 
         trigger_task = asyncio.create_task(trigger_stop())
 
