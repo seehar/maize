@@ -51,9 +51,9 @@ theme:
 
 nav:
   - 简介: index.md
+  - 使用前必读: use/before_use.md
   - 快速上手: quick_start.md
   - 使用指南:
-      - 使用前必读: use/before_use.md
       - 配置说明: features/settings.md
   - 核心组件:
       - Lite 轻量爬虫: features/lite_spider.md
