@@ -159,11 +159,12 @@ class MySpider(LiteSpider):
 
 ## 使用代理
 
-通过 `proxy` 属性设置代理：
+通过构造函数 `proxy` 参数设置代理：
 
 ```python
 class ProxySpider(LiteSpider):
-    proxy = "http://user:password@127.0.0.1:7890"
+    def __init__(self):
+        super().__init__(proxy="http://user:password@127.0.0.1:7890")
 
     async def start_requests(self):
         yield Request(url="https://example.com")
@@ -171,6 +172,8 @@ class ProxySpider(LiteSpider):
     async def parse(self, response: Response):
         self.logger.info(response.text)
 ```
+
+也可以通过 `Request(proxy=...)` 为单个请求设置不同代理。
 
 ## 请求去重
 
