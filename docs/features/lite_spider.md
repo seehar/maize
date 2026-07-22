@@ -252,7 +252,7 @@ print(crawler.stats)
 
 | 指标 | 说明 |
 |------|------|
-| `requested` | 入队请求数（含重试入队的） |
+| `requested` | 入队请求数（不含重试，重试单独计入 `retried`） |
 | `succeeded` | status 在 1xx-3xx 的响应数 |
 | `failed` | status==0 或 status>=400 的响应数 |
 | `retried` | 触发重试的次数 |
@@ -355,7 +355,7 @@ class PoliteSpider(LiteSpider):
         yield Request(url="https://b.com/1")
 ```
 
-`per_domain_concurrency=0`（默认）表示不限，回退到全局 `concurrency`。按请求 URL 的 netloc 分组限流。
+`per_domain_concurrency=0`（默认）表示不限，回退到全局 `concurrency`。按请求 URL 的 netloc 分组限流。注意：重试退避等待期间 semaphore 仍被持有，同域名其他请求会等待退避完成，对被限流的站点这属于礼貌行为。
 
 ## 结构化请求日志
 

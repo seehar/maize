@@ -155,19 +155,20 @@ class LiteCrawler:
                 if request is None:
                     request_queue.task_done()
                     break
-                await self._process(request, request_queue)
+                try:
+                    await self._process(request, request_queue)
+                except Exception as e:
+                    self.logger.error(f"worker error: {e}")
 
         workers = [asyncio.create_task(worker()) for _ in range(self.concurrency)]
 
         try:
             await feed_task
-            await request_queue.join()
-        finally:
             for _ in workers:
                 self._tie_breaker += 1
                 await request_queue.put((float("inf"), self._tie_breaker, None))
             await asyncio.gather(*workers, return_exceptions=True)
-
+        finally:
             for sig in signal_handlers_registered:
                 with contextlib.suppress(NotImplementedError, RuntimeError):
                     loop.remove_signal_handler(sig)

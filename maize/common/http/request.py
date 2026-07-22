@@ -95,8 +95,9 @@ class Request:
             self.method,
             self.url,
             self.headers or "",
-            self.params or "",
-            self.data or "",
+            repr(self.params) or "",
+            repr(self.data) or "",
+            repr(self.json) or "",
         ]
         request_data_str = ":".join(request_data_list)
         return hashlib.md5(request_data_str.encode("utf-8")).hexdigest()

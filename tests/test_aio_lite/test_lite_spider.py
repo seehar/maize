@@ -3,6 +3,7 @@ Tests for lite spider
 """
 
 import asyncio
+import contextlib
 import logging
 from abc import ABC
 from unittest.mock import AsyncMock, patch
@@ -1033,3 +1034,104 @@ async def test_log_level_by_status(caplog):
     infos = [r for r in caplog.records if r.levelno == logging.INFO and "request url=" in r.message]
     assert any("status=500" in r.message and "retry" in r.message for r in warnings)
     assert len(infos) == 3  # ok, err(final 200), notfound
+
+
+@pytest.mark.asyncio
+async def test_sigint_no_deadlock():
+    """SIGINT 后 crawl() 不死锁，on_close 被执行，未处理请求被丢弃"""
+
+    class SigintSpider(LiteSpider):
+        def __init__(self):
+            super().__init__(concurrency=2)
+            self.on_close_called = False
+            self.processed = []
+
+        async def start_requests(self):
+            # 入队多个请求，确保 SIGINT 时队列中仍有 pending
+            for i in range(10):
+                yield Request(f"https://example.com/p{i}")
+
+        async def parse(self, response):
+            self.processed.append(response.url)
+
+        async def on_close(self):
+            self.on_close_called = True
+
+    spider = SigintSpider()
+    responses = [
+        Response(
+            url=f"https://example.com/p{i}",
+            headers={},
+            body=b"",
+            status=200,
+            request=Request(f"https://example.com/p{i}"),
+        )
+        for i in range(10)
+    ]
+
+    fetch_event = asyncio.Event()
+
+    async def mock_fetch(request):
+        # 第一个请求处理中时触发 SIGINT
+        fetch_event.set()
+        await asyncio.sleep(0.01)
+        return responses[int(request.url.split("/p")[-1])]
+
+    with patch.object(spider, "fetch", mock_fetch):
+        crawler = LiteCrawler(spider)
+
+        # 在 crawl 开始后触发 stop_event（模拟 SIGINT）
+        async def trigger_stop():
+            await fetch_event.wait()
+            # 直接调用 crawler 内部 signal handler 逻辑
+            # 找到 crawl() 中注册的 signal handler 并触发
+            crawler._logger.info("test: simulating SIGINT")
+            # 通过发送真实信号来触发
+            import signal as sig_mod
+
+            sig_mod.raise_signal(sig_mod.SIGINT)
+
+        trigger_task = asyncio.create_task(trigger_stop())
+
+        try:
+            await asyncio.wait_for(crawler.crawl(), timeout=5.0)
+        except asyncio.TimeoutError:
+            pytest.fail("crawl() deadlocked after SIGINT")
+        finally:
+            trigger_task.cancel()
+            with contextlib.suppress(asyncio.CancelledError):
+                await trigger_task
+
+    assert spider.on_close_called is True
+
+
+@pytest.mark.asyncio
+async def test_worker_exception_does_not_deadlock():
+    """_process 抛异常时 worker 不死锁，crawl 正常结束"""
+
+    class BombSpider(LiteSpider):
+        def __init__(self):
+            super().__init__(concurrency=1)
+            self.on_close_called = False
+
+        async def start_requests(self):
+            yield Request("https://example.com/ok")
+
+        async def parse(self, response):
+            raise ValueError("boom")
+
+        async def on_close(self):
+            self.on_close_called = True
+
+    spider = BombSpider()
+    req = Request("https://example.com/ok")
+    resp = Response(url="https://example.com/ok", headers={}, body=b"", status=200, request=req)
+
+    with patch.object(spider, "fetch", AsyncMock(return_value=resp)):
+        crawler = LiteCrawler(spider)
+        try:
+            await asyncio.wait_for(crawler.crawl(), timeout=5.0)
+        except asyncio.TimeoutError:
+            pytest.fail("crawl() deadlocked on worker exception")
+
+    assert spider.on_close_called is True
