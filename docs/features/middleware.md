@@ -345,6 +345,98 @@ custom_settings = {
 }
 ```
 
+## 速查表
+
+### 内置中间件一览
+
+| 类型 | 中间件 | 功能 | 配置项 |
+|:-----|:------|:-----|:------|
+| 下载器 | `UserAgentMiddleware` | 轮换 UA | `user_agent_list`, `user_agent_mode` |
+| 下载器 | `DefaultHeadersMiddleware` | 默认请求头 | `default_headers` |
+| 下载器 | `RetryMiddleware` | 请求重试 | `max_retry_count`, `retry_http_codes` |
+| 爬虫 | `DepthMiddleware` | 深度限制 | `max_depth` |
+| 爬虫 | `HttpErrorMiddleware` | HTTP 错误过滤 | `http_error_allowed_codes` |
+| 管道 | `ItemValidationMiddleware` | 数据验证 | `required_fields` |
+| 管道 | `ItemCleanerMiddleware` | 数据清洗 | `strip_whitespace`, `remove_html` |
+
+### 方法返回值速查
+
+**DownloaderMiddleware**
+
+| 方法 | 返回值 | 效果 |
+|:----|:------|:----|
+| `process_request` | `Request` | 继续处理 |
+| | `Response` | 跳过下载 |
+| | `None` | 丢弃请求 |
+| `process_response` | `Response` | 继续处理 |
+| | `Request` | 重试请求 |
+| | `None` | 丢弃响应 |
+| `process_exception` | `Request` | 重试请求 |
+| | `Response` | 使用响应 |
+| | `None` | 忽略异常 |
+
+**SpiderMiddleware**
+
+| 方法 | 返回值 | 效果 |
+|:----|:------|:----|
+| `process_spider_input` | `None` | 正常 |
+| | 抛出异常 | 触发 exception 处理 |
+| `process_spider_output` | `AsyncGenerator` | 返回结果 |
+| `process_spider_exception` | `AsyncGenerator` | 处理异常 |
+| | `None` | 继续传播 |
+
+**PipelineMiddleware**
+
+| 方法 | 返回值 | 效果 |
+|:----|:------|:----|
+| `process_item_before` | `Item` | 继续处理 |
+| | `None` | 丢弃 Item |
+| `process_item_after` | `Item` | 继续处理 |
+| | `None` | 丢弃 Item |
+
+### 常用代码片段
+
+添加自定义请求头：
+```python
+async def process_request(self, request, spider):
+    request.headers = request.headers or {}
+    request.headers['X-Custom'] = 'value'
+    return request
+```
+
+基于状态码重试：
+```python
+async def process_response(self, request, response, spider):
+    if response.status == 429:
+        return request  # 重试
+    return response
+```
+
+过滤 URL：
+```python
+async def process_spider_output(self, response, result, spider):
+    async for item in result:
+        if isinstance(item, Request):
+            if 'allowed.com' not in item.url:
+                continue
+        yield item
+```
+
+验证必填字段：
+```python
+async def process_item_before(self, item, spider):
+    if not hasattr(item, 'title') or not item.title:
+        return None  # 丢弃
+    return item
+```
+
+清洗数据：
+```python
+async def process_item_before(self, item, spider):
+    if hasattr(item, 'title'):
+        item.title = item.title.strip()
+    return item
+```
 ## 创建自定义中间件
 
 ### 示例：自定义代理中间件
@@ -568,6 +660,5 @@ class StatsMiddleware(DownloaderMiddleware):
 
 ## 参考资料
 
-- [API 文档](../api/middlewares.md)
 - [示例代码](../../examples/middleware_example.py)
 - [源代码](../../maize/middlewares/)

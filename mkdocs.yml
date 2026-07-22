@@ -65,7 +65,6 @@ nav:
       - Pipeline 管道: features/pipeline.md
       - Downloader 下载器: features/downloader.md
       - 中间件系统: features/middleware.md
-      - 中间件速查: features/middleware_quick_reference.md
   - 工具类:
       - MysqlUtil: features/mysql_util.md
       - RedisUtil: features/redis_util.md
