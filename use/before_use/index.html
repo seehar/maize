@@ -286,7 +286,7 @@
     
     
       <li class="md-tabs__item">
-        <a href="../../features/spider/" class="md-tabs__link">
+        <a href="../../features/lite_spider/" class="md-tabs__link">
           
   
     
@@ -474,6 +474,17 @@
         
       
       
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  <span class="md-ellipsis">
+    使用前必读
+  </span>
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
       <a href="./" class="md-nav__link md-nav__link--active">
         
   
@@ -483,6 +494,76 @@
   
 
       </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="目录">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      目录
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#_2" class="md-nav__link">
+    <span class="md-ellipsis">
+      选择爬虫模式
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_3" class="md-nav__link">
+    <span class="md-ellipsis">
+      推荐项目结构
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="推荐项目结构">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#lite" class="md-nav__link">
+    <span class="md-ellipsis">
+      Lite 项目（简单场景）
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#classic" class="md-nav__link">
+    <span class="md-ellipsis">
+      Classic 项目（完整功能）
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_4" class="md-nav__link">
+    <span class="md-ellipsis">
+      模块对照表
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
       
     </li>
   
@@ -540,6 +621,12 @@
       
         
       
+        
+      
+        
+      
+        
+      
     
     
     
@@ -574,6 +661,27 @@
             核心组件
           </label>
           <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../features/lite_spider/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Lite 轻量爬虫
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
             
               
                 
@@ -713,6 +821,48 @@
   
   <span class="md-ellipsis">
     Downloader 下载器
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../features/middleware/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    中间件系统
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../features/middleware_quick_reference/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    中间件速查
   </span>
   
 
@@ -869,6 +1019,65 @@
     
   
   
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      目录
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#_2" class="md-nav__link">
+    <span class="md-ellipsis">
+      选择爬虫模式
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_3" class="md-nav__link">
+    <span class="md-ellipsis">
+      推荐项目结构
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="推荐项目结构">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#lite" class="md-nav__link">
+    <span class="md-ellipsis">
+      Lite 项目（简单场景）
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#classic" class="md-nav__link">
+    <span class="md-ellipsis">
+      Classic 项目（完整功能）
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_4" class="md-nav__link">
+    <span class="md-ellipsis">
+      模块对照表
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
 </nav>
                   </div>
                 </div>
@@ -886,16 +1095,168 @@
 
 
 <h1 id="_1">使用前必读<a class="headerlink" href="#_1" title="Permanent link">&para;</a></h1>
-<p>推荐使用的项目结构</p>
-<div class="language-text highlight"><span class="filename">Text Only</span><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>├─example_spider
-</span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>│ └─spiders        # 存放所有爬虫
-</span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>│   ├─spiders_1.py
-</span><span id="__span-0-4"><a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a>│   ├─spiders_2.py
-</span><span id="__span-0-5"><a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a>│   └─...
-</span><span id="__span-0-6"><a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a>├─items.py         # 定义爬虫解析后的 Item
-</span><span id="__span-0-7"><a id="__codelineno-0-7" name="__codelineno-0-7" href="#__codelineno-0-7"></a>├─settings.py      # 项目配置文件
-</span><span id="__span-0-8"><a id="__codelineno-0-8" name="__codelineno-0-8" href="#__codelineno-0-8"></a>└─run.py           # 启动入口，main.py 也可以
+<h2 id="_2">选择爬虫模式<a class="headerlink" href="#_2" title="Permanent link">&para;</a></h2>
+<p>maize 提供两种爬虫模式，按需求选择：</p>
+<table>
+<thead>
+<tr>
+<th>场景</th>
+<th>推荐模式</th>
+<th>原因</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>简单页面抓取、API 采集</td>
+<td>Lite</td>
+<td>轻量，无需中间件/管道，构造函数即用</td>
+</tr>
+<tr>
+<td>监控轮询、定时抓取</td>
+<td>Lite</td>
+<td>内置去重可关闭，<code>dont_filter</code> 单请求逃生口</td>
+</tr>
+<tr>
+<td>需要中间件（UA 轮换、代理池、重试策略）</td>
+<td>Classic</td>
+<td>完整中间件链</td>
+</tr>
+<tr>
+<td>多管道批量入库（MySQL + Redis + CSV）</td>
+<td>Classic</td>
+<td>Pipeline 链，批量处理</td>
+</tr>
+<tr>
+<td>分布式爬虫</td>
+<td>Classic</td>
+<td>基于 Redis 的分布式调度</td>
+</tr>
+<tr>
+<td>RPA / 浏览器渲染页面</td>
+<td>Classic</td>
+<td>Playwright/Patchright 下载器</td>
+</tr>
+<tr>
+<td>快速原型、教学演示</td>
+<td>Lite</td>
+<td>5 分钟上手，单文件即跑</td>
+</tr>
+</tbody>
+</table>
+<ul>
+<li><strong>Lite 模式</strong>：<code>from maize.aio.lite import LiteSpider</code>，详见 <a href="../../features/lite_spider/">Lite 轻量爬虫</a></li>
+<li><strong>Classic 模式</strong>：<code>from maize import Spider</code>，详见 <a href="../../features/spider/">Spider 进阶</a></li>
+</ul>
+<h2 id="_3">推荐项目结构<a class="headerlink" href="#_3" title="Permanent link">&para;</a></h2>
+<h3 id="lite">Lite 项目（简单场景）<a class="headerlink" href="#lite" title="Permanent link">&para;</a></h3>
+<div class="language-text highlight"><span class="filename">Text Only</span><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>my_project/
+</span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>├── spider.py        # 爬虫文件（含 LiteSpider 子类）
+</span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>└── run.py           # 启动入口（可选，也可直接在 spider.py 末尾 run）
 </span></code></pre></div>
+<p>最小示例（单文件即可运行）：</p>
+<div class="language-python highlight"><span class="filename">Python</span><pre><span></span><code><span id="__span-1-1"><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="c1"># spider.py</span>
+</span><span id="__span-1-2"><a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a><span class="kn">from</span><span class="w"> </span><span class="nn">maize.aio.lite</span><span class="w"> </span><span class="kn">import</span> <span class="n">LiteSpider</span><span class="p">,</span> <span class="n">Request</span><span class="p">,</span> <span class="n">Response</span>
+</span><span id="__span-1-3"><a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a>
+</span><span id="__span-1-4"><a id="__codelineno-1-4" name="__codelineno-1-4" href="#__codelineno-1-4"></a><span class="k">class</span><span class="w"> </span><span class="nc">MySpider</span><span class="p">(</span><span class="n">LiteSpider</span><span class="p">):</span>
+</span><span id="__span-1-5"><a id="__codelineno-1-5" name="__codelineno-1-5" href="#__codelineno-1-5"></a>    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">start_requests</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+</span><span id="__span-1-6"><a id="__codelineno-1-6" name="__codelineno-1-6" href="#__codelineno-1-6"></a>        <span class="k">yield</span> <span class="n">Request</span><span class="p">(</span><span class="n">url</span><span class="o">=</span><span class="s2">&quot;https://example.com&quot;</span><span class="p">)</span>
+</span><span id="__span-1-7"><a id="__codelineno-1-7" name="__codelineno-1-7" href="#__codelineno-1-7"></a>
+</span><span id="__span-1-8"><a id="__codelineno-1-8" name="__codelineno-1-8" href="#__codelineno-1-8"></a>    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">parse</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">response</span><span class="p">:</span> <span class="n">Response</span><span class="p">):</span>
+</span><span id="__span-1-9"><a id="__codelineno-1-9" name="__codelineno-1-9" href="#__codelineno-1-9"></a>        <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="n">response</span><span class="o">.</span><span class="n">xpath</span><span class="p">(</span><span class="s2">&quot;//title/text()&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">get</span><span class="p">())</span>
+</span><span id="__span-1-10"><a id="__codelineno-1-10" name="__codelineno-1-10" href="#__codelineno-1-10"></a>
+</span><span id="__span-1-11"><a id="__codelineno-1-11" name="__codelineno-1-11" href="#__codelineno-1-11"></a><span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s2">&quot;__main__&quot;</span><span class="p">:</span>
+</span><span id="__span-1-12"><a id="__codelineno-1-12" name="__codelineno-1-12" href="#__codelineno-1-12"></a>    <span class="n">MySpider</span><span class="p">()</span><span class="o">.</span><span class="n">run</span><span class="p">()</span>
+</span></code></pre></div>
+<h3 id="classic">Classic 项目（完整功能）<a class="headerlink" href="#classic" title="Permanent link">&para;</a></h3>
+<div class="language-text highlight"><span class="filename">Text Only</span><pre><span></span><code><span id="__span-2-1"><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a>my_project/
+</span><span id="__span-2-2"><a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a>├── spiders/               # 存放所有爬虫
+</span><span id="__span-2-3"><a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a>│   ├── __init__.py
+</span><span id="__span-2-4"><a id="__codelineno-2-4" name="__codelineno-2-4" href="#__codelineno-2-4"></a>│   ├── spider_1.py
+</span><span id="__span-2-5"><a id="__codelineno-2-5" name="__codelineno-2-5" href="#__codelineno-2-5"></a>│   └── spider_2.py
+</span><span id="__span-2-6"><a id="__codelineno-2-6" name="__codelineno-2-6" href="#__codelineno-2-6"></a>├── items.py              # 定义采集后的 Item
+</span><span id="__span-2-7"><a id="__codelineno-2-7" name="__codelineno-2-7" href="#__codelineno-2-7"></a>├── pipelines.py          # 自定义数据管道（可选）
+</span><span id="__span-2-8"><a id="__codelineno-2-8" name="__codelineno-2-8" href="#__codelineno-2-8"></a>├── middlewares.py        # 自定义中间件（可选）
+</span><span id="__span-2-9"><a id="__codelineno-2-9" name="__codelineno-2-9" href="#__codelineno-2-9"></a>├── settings.py           # 项目配置文件
+</span><span id="__span-2-10"><a id="__codelineno-2-10" name="__codelineno-2-10" href="#__codelineno-2-10"></a>└── run.py                # 启动入口
+</span></code></pre></div>
+<p>完整项目结构示例见 <a href="../../features/spider/">Spider 进阶</a>。</p>
+<h2 id="_4">模块对照表<a class="headerlink" href="#_4" title="Permanent link">&para;</a></h2>
+<table>
+<thead>
+<tr>
+<th>功能</th>
+<th>Lite</th>
+<th>Classic</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>爬虫基类</td>
+<td><code>LiteSpider</code></td>
+<td><code>Spider</code> / <code>TaskSpider</code></td>
+</tr>
+<tr>
+<td>请求/响应</td>
+<td><code>maize.common.http.Request/Response</code>（共享）</td>
+<td>同左</td>
+</tr>
+<tr>
+<td>数据项</td>
+<td><code>maize.common.items.Item</code>（共享）</td>
+<td>同左</td>
+</tr>
+<tr>
+<td>配置</td>
+<td>构造函数参数 + 可重写属性</td>
+<td><code>SpiderSettings</code>（文件/对象/环境变量）</td>
+</tr>
+<tr>
+<td>并发控制</td>
+<td><code>concurrency</code> 参数</td>
+<td><code>SpiderSettings.concurrency</code></td>
+</tr>
+<tr>
+<td>重试</td>
+<td><code>retry</code> 参数 + <code>should_retry</code></td>
+<td><code>RequestSettings.max_retry_count</code> + 中间件</td>
+</tr>
+<tr>
+<td>代理</td>
+<td><code>proxy</code> 参数</td>
+<td><code>ProxySettings</code> 或 <code>Request.proxy</code></td>
+</tr>
+<tr>
+<td>去重</td>
+<td>内置 <code>dedup</code> 属性</td>
+<td><code>DepthMiddleware</code> 等中间件</td>
+</tr>
+<tr>
+<td>深度控制</td>
+<td><code>max_depth</code> 属性</td>
+<td><code>DepthMiddleware</code></td>
+</tr>
+<tr>
+<td>数据处理</td>
+<td><code>process_item</code> 钩子</td>
+<td><code>Pipeline</code> 链</td>
+</tr>
+<tr>
+<td>下载器</td>
+<td>aiohttp（内置）</td>
+<td>可选 aiohttp/httpx/playwright/patchright</td>
+</tr>
+<tr>
+<td>中间件</td>
+<td>不支持</td>
+<td>三层中间件链</td>
+</tr>
+<tr>
+<td>日志</td>
+<td><code>self.logger</code></td>
+<td><code>self.logger</code> + <code>logger_handler</code> 配置</td>
+</tr>
+</tbody>
+</table>
 
 
 

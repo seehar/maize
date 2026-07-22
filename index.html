@@ -284,7 +284,7 @@
     
     
       <li class="md-tabs__item">
-        <a href="features/spider/" class="md-tabs__link">
+        <a href="features/lite_spider/" class="md-tabs__link">
           
   
     
@@ -432,7 +432,7 @@
         <li class="md-nav__item">
   <a href="#_3" class="md-nav__link">
     <span class="md-ellipsis">
-      环境要求
+      两种爬虫模式
     </span>
   </a>
   
@@ -440,6 +440,15 @@
       
         <li class="md-nav__item">
   <a href="#_4" class="md-nav__link">
+    <span class="md-ellipsis">
+      环境要求
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_5" class="md-nav__link">
     <span class="md-ellipsis">
       安装
     </span>
@@ -449,7 +458,7 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#_5" class="md-nav__link">
+  <a href="#_6" class="md-nav__link">
     <span class="md-ellipsis">
       基础安装
     </span>
@@ -458,7 +467,7 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#_6" class="md-nav__link">
+  <a href="#_7" class="md-nav__link">
     <span class="md-ellipsis">
       可选依赖
     </span>
@@ -472,7 +481,7 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#_7" class="md-nav__link">
+  <a href="#_8" class="md-nav__link">
     <span class="md-ellipsis">
       快速开始
     </span>
@@ -482,9 +491,18 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#_8" class="md-nav__link">
+  <a href="#lite" class="md-nav__link">
     <span class="md-ellipsis">
-      方式一：简单爬虫
+      方式一：Lite 爬虫（推荐入门）
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#classic-spider" class="md-nav__link">
+    <span class="md-ellipsis">
+      方式二：Classic Spider + 配置对象
     </span>
   </a>
   
@@ -493,7 +511,7 @@
           <li class="md-nav__item">
   <a href="#_9" class="md-nav__link">
     <span class="md-ellipsis">
-      方式二：使用配置对象
+      方式三：装饰器方式启动多个爬虫
     </span>
   </a>
   
@@ -502,16 +520,7 @@
           <li class="md-nav__item">
   <a href="#_10" class="md-nav__link">
     <span class="md-ellipsis">
-      方式三：装饰器方式启动爬虫
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#_11" class="md-nav__link">
-    <span class="md-ellipsis">
-      方式四：使用配置文件
+      方式四：配置文件
     </span>
   </a>
   
@@ -523,7 +532,7 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#_12" class="md-nav__link">
+  <a href="#_11" class="md-nav__link">
     <span class="md-ellipsis">
       核心概念
     </span>
@@ -544,25 +553,7 @@
           <li class="md-nav__item">
   <a href="#request-response" class="md-nav__link">
     <span class="md-ellipsis">
-      Request / Response 流程
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#request" class="md-nav__link">
-    <span class="md-ellipsis">
-      Request（请求）
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#response" class="md-nav__link">
-    <span class="md-ellipsis">
-      Response（响应）
+      Request / Response
     </span>
   </a>
   
@@ -578,18 +569,27 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#spidersettings" class="md-nav__link">
+  <a href="#pipeline" class="md-nav__link">
     <span class="md-ellipsis">
-      SpiderSettings（配置）
+      Pipeline（数据管道）
     </span>
   </a>
   
 </li>
         
           <li class="md-nav__item">
-  <a href="#pipeline" class="md-nav__link">
+  <a href="#_12" class="md-nav__link">
     <span class="md-ellipsis">
-      Pipeline（数据管道）
+      中间件系统
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#spidersettings" class="md-nav__link">
+    <span class="md-ellipsis">
+      SpiderSettings（配置）
     </span>
   </a>
   
@@ -757,6 +757,12 @@
       
         
       
+        
+      
+        
+      
+        
+      
     
     
     
@@ -791,6 +797,27 @@
             核心组件
           </label>
           <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="features/lite_spider/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Lite 轻量爬虫
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
             
               
                 
@@ -930,6 +957,48 @@
   
   <span class="md-ellipsis">
     Downloader 下载器
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="features/middleware/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    中间件系统
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="features/middleware_quick_reference/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    中间件速查
   </span>
   
 
@@ -1104,7 +1173,7 @@
         <li class="md-nav__item">
   <a href="#_3" class="md-nav__link">
     <span class="md-ellipsis">
-      环境要求
+      两种爬虫模式
     </span>
   </a>
   
@@ -1112,6 +1181,15 @@
       
         <li class="md-nav__item">
   <a href="#_4" class="md-nav__link">
+    <span class="md-ellipsis">
+      环境要求
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_5" class="md-nav__link">
     <span class="md-ellipsis">
       安装
     </span>
@@ -1121,7 +1199,7 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#_5" class="md-nav__link">
+  <a href="#_6" class="md-nav__link">
     <span class="md-ellipsis">
       基础安装
     </span>
@@ -1130,7 +1208,7 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#_6" class="md-nav__link">
+  <a href="#_7" class="md-nav__link">
     <span class="md-ellipsis">
       可选依赖
     </span>
@@ -1144,7 +1222,7 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#_7" class="md-nav__link">
+  <a href="#_8" class="md-nav__link">
     <span class="md-ellipsis">
       快速开始
     </span>
@@ -1154,9 +1232,18 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#_8" class="md-nav__link">
+  <a href="#lite" class="md-nav__link">
     <span class="md-ellipsis">
-      方式一：简单爬虫
+      方式一：Lite 爬虫（推荐入门）
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#classic-spider" class="md-nav__link">
+    <span class="md-ellipsis">
+      方式二：Classic Spider + 配置对象
     </span>
   </a>
   
@@ -1165,7 +1252,7 @@
           <li class="md-nav__item">
   <a href="#_9" class="md-nav__link">
     <span class="md-ellipsis">
-      方式二：使用配置对象
+      方式三：装饰器方式启动多个爬虫
     </span>
   </a>
   
@@ -1174,16 +1261,7 @@
           <li class="md-nav__item">
   <a href="#_10" class="md-nav__link">
     <span class="md-ellipsis">
-      方式三：装饰器方式启动爬虫
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#_11" class="md-nav__link">
-    <span class="md-ellipsis">
-      方式四：使用配置文件
+      方式四：配置文件
     </span>
   </a>
   
@@ -1195,7 +1273,7 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#_12" class="md-nav__link">
+  <a href="#_11" class="md-nav__link">
     <span class="md-ellipsis">
       核心概念
     </span>
@@ -1216,25 +1294,7 @@
           <li class="md-nav__item">
   <a href="#request-response" class="md-nav__link">
     <span class="md-ellipsis">
-      Request / Response 流程
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#request" class="md-nav__link">
-    <span class="md-ellipsis">
-      Request（请求）
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#response" class="md-nav__link">
-    <span class="md-ellipsis">
-      Response（响应）
+      Request / Response
     </span>
   </a>
   
@@ -1250,18 +1310,27 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#spidersettings" class="md-nav__link">
+  <a href="#pipeline" class="md-nav__link">
     <span class="md-ellipsis">
-      SpiderSettings（配置）
+      Pipeline（数据管道）
     </span>
   </a>
   
 </li>
         
           <li class="md-nav__item">
-  <a href="#pipeline" class="md-nav__link">
+  <a href="#_12" class="md-nav__link">
     <span class="md-ellipsis">
-      Pipeline（数据管道）
+      中间件系统
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#spidersettings" class="md-nav__link">
+    <span class="md-ellipsis">
+      SpiderSettings（配置）
     </span>
   </a>
   
@@ -1301,28 +1370,79 @@
 
 <h1 id="_1">简介及安装<a class="headerlink" href="#_1" title="Permanent link">&para;</a></h1>
 <blockquote>
-<p>maize 是一个基于异步、强大易用的 Python 爬虫框架</p>
+<p>maize 是一个基于 asyncio 的轻量级异步 Python 爬虫框架，提供 Lite 和 Classic 两种使用模式。</p>
 </blockquote>
 <h2 id="_2">特性<a class="headerlink" href="#_2" title="Permanent link">&para;</a></h2>
 <ul>
-<li>🚀 <strong>异步高性能</strong>：基于 asyncio 实现，支持高并发采集</li>
-<li>🎯 <strong>简单易用</strong>：提供简洁的 API，快速上手</li>
-<li>🔧 <strong>灵活配置</strong>：支持多种配置方式（代码、配置文件、环境变量）</li>
-<li>📦 <strong>插件化设计</strong>：下载器、管道、中间件均可自定义扩展</li>
-<li>🌐 <strong>多种下载器</strong>：内置 aiohttp、httpx、playwright、patchright 下载器</li>
-<li>🤖 <strong>RPA 支持</strong>：集成浏览器自动化，支持复杂页面采集</li>
-<li>📊 <strong>数据管道</strong>：支持多管道并行处理，自动批量入库</li>
+<li>🚀 <strong>异步高性能</strong>：基于 asyncio 实现，高并发采集</li>
+<li>🎯 <strong>双模式</strong>：Lite 轻量开箱即用，Classic 完整中间件/管道/调度器</li>
+<li>🧩 <strong>中间件系统</strong>：下载器/爬虫/管道三层中间件，可插拔扩展</li>
+<li>📦 <strong>插件化下载器</strong>：内置 aiohttp、httpx、playwright、patchright</li>
+<li>🤖 <strong>RPA 支持</strong>：浏览器自动化，动态页面采集与反检测</li>
+<li>📊 <strong>数据管道</strong>：多管道并行，批量入库，支持 MySQL/Redis/CSV 等</li>
 <li>🔄 <strong>分布式支持</strong>：基于 Redis 实现分布式爬虫</li>
-<li>⏸️ <strong>暂停/继续</strong>：支持爬虫暂停和继续功能</li>
-<li>📝 <strong>日志系统</strong>：灵活的日志配置，支持自定义日志处理器</li>
+<li>⏸️ <strong>暂停/继续</strong>：爬虫运行时暂停和恢复</li>
+<li>📝 <strong>灵活配置</strong>：代码、配置文件、环境变量、YAML/TOML 多方式配置</li>
 </ul>
-<h2 id="_3">环境要求<a class="headerlink" href="#_3" title="Permanent link">&para;</a></h2>
+<h2 id="_3">两种爬虫模式<a class="headerlink" href="#_3" title="Permanent link">&para;</a></h2>
+<p>maize 提供 Lite 和 Classic 两种模式，按场景选择：</p>
+<table>
+<thead>
+<tr>
+<th>维度</th>
+<th>Lite Spider</th>
+<th>Classic Spider</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>定位</td>
+<td>轻量开箱即用，单文件即跑</td>
+<td>完整功能，中间件/管道/调度器</td>
+</tr>
+<tr>
+<td>依赖</td>
+<td>aiohttp 单依赖</td>
+<td>可选 MySQL/Redis/Playwright</td>
+</tr>
+<tr>
+<td>配置</td>
+<td>构造函数参数 + 可重写属性</td>
+<td>SpiderSettings 文件/对象/环境变量</td>
+</tr>
+<tr>
+<td>中间件</td>
+<td>不支持</td>
+<td>三层中间件链</td>
+</tr>
+<tr>
+<td>数据管道</td>
+<td><code>process_item</code> 钩子</td>
+<td>Pipeline 链（批量入库）</td>
+</tr>
+<tr>
+<td>去重/深度</td>
+<td>内置（可关闭）</td>
+<td>中间件实现</td>
+</tr>
+<tr>
+<td>适用场景</td>
+<td>简单抓取、API 采集、监控轮询</td>
+<td>大型项目、多管道、分布式</td>
+</tr>
+</tbody>
+</table>
+<ul>
+<li><strong>Lite 模式</strong>：5 分钟上手，适合简单抓取。详见 <a href="features/lite_spider/">Lite 轻量爬虫</a>。</li>
+<li><strong>Classic 模式</strong>：完整功能，适合大型项目。详见 <a href="features/spider/">Spider 进阶</a>。</li>
+</ul>
+<h2 id="_4">环境要求<a class="headerlink" href="#_4" title="Permanent link">&para;</a></h2>
 <ul>
 <li>Python 3.10+</li>
 <li>Linux, Windows, macOS</li>
 </ul>
-<h2 id="_4">安装<a class="headerlink" href="#_4" title="Permanent link">&para;</a></h2>
-<h3 id="_5">基础安装<a class="headerlink" href="#_5" title="Permanent link">&para;</a></h3>
+<h2 id="_5">安装<a class="headerlink" href="#_5" title="Permanent link">&para;</a></h2>
+<h3 id="_6">基础安装<a class="headerlink" href="#_6" title="Permanent link">&para;</a></h3>
 <div class="tabbed-set tabbed-alternate" data-tabs="1:3"><input checked="checked" id="__tabbed_1_1" name="__tabbed_1" type="radio" /><input id="__tabbed_1_2" name="__tabbed_1" type="radio" /><input id="__tabbed_1_3" name="__tabbed_1" type="radio" /><div class="tabbed-labels"><label for="__tabbed_1_1">pip</label><label for="__tabbed_1_2">poetry</label><label for="__tabbed_1_3">uv</label></div>
 <div class="tabbed-content">
 <div class="tabbed-block">
@@ -1339,8 +1459,7 @@
 </div>
 </div>
 </div>
-<h3 id="_6">可选依赖<a class="headerlink" href="#_6" title="Permanent link">&para;</a></h3>
-<p>根据需要安装额外功能：</p>
+<h3 id="_7">可选依赖<a class="headerlink" href="#_7" title="Permanent link">&para;</a></h3>
 <div class="tabbed-set tabbed-alternate" data-tabs="2:4"><input checked="checked" id="__tabbed_2_1" name="__tabbed_2" type="radio" /><input id="__tabbed_2_2" name="__tabbed_2" type="radio" /><input id="__tabbed_2_3" name="__tabbed_2" type="radio" /><input id="__tabbed_2_4" name="__tabbed_2" type="radio" /><div class="tabbed-labels"><label for="__tabbed_2_1">RPA 支持（Playwright/Patchright）</label><label for="__tabbed_2_2">MySQL 支持</label><label for="__tabbed_2_3">Redis 分布式支持</label><label for="__tabbed_2_4">完整安装</label></div>
 <div class="tabbed-content">
 <div class="tabbed-block">
@@ -1363,168 +1482,136 @@
 </div>
 </div>
 </div>
-<h2 id="_7">快速开始<a class="headerlink" href="#_7" title="Permanent link">&para;</a></h2>
-<h3 id="_8">方式一：简单爬虫<a class="headerlink" href="#_8" title="Permanent link">&para;</a></h3>
-<p>最简单的爬虫示例：</p>
-<div class="language-python highlight"><span class="filename">Python</span><pre><span></span><code><span id="__span-7-1"><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a><span class="kn">from</span><span class="w"> </span><span class="nn">maize</span><span class="w"> </span><span class="kn">import</span> <span class="n">Request</span><span class="p">,</span> <span class="n">Response</span><span class="p">,</span> <span class="n">Spider</span>
+<h2 id="_8">快速开始<a class="headerlink" href="#_8" title="Permanent link">&para;</a></h2>
+<h3 id="lite">方式一：Lite 爬虫（推荐入门）<a class="headerlink" href="#lite" title="Permanent link">&para;</a></h3>
+<p>最轻量的用法，无需配置文件，构造函数即用：</p>
+<div class="language-python highlight"><span class="filename">Python</span><pre><span></span><code><span id="__span-7-1"><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a><span class="kn">from</span><span class="w"> </span><span class="nn">maize.aio.lite</span><span class="w"> </span><span class="kn">import</span> <span class="n">LiteSpider</span><span class="p">,</span> <span class="n">Request</span><span class="p">,</span> <span class="n">Response</span>
 </span><span id="__span-7-2"><a id="__codelineno-7-2" name="__codelineno-7-2" href="#__codelineno-7-2"></a>
-</span><span id="__span-7-3"><a id="__codelineno-7-3" name="__codelineno-7-3" href="#__codelineno-7-3"></a>
-</span><span id="__span-7-4"><a id="__codelineno-7-4" name="__codelineno-7-4" href="#__codelineno-7-4"></a><span class="k">class</span><span class="w"> </span><span class="nc">BaiduSpider</span><span class="p">(</span><span class="n">Spider</span><span class="p">):</span>
-</span><span id="__span-7-5"><a id="__codelineno-7-5" name="__codelineno-7-5" href="#__codelineno-7-5"></a>    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">start_requests</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-</span><span id="__span-7-6"><a id="__codelineno-7-6" name="__codelineno-7-6" href="#__codelineno-7-6"></a>        <span class="k">yield</span> <span class="n">Request</span><span class="p">(</span><span class="n">url</span><span class="o">=</span><span class="s2">&quot;http://www.baidu.com&quot;</span><span class="p">)</span>
-</span><span id="__span-7-7"><a id="__codelineno-7-7" name="__codelineno-7-7" href="#__codelineno-7-7"></a>
-</span><span id="__span-7-8"><a id="__codelineno-7-8" name="__codelineno-7-8" href="#__codelineno-7-8"></a>    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">parse</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">response</span><span class="p">:</span> <span class="n">Response</span><span class="p">):</span>
-</span><span id="__span-7-9"><a id="__codelineno-7-9" name="__codelineno-7-9" href="#__codelineno-7-9"></a>        <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;响应状态码: </span><span class="si">{</span><span class="n">response</span><span class="o">.</span><span class="n">status</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
-</span><span id="__span-7-10"><a id="__codelineno-7-10" name="__codelineno-7-10" href="#__codelineno-7-10"></a>        <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;响应内容: </span><span class="si">{</span><span class="n">response</span><span class="o">.</span><span class="n">text</span><span class="p">[:</span><span class="mi">100</span><span class="p">]</span><span class="si">}</span><span class="s2">...&quot;</span><span class="p">)</span>
-</span><span id="__span-7-11"><a id="__codelineno-7-11" name="__codelineno-7-11" href="#__codelineno-7-11"></a>
-</span><span id="__span-7-12"><a id="__codelineno-7-12" name="__codelineno-7-12" href="#__codelineno-7-12"></a>
-</span><span id="__span-7-13"><a id="__codelineno-7-13" name="__codelineno-7-13" href="#__codelineno-7-13"></a><span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s2">&quot;__main__&quot;</span><span class="p">:</span>
-</span><span id="__span-7-14"><a id="__codelineno-7-14" name="__codelineno-7-14" href="#__codelineno-7-14"></a>    <span class="n">BaiduSpider</span><span class="p">()</span><span class="o">.</span><span class="n">run</span><span class="p">()</span>
+</span><span id="__span-7-3"><a id="__codelineno-7-3" name="__codelineno-7-3" href="#__codelineno-7-3"></a><span class="k">class</span><span class="w"> </span><span class="nc">MySpider</span><span class="p">(</span><span class="n">LiteSpider</span><span class="p">):</span>
+</span><span id="__span-7-4"><a id="__codelineno-7-4" name="__codelineno-7-4" href="#__codelineno-7-4"></a>    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">start_requests</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+</span><span id="__span-7-5"><a id="__codelineno-7-5" name="__codelineno-7-5" href="#__codelineno-7-5"></a>        <span class="k">yield</span> <span class="n">Request</span><span class="p">(</span><span class="n">url</span><span class="o">=</span><span class="s2">&quot;https://example.com&quot;</span><span class="p">)</span>
+</span><span id="__span-7-6"><a id="__codelineno-7-6" name="__codelineno-7-6" href="#__codelineno-7-6"></a>
+</span><span id="__span-7-7"><a id="__codelineno-7-7" name="__codelineno-7-7" href="#__codelineno-7-7"></a>    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">parse</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">response</span><span class="p">:</span> <span class="n">Response</span><span class="p">):</span>
+</span><span id="__span-7-8"><a id="__codelineno-7-8" name="__codelineno-7-8" href="#__codelineno-7-8"></a>        <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;状态码: </span><span class="si">{</span><span class="n">response</span><span class="o">.</span><span class="n">status</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+</span><span id="__span-7-9"><a id="__codelineno-7-9" name="__codelineno-7-9" href="#__codelineno-7-9"></a>        <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;标题: </span><span class="si">{</span><span class="n">response</span><span class="o">.</span><span class="n">xpath</span><span class="p">(</span><span class="s1">&#39;//title/text()&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">get</span><span class="p">()</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+</span><span id="__span-7-10"><a id="__codelineno-7-10" name="__codelineno-7-10" href="#__codelineno-7-10"></a>
+</span><span id="__span-7-11"><a id="__codelineno-7-11" name="__codelineno-7-11" href="#__codelineno-7-11"></a><span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s2">&quot;__main__&quot;</span><span class="p">:</span>
+</span><span id="__span-7-12"><a id="__codelineno-7-12" name="__codelineno-7-12" href="#__codelineno-7-12"></a>    <span class="n">MySpider</span><span class="p">()</span><span class="o">.</span><span class="n">run</span><span class="p">()</span>
 </span></code></pre></div>
-<h3 id="_9">方式二：使用配置对象<a class="headerlink" href="#_9" title="Permanent link">&para;</a></h3>
-<p>使用 SpiderSettings 对象进行配置：</p>
-<div class="language-python highlight"><span class="filename">Python</span><pre><span></span><code><span id="__span-8-1"><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a><span class="kn">from</span><span class="w"> </span><span class="nn">maize</span><span class="w"> </span><span class="kn">import</span> <span class="n">Request</span><span class="p">,</span> <span class="n">Response</span><span class="p">,</span> <span class="n">Spider</span><span class="p">,</span> <span class="n">SpiderSettings</span>
+<p>Lite 爬虫内置并发、重试、代理、请求去重、深度控制、优先级队列、优雅关闭，
+详见 <a href="features/lite_spider/">Lite 轻量爬虫</a>。</p>
+<h3 id="classic-spider">方式二：Classic Spider + 配置对象<a class="headerlink" href="#classic-spider" title="Permanent link">&para;</a></h3>
+<div class="language-python highlight"><span class="filename">Python</span><pre><span></span><code><span id="__span-8-1"><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a><span class="kn">from</span><span class="w"> </span><span class="nn">maize</span><span class="w"> </span><span class="kn">import</span> <span class="n">Request</span><span class="p">,</span> <span class="n">Response</span><span class="p">,</span> <span class="n">Spider</span><span class="p">,</span> <span class="n">SpiderSettings</span><span class="p">,</span> <span class="n">SpiderDownloaderEnum</span><span class="p">,</span> <span class="n">LogLevelEnum</span>
 </span><span id="__span-8-2"><a id="__codelineno-8-2" name="__codelineno-8-2" href="#__codelineno-8-2"></a>
-</span><span id="__span-8-3"><a id="__codelineno-8-3" name="__codelineno-8-3" href="#__codelineno-8-3"></a>
-</span><span id="__span-8-4"><a id="__codelineno-8-4" name="__codelineno-8-4" href="#__codelineno-8-4"></a><span class="k">class</span><span class="w"> </span><span class="nc">SimpleSpider</span><span class="p">(</span><span class="n">Spider</span><span class="p">):</span>
-</span><span id="__span-8-5"><a id="__codelineno-8-5" name="__codelineno-8-5" href="#__codelineno-8-5"></a>    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">start_requests</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-</span><span id="__span-8-6"><a id="__codelineno-8-6" name="__codelineno-8-6" href="#__codelineno-8-6"></a>        <span class="k">yield</span> <span class="n">Request</span><span class="p">(</span><span class="n">url</span><span class="o">=</span><span class="s2">&quot;http://www.baidu.com&quot;</span><span class="p">)</span>
-</span><span id="__span-8-7"><a id="__codelineno-8-7" name="__codelineno-8-7" href="#__codelineno-8-7"></a>
-</span><span id="__span-8-8"><a id="__codelineno-8-8" name="__codelineno-8-8" href="#__codelineno-8-8"></a>    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">parse</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">response</span><span class="p">:</span> <span class="n">Response</span><span class="p">):</span>
-</span><span id="__span-8-9"><a id="__codelineno-8-9" name="__codelineno-8-9" href="#__codelineno-8-9"></a>        <span class="nb">print</span><span class="p">(</span><span class="n">response</span><span class="o">.</span><span class="n">text</span><span class="p">[:</span><span class="mi">100</span><span class="p">])</span>
-</span><span id="__span-8-10"><a id="__codelineno-8-10" name="__codelineno-8-10" href="#__codelineno-8-10"></a>
-</span><span id="__span-8-11"><a id="__codelineno-8-11" name="__codelineno-8-11" href="#__codelineno-8-11"></a>
-</span><span id="__span-8-12"><a id="__codelineno-8-12" name="__codelineno-8-12" href="#__codelineno-8-12"></a><span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s2">&quot;__main__&quot;</span><span class="p">:</span>
-</span><span id="__span-8-13"><a id="__codelineno-8-13" name="__codelineno-8-13" href="#__codelineno-8-13"></a>    <span class="n">settings</span> <span class="o">=</span> <span class="n">SpiderSettings</span><span class="p">(</span>
-</span><span id="__span-8-14"><a id="__codelineno-8-14" name="__codelineno-8-14" href="#__codelineno-8-14"></a>        <span class="n">project_name</span><span class="o">=</span><span class="s2">&quot;简单爬虫&quot;</span><span class="p">,</span>
-</span><span id="__span-8-15"><a id="__codelineno-8-15" name="__codelineno-8-15" href="#__codelineno-8-15"></a>        <span class="n">concurrency</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span>
-</span><span id="__span-8-16"><a id="__codelineno-8-16" name="__codelineno-8-16" href="#__codelineno-8-16"></a>        <span class="n">log_level</span><span class="o">=</span><span class="s2">&quot;DEBUG&quot;</span><span class="p">,</span>
-</span><span id="__span-8-17"><a id="__codelineno-8-17" name="__codelineno-8-17" href="#__codelineno-8-17"></a>        <span class="n">downloader</span><span class="o">=</span><span class="s2">&quot;maize.HTTPXDownloader&quot;</span>
-</span><span id="__span-8-18"><a id="__codelineno-8-18" name="__codelineno-8-18" href="#__codelineno-8-18"></a>    <span class="p">)</span>
-</span><span id="__span-8-19"><a id="__codelineno-8-19" name="__codelineno-8-19" href="#__codelineno-8-19"></a>
-</span><span id="__span-8-20"><a id="__codelineno-8-20" name="__codelineno-8-20" href="#__codelineno-8-20"></a>    <span class="n">SimpleSpider</span><span class="p">()</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">settings</span><span class="o">=</span><span class="n">settings</span><span class="p">)</span>
+</span><span id="__span-8-3"><a id="__codelineno-8-3" name="__codelineno-8-3" href="#__codelineno-8-3"></a><span class="k">class</span><span class="w"> </span><span class="nc">SimpleSpider</span><span class="p">(</span><span class="n">Spider</span><span class="p">):</span>
+</span><span id="__span-8-4"><a id="__codelineno-8-4" name="__codelineno-8-4" href="#__codelineno-8-4"></a>    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">start_requests</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+</span><span id="__span-8-5"><a id="__codelineno-8-5" name="__codelineno-8-5" href="#__codelineno-8-5"></a>        <span class="k">yield</span> <span class="n">Request</span><span class="p">(</span><span class="n">url</span><span class="o">=</span><span class="s2">&quot;http://www.baidu.com&quot;</span><span class="p">)</span>
+</span><span id="__span-8-6"><a id="__codelineno-8-6" name="__codelineno-8-6" href="#__codelineno-8-6"></a>
+</span><span id="__span-8-7"><a id="__codelineno-8-7" name="__codelineno-8-7" href="#__codelineno-8-7"></a>    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">parse</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">response</span><span class="p">:</span> <span class="n">Response</span><span class="p">):</span>
+</span><span id="__span-8-8"><a id="__codelineno-8-8" name="__codelineno-8-8" href="#__codelineno-8-8"></a>        <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="n">response</span><span class="o">.</span><span class="n">text</span><span class="p">[:</span><span class="mi">100</span><span class="p">])</span>
+</span><span id="__span-8-9"><a id="__codelineno-8-9" name="__codelineno-8-9" href="#__codelineno-8-9"></a>
+</span><span id="__span-8-10"><a id="__codelineno-8-10" name="__codelineno-8-10" href="#__codelineno-8-10"></a><span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s2">&quot;__main__&quot;</span><span class="p">:</span>
+</span><span id="__span-8-11"><a id="__codelineno-8-11" name="__codelineno-8-11" href="#__codelineno-8-11"></a>    <span class="n">settings</span> <span class="o">=</span> <span class="n">SpiderSettings</span><span class="p">(</span>
+</span><span id="__span-8-12"><a id="__codelineno-8-12" name="__codelineno-8-12" href="#__codelineno-8-12"></a>        <span class="n">project_name</span><span class="o">=</span><span class="s2">&quot;简单爬虫&quot;</span><span class="p">,</span>
+</span><span id="__span-8-13"><a id="__codelineno-8-13" name="__codelineno-8-13" href="#__codelineno-8-13"></a>        <span class="n">concurrency</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span>
+</span><span id="__span-8-14"><a id="__codelineno-8-14" name="__codelineno-8-14" href="#__codelineno-8-14"></a>        <span class="n">log_level</span><span class="o">=</span><span class="n">LogLevelEnum</span><span class="o">.</span><span class="n">DEBUG</span><span class="o">.</span><span class="n">value</span><span class="p">,</span>
+</span><span id="__span-8-15"><a id="__codelineno-8-15" name="__codelineno-8-15" href="#__codelineno-8-15"></a>        <span class="n">downloader</span><span class="o">=</span><span class="n">SpiderDownloaderEnum</span><span class="o">.</span><span class="n">HTTPX</span><span class="o">.</span><span class="n">value</span>
+</span><span id="__span-8-16"><a id="__codelineno-8-16" name="__codelineno-8-16" href="#__codelineno-8-16"></a>    <span class="p">)</span>
+</span><span id="__span-8-17"><a id="__codelineno-8-17" name="__codelineno-8-17" href="#__codelineno-8-17"></a>    <span class="n">SimpleSpider</span><span class="p">()</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">settings</span><span class="o">=</span><span class="n">settings</span><span class="p">)</span>
 </span></code></pre></div>
-<h3 id="_10">方式三：装饰器方式启动爬虫<a class="headerlink" href="#_10" title="Permanent link">&para;</a></h3>
-<p>使用装饰器注册并启动多个爬虫：</p>
+<h3 id="_9">方式三：装饰器方式启动多个爬虫<a class="headerlink" href="#_9" title="Permanent link">&para;</a></h3>
 <div class="language-python highlight"><span class="filename">Python</span><pre><span></span><code><span id="__span-9-1"><a id="__codelineno-9-1" name="__codelineno-9-1" href="#__codelineno-9-1"></a><span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">AsyncGenerator</span>
 </span><span id="__span-9-2"><a id="__codelineno-9-2" name="__codelineno-9-2" href="#__codelineno-9-2"></a>
-</span><span id="__span-9-3"><a id="__codelineno-9-3" name="__codelineno-9-3" href="#__codelineno-9-3"></a><span class="kn">from</span><span class="w"> </span><span class="nn">maize</span><span class="w"> </span><span class="kn">import</span> <span class="n">Request</span><span class="p">,</span> <span class="n">Response</span><span class="p">,</span> <span class="n">Spider</span><span class="p">,</span> <span class="n">SpiderEntry</span>
+</span><span id="__span-9-3"><a id="__codelineno-9-3" name="__codelineno-9-3" href="#__codelineno-9-3"></a><span class="kn">from</span><span class="w"> </span><span class="nn">maize</span><span class="w"> </span><span class="kn">import</span> <span class="n">Request</span><span class="p">,</span> <span class="n">Response</span><span class="p">,</span> <span class="n">Spider</span><span class="p">,</span> <span class="n">SpiderEntry</span><span class="p">,</span> <span class="n">SpiderDownloaderEnum</span><span class="p">,</span> <span class="n">LogLevelEnum</span>
 </span><span id="__span-9-4"><a id="__codelineno-9-4" name="__codelineno-9-4" href="#__codelineno-9-4"></a>
 </span><span id="__span-9-5"><a id="__codelineno-9-5" name="__codelineno-9-5" href="#__codelineno-9-5"></a><span class="n">spider_entry</span> <span class="o">=</span> <span class="n">SpiderEntry</span><span class="p">()</span>
 </span><span id="__span-9-6"><a id="__codelineno-9-6" name="__codelineno-9-6" href="#__codelineno-9-6"></a>
-</span><span id="__span-9-7"><a id="__codelineno-9-7" name="__codelineno-9-7" href="#__codelineno-9-7"></a>
-</span><span id="__span-9-8"><a id="__codelineno-9-8" name="__codelineno-9-8" href="#__codelineno-9-8"></a><span class="nd">@spider_entry</span><span class="o">.</span><span class="n">register</span><span class="p">(</span><span class="n">settings</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;downloader&quot;</span><span class="p">:</span> <span class="s2">&quot;maize.HTTPXDownloader&quot;</span><span class="p">})</span>
-</span><span id="__span-9-9"><a id="__codelineno-9-9" name="__codelineno-9-9" href="#__codelineno-9-9"></a><span class="k">class</span><span class="w"> </span><span class="nc">DecoratorSpider</span><span class="p">(</span><span class="n">Spider</span><span class="p">):</span>
-</span><span id="__span-9-10"><a id="__codelineno-9-10" name="__codelineno-9-10" href="#__codelineno-9-10"></a>    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">start_requests</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">AsyncGenerator</span><span class="p">[</span><span class="n">Request</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span>
-</span><span id="__span-9-11"><a id="__codelineno-9-11" name="__codelineno-9-11" href="#__codelineno-9-11"></a>        <span class="k">yield</span> <span class="n">Request</span><span class="p">(</span><span class="n">url</span><span class="o">=</span><span class="s2">&quot;http://www.baidu.com&quot;</span><span class="p">)</span>
-</span><span id="__span-9-12"><a id="__codelineno-9-12" name="__codelineno-9-12" href="#__codelineno-9-12"></a>
-</span><span id="__span-9-13"><a id="__codelineno-9-13" name="__codelineno-9-13" href="#__codelineno-9-13"></a>    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">parse</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">response</span><span class="p">:</span> <span class="n">Response</span><span class="p">):</span>
-</span><span id="__span-9-14"><a id="__codelineno-9-14" name="__codelineno-9-14" href="#__codelineno-9-14"></a>        <span class="nb">print</span><span class="p">(</span><span class="n">response</span><span class="o">.</span><span class="n">text</span><span class="p">[:</span><span class="mi">100</span><span class="p">])</span>
-</span><span id="__span-9-15"><a id="__codelineno-9-15" name="__codelineno-9-15" href="#__codelineno-9-15"></a>
-</span><span id="__span-9-16"><a id="__codelineno-9-16" name="__codelineno-9-16" href="#__codelineno-9-16"></a>
-</span><span id="__span-9-17"><a id="__codelineno-9-17" name="__codelineno-9-17" href="#__codelineno-9-17"></a><span class="nd">@spider_entry</span><span class="o">.</span><span class="n">register</span><span class="p">(</span><span class="n">settings</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;concurrency&quot;</span><span class="p">:</span> <span class="mi">3</span><span class="p">})</span>
-</span><span id="__span-9-18"><a id="__codelineno-9-18" name="__codelineno-9-18" href="#__codelineno-9-18"></a><span class="k">class</span><span class="w"> </span><span class="nc">AnotherSpider</span><span class="p">(</span><span class="n">Spider</span><span class="p">):</span>
-</span><span id="__span-9-19"><a id="__codelineno-9-19" name="__codelineno-9-19" href="#__codelineno-9-19"></a>    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">start_requests</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">AsyncGenerator</span><span class="p">[</span><span class="n">Request</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span>
-</span><span id="__span-9-20"><a id="__codelineno-9-20" name="__codelineno-9-20" href="#__codelineno-9-20"></a>        <span class="k">yield</span> <span class="n">Request</span><span class="p">(</span><span class="n">url</span><span class="o">=</span><span class="s2">&quot;http://www.example.com&quot;</span><span class="p">)</span>
-</span><span id="__span-9-21"><a id="__codelineno-9-21" name="__codelineno-9-21" href="#__codelineno-9-21"></a>
-</span><span id="__span-9-22"><a id="__codelineno-9-22" name="__codelineno-9-22" href="#__codelineno-9-22"></a>    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">parse</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">response</span><span class="p">:</span> <span class="n">Response</span><span class="p">):</span>
-</span><span id="__span-9-23"><a id="__codelineno-9-23" name="__codelineno-9-23" href="#__codelineno-9-23"></a>        <span class="nb">print</span><span class="p">(</span><span class="n">response</span><span class="o">.</span><span class="n">status</span><span class="p">)</span>
-</span><span id="__span-9-24"><a id="__codelineno-9-24" name="__codelineno-9-24" href="#__codelineno-9-24"></a>
-</span><span id="__span-9-25"><a id="__codelineno-9-25" name="__codelineno-9-25" href="#__codelineno-9-25"></a>
-</span><span id="__span-9-26"><a id="__codelineno-9-26" name="__codelineno-9-26" href="#__codelineno-9-26"></a><span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s2">&quot;__main__&quot;</span><span class="p">:</span>
-</span><span id="__span-9-27"><a id="__codelineno-9-27" name="__codelineno-9-27" href="#__codelineno-9-27"></a>    <span class="n">spider_entry</span><span class="o">.</span><span class="n">run</span><span class="p">()</span>
+</span><span id="__span-9-7"><a id="__codelineno-9-7" name="__codelineno-9-7" href="#__codelineno-9-7"></a><span class="nd">@spider_entry</span><span class="o">.</span><span class="n">register</span><span class="p">(</span><span class="n">settings</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;downloader&quot;</span><span class="p">:</span> <span class="n">SpiderDownloaderEnum</span><span class="o">.</span><span class="n">HTTPX</span><span class="o">.</span><span class="n">value</span><span class="p">})</span>
+</span><span id="__span-9-8"><a id="__codelineno-9-8" name="__codelineno-9-8" href="#__codelineno-9-8"></a><span class="k">class</span><span class="w"> </span><span class="nc">DecoratorSpider</span><span class="p">(</span><span class="n">Spider</span><span class="p">):</span>
+</span><span id="__span-9-9"><a id="__codelineno-9-9" name="__codelineno-9-9" href="#__codelineno-9-9"></a>    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">start_requests</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">AsyncGenerator</span><span class="p">[</span><span class="n">Request</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span>
+</span><span id="__span-9-10"><a id="__codelineno-9-10" name="__codelineno-9-10" href="#__codelineno-9-10"></a>        <span class="k">yield</span> <span class="n">Request</span><span class="p">(</span><span class="n">url</span><span class="o">=</span><span class="s2">&quot;http://www.baidu.com&quot;</span><span class="p">)</span>
+</span><span id="__span-9-11"><a id="__codelineno-9-11" name="__codelineno-9-11" href="#__codelineno-9-11"></a>
+</span><span id="__span-9-12"><a id="__codelineno-9-12" name="__codelineno-9-12" href="#__codelineno-9-12"></a>    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">parse</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">response</span><span class="p">:</span> <span class="n">Response</span><span class="p">):</span>
+</span><span id="__span-9-13"><a id="__codelineno-9-13" name="__codelineno-9-13" href="#__codelineno-9-13"></a>        <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="n">response</span><span class="o">.</span><span class="n">text</span><span class="p">[:</span><span class="mi">100</span><span class="p">])</span>
+</span><span id="__span-9-14"><a id="__codelineno-9-14" name="__codelineno-9-14" href="#__codelineno-9-14"></a>
+</span><span id="__span-9-15"><a id="__codelineno-9-15" name="__codelineno-9-15" href="#__codelineno-9-15"></a><span class="nd">@spider_entry</span><span class="o">.</span><span class="n">register</span><span class="p">(</span><span class="n">settings</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;concurrency&quot;</span><span class="p">:</span> <span class="mi">3</span><span class="p">})</span>
+</span><span id="__span-9-16"><a id="__codelineno-9-16" name="__codelineno-9-16" href="#__codelineno-9-16"></a><span class="k">class</span><span class="w"> </span><span class="nc">AnotherSpider</span><span class="p">(</span><span class="n">Spider</span><span class="p">):</span>
+</span><span id="__span-9-17"><a id="__codelineno-9-17" name="__codelineno-9-17" href="#__codelineno-9-17"></a>    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">start_requests</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">AsyncGenerator</span><span class="p">[</span><span class="n">Request</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span>
+</span><span id="__span-9-18"><a id="__codelineno-9-18" name="__codelineno-9-18" href="#__codelineno-9-18"></a>        <span class="k">yield</span> <span class="n">Request</span><span class="p">(</span><span class="n">url</span><span class="o">=</span><span class="s2">&quot;http://www.example.com&quot;</span><span class="p">)</span>
+</span><span id="__span-9-19"><a id="__codelineno-9-19" name="__codelineno-9-19" href="#__codelineno-9-19"></a>
+</span><span id="__span-9-20"><a id="__codelineno-9-20" name="__codelineno-9-20" href="#__codelineno-9-20"></a>    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">parse</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">response</span><span class="p">:</span> <span class="n">Response</span><span class="p">):</span>
+</span><span id="__span-9-21"><a id="__codelineno-9-21" name="__codelineno-9-21" href="#__codelineno-9-21"></a>        <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="n">response</span><span class="o">.</span><span class="n">status</span><span class="p">)</span>
+</span><span id="__span-9-22"><a id="__codelineno-9-22" name="__codelineno-9-22" href="#__codelineno-9-22"></a>
+</span><span id="__span-9-23"><a id="__codelineno-9-23" name="__codelineno-9-23" href="#__codelineno-9-23"></a><span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s2">&quot;__main__&quot;</span><span class="p">:</span>
+</span><span id="__span-9-24"><a id="__codelineno-9-24" name="__codelineno-9-24" href="#__codelineno-9-24"></a>    <span class="n">spider_entry</span><span class="o">.</span><span class="n">run</span><span class="p">()</span>
 </span></code></pre></div>
-<h3 id="_11">方式四：使用配置文件<a class="headerlink" href="#_11" title="Permanent link">&para;</a></h3>
+<h3 id="_10">方式四：配置文件<a class="headerlink" href="#_10" title="Permanent link">&para;</a></h3>
 <p>创建 <code>settings.py</code> 配置文件：</p>
 <div class="language-python highlight"><span class="filename">Python</span><pre><span></span><code><span id="__span-10-1"><a id="__codelineno-10-1" name="__codelineno-10-1" href="#__codelineno-10-1"></a><span class="c1"># settings.py</span>
-</span><span id="__span-10-2"><a id="__codelineno-10-2" name="__codelineno-10-2" href="#__codelineno-10-2"></a><span class="kn">from</span><span class="w"> </span><span class="nn">maize</span><span class="w"> </span><span class="kn">import</span> <span class="n">SpiderSettings</span>
+</span><span id="__span-10-2"><a id="__codelineno-10-2" name="__codelineno-10-2" href="#__codelineno-10-2"></a><span class="kn">from</span><span class="w"> </span><span class="nn">maize</span><span class="w"> </span><span class="kn">import</span> <span class="n">SpiderSettings</span><span class="p">,</span> <span class="n">SpiderDownloaderEnum</span><span class="p">,</span> <span class="n">LogLevelEnum</span>
 </span><span id="__span-10-3"><a id="__codelineno-10-3" name="__codelineno-10-3" href="#__codelineno-10-3"></a>
-</span><span id="__span-10-4"><a id="__codelineno-10-4" name="__codelineno-10-4" href="#__codelineno-10-4"></a>
-</span><span id="__span-10-5"><a id="__codelineno-10-5" name="__codelineno-10-5" href="#__codelineno-10-5"></a><span class="k">class</span><span class="w"> </span><span class="nc">Settings</span><span class="p">(</span><span class="n">SpiderSettings</span><span class="p">):</span>
-</span><span id="__span-10-6"><a id="__codelineno-10-6" name="__codelineno-10-6" href="#__codelineno-10-6"></a>    <span class="n">project_name</span> <span class="o">=</span> <span class="s2">&quot;我的爬虫项目&quot;</span>
-</span><span id="__span-10-7"><a id="__codelineno-10-7" name="__codelineno-10-7" href="#__codelineno-10-7"></a>    <span class="n">concurrency</span> <span class="o">=</span> <span class="mi">10</span>
-</span><span id="__span-10-8"><a id="__codelineno-10-8" name="__codelineno-10-8" href="#__codelineno-10-8"></a>    <span class="n">log_level</span> <span class="o">=</span> <span class="s2">&quot;INFO&quot;</span>
-</span><span id="__span-10-9"><a id="__codelineno-10-9" name="__codelineno-10-9" href="#__codelineno-10-9"></a>    <span class="n">downloader</span> <span class="o">=</span> <span class="s2">&quot;maize.AioHttpDownloader&quot;</span>
+</span><span id="__span-10-4"><a id="__codelineno-10-4" name="__codelineno-10-4" href="#__codelineno-10-4"></a><span class="k">class</span><span class="w"> </span><span class="nc">Settings</span><span class="p">(</span><span class="n">SpiderSettings</span><span class="p">):</span>
+</span><span id="__span-10-5"><a id="__codelineno-10-5" name="__codelineno-10-5" href="#__codelineno-10-5"></a>    <span class="n">project_name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;我的爬虫项目&quot;</span>
+</span><span id="__span-10-6"><a id="__codelineno-10-6" name="__codelineno-10-6" href="#__codelineno-10-6"></a>    <span class="n">concurrency</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">10</span>
+</span><span id="__span-10-7"><a id="__codelineno-10-7" name="__codelineno-10-7" href="#__codelineno-10-7"></a>    <span class="n">log_level</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">LogLevelEnum</span><span class="o">.</span><span class="n">INFO</span><span class="o">.</span><span class="n">value</span>
+</span><span id="__span-10-8"><a id="__codelineno-10-8" name="__codelineno-10-8" href="#__codelineno-10-8"></a>    <span class="n">downloader</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">SpiderDownloaderEnum</span><span class="o">.</span><span class="n">AIOHTTP</span><span class="o">.</span><span class="n">value</span>
 </span></code></pre></div>
 <p>在爬虫中使用配置文件：</p>
 <div class="language-python highlight"><span class="filename">Python</span><pre><span></span><code><span id="__span-11-1"><a id="__codelineno-11-1" name="__codelineno-11-1" href="#__codelineno-11-1"></a><span class="kn">from</span><span class="w"> </span><span class="nn">maize</span><span class="w"> </span><span class="kn">import</span> <span class="n">Request</span><span class="p">,</span> <span class="n">Response</span><span class="p">,</span> <span class="n">Spider</span>
 </span><span id="__span-11-2"><a id="__codelineno-11-2" name="__codelineno-11-2" href="#__codelineno-11-2"></a>
-</span><span id="__span-11-3"><a id="__codelineno-11-3" name="__codelineno-11-3" href="#__codelineno-11-3"></a>
-</span><span id="__span-11-4"><a id="__codelineno-11-4" name="__codelineno-11-4" href="#__codelineno-11-4"></a><span class="k">class</span><span class="w"> </span><span class="nc">MySpider</span><span class="p">(</span><span class="n">Spider</span><span class="p">):</span>
-</span><span id="__span-11-5"><a id="__codelineno-11-5" name="__codelineno-11-5" href="#__codelineno-11-5"></a>    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">start_requests</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-</span><span id="__span-11-6"><a id="__codelineno-11-6" name="__codelineno-11-6" href="#__codelineno-11-6"></a>        <span class="k">yield</span> <span class="n">Request</span><span class="p">(</span><span class="n">url</span><span class="o">=</span><span class="s2">&quot;http://www.example.com&quot;</span><span class="p">)</span>
-</span><span id="__span-11-7"><a id="__codelineno-11-7" name="__codelineno-11-7" href="#__codelineno-11-7"></a>
-</span><span id="__span-11-8"><a id="__codelineno-11-8" name="__codelineno-11-8" href="#__codelineno-11-8"></a>    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">parse</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">response</span><span class="p">:</span> <span class="n">Response</span><span class="p">):</span>
-</span><span id="__span-11-9"><a id="__codelineno-11-9" name="__codelineno-11-9" href="#__codelineno-11-9"></a>        <span class="nb">print</span><span class="p">(</span><span class="n">response</span><span class="o">.</span><span class="n">text</span><span class="p">)</span>
-</span><span id="__span-11-10"><a id="__codelineno-11-10" name="__codelineno-11-10" href="#__codelineno-11-10"></a>
-</span><span id="__span-11-11"><a id="__codelineno-11-11" name="__codelineno-11-11" href="#__codelineno-11-11"></a>
-</span><span id="__span-11-12"><a id="__codelineno-11-12" name="__codelineno-11-12" href="#__codelineno-11-12"></a><span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s2">&quot;__main__&quot;</span><span class="p">:</span>
-</span><span id="__span-11-13"><a id="__codelineno-11-13" name="__codelineno-11-13" href="#__codelineno-11-13"></a>    <span class="c1"># 自动加载当前目录下的 settings.Settings 类</span>
-</span><span id="__span-11-14"><a id="__codelineno-11-14" name="__codelineno-11-14" href="#__codelineno-11-14"></a>    <span class="n">MySpider</span><span class="p">()</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">settings_path</span><span class="o">=</span><span class="s2">&quot;settings.Settings&quot;</span><span class="p">)</span>
+</span><span id="__span-11-3"><a id="__codelineno-11-3" name="__codelineno-11-3" href="#__codelineno-11-3"></a><span class="k">class</span><span class="w"> </span><span class="nc">MySpider</span><span class="p">(</span><span class="n">Spider</span><span class="p">):</span>
+</span><span id="__span-11-4"><a id="__codelineno-11-4" name="__codelineno-11-4" href="#__codelineno-11-4"></a>    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">start_requests</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+</span><span id="__span-11-5"><a id="__codelineno-11-5" name="__codelineno-11-5" href="#__codelineno-11-5"></a>        <span class="k">yield</span> <span class="n">Request</span><span class="p">(</span><span class="n">url</span><span class="o">=</span><span class="s2">&quot;http://www.example.com&quot;</span><span class="p">)</span>
+</span><span id="__span-11-6"><a id="__codelineno-11-6" name="__codelineno-11-6" href="#__codelineno-11-6"></a>
+</span><span id="__span-11-7"><a id="__codelineno-11-7" name="__codelineno-11-7" href="#__codelineno-11-7"></a>    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">parse</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">response</span><span class="p">:</span> <span class="n">Response</span><span class="p">):</span>
+</span><span id="__span-11-8"><a id="__codelineno-11-8" name="__codelineno-11-8" href="#__codelineno-11-8"></a>        <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="n">response</span><span class="o">.</span><span class="n">text</span><span class="p">)</span>
+</span><span id="__span-11-9"><a id="__codelineno-11-9" name="__codelineno-11-9" href="#__codelineno-11-9"></a>
+</span><span id="__span-11-10"><a id="__codelineno-11-10" name="__codelineno-11-10" href="#__codelineno-11-10"></a><span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s2">&quot;__main__&quot;</span><span class="p">:</span>
+</span><span id="__span-11-11"><a id="__codelineno-11-11" name="__codelineno-11-11" href="#__codelineno-11-11"></a>    <span class="c1"># 自动加载当前目录下的 settings.Settings 类</span>
+</span><span id="__span-11-12"><a id="__codelineno-11-12" name="__codelineno-11-12" href="#__codelineno-11-12"></a>    <span class="n">MySpider</span><span class="p">()</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">settings_path</span><span class="o">=</span><span class="s2">&quot;settings.Settings&quot;</span><span class="p">)</span>
 </span></code></pre></div>
-<h2 id="_12">核心概念<a class="headerlink" href="#_12" title="Permanent link">&para;</a></h2>
+<h2 id="_11">核心概念<a class="headerlink" href="#_11" title="Permanent link">&para;</a></h2>
 <h3 id="spider">Spider（爬虫）<a class="headerlink" href="#spider" title="Permanent link">&para;</a></h3>
 <p>maize 提供两种爬虫模式：</p>
 <ul>
+<li><strong>Lite Spider</strong>：轻量级，内置并发、重试、代理、去重、深度控制，无中间件</li>
 <li><strong>Classic Spider</strong>：完整功能，支持中间件、管道、调度器</li>
-<li><strong>Lite Spider</strong>：轻量级，内置并发、重试、代理，无中间件</li>
 </ul>
-<p>详见 <a href="features/lite_spider/">Lite 轻量爬虫</a>。</p>
-<h3 id="request-response">Request / Response 流程<a class="headerlink" href="#request-response" title="Permanent link">&para;</a></h3>
+<h3 id="request-response">Request / Response<a class="headerlink" href="#request-response" title="Permanent link">&para;</a></h3>
 <ul>
 <li><strong>start_requests</strong>：生成初始请求</li>
 <li><strong>parse</strong>：解析响应，可以 yield Request（新请求）或 Item（数据）</li>
 </ul>
-<h3 id="request">Request（请求）<a class="headerlink" href="#request" title="Permanent link">&para;</a></h3>
-<p><code>Request</code> 封装了 HTTP 请求的所有参数，支持：</p>
-<ul>
-<li>多种 HTTP 方法（GET、POST、PUT 等）</li>
-<li>自定义请求头、参数、数据</li>
-<li>代理支持</li>
-<li>优先级控制</li>
-<li>自定义回调函数</li>
-</ul>
-<h3 id="response">Response（响应）<a class="headerlink" href="#response" title="Permanent link">&para;</a></h3>
-<p><code>Response</code> 封装了 HTTP 响应，提供便捷的数据提取方法：</p>
-<ul>
-<li><code>text</code>：响应文本</li>
-<li><code>body</code>：响应二进制数据</li>
-<li><code>json()</code>：解析 JSON</li>
-<li><code>xpath()</code>：XPath 选择器</li>
-<li><code>css()</code>：CSS 选择器</li>
-</ul>
+<p><code>Request</code> 封装 HTTP 请求参数，支持多种方法、自定义头、代理、优先级、自定义回调。
+<code>Response</code> 封装响应，提供 <code>text</code>、<code>body</code>、<code>json()</code>、<code>xpath()</code>、<code>css()</code> 等方法。</p>
 <h3 id="item">Item（数据项）<a class="headerlink" href="#item" title="Permanent link">&para;</a></h3>
 <p><code>Item</code> 用于定义采集的数据结构：</p>
 <div class="language-python highlight"><span class="filename">Python</span><pre><span></span><code><span id="__span-12-1"><a id="__codelineno-12-1" name="__codelineno-12-1" href="#__codelineno-12-1"></a><span class="kn">from</span><span class="w"> </span><span class="nn">maize</span><span class="w"> </span><span class="kn">import</span> <span class="n">Field</span><span class="p">,</span> <span class="n">Item</span>
 </span><span id="__span-12-2"><a id="__codelineno-12-2" name="__codelineno-12-2" href="#__codelineno-12-2"></a>
-</span><span id="__span-12-3"><a id="__codelineno-12-3" name="__codelineno-12-3" href="#__codelineno-12-3"></a>
-</span><span id="__span-12-4"><a id="__codelineno-12-4" name="__codelineno-12-4" href="#__codelineno-12-4"></a><span class="k">class</span><span class="w"> </span><span class="nc">MyItem</span><span class="p">(</span><span class="n">Item</span><span class="p">):</span>
-</span><span id="__span-12-5"><a id="__codelineno-12-5" name="__codelineno-12-5" href="#__codelineno-12-5"></a>    <span class="n">__table_name__</span> <span class="o">=</span> <span class="s2">&quot;my_table&quot;</span>  <span class="c1"># 数据库表名（可选）</span>
-</span><span id="__span-12-6"><a id="__codelineno-12-6" name="__codelineno-12-6" href="#__codelineno-12-6"></a>
-</span><span id="__span-12-7"><a id="__codelineno-12-7" name="__codelineno-12-7" href="#__codelineno-12-7"></a>    <span class="n">title</span> <span class="o">=</span> <span class="n">Field</span><span class="p">()</span>
-</span><span id="__span-12-8"><a id="__codelineno-12-8" name="__codelineno-12-8" href="#__codelineno-12-8"></a>    <span class="n">url</span> <span class="o">=</span> <span class="n">Field</span><span class="p">()</span>
-</span><span id="__span-12-9"><a id="__codelineno-12-9" name="__codelineno-12-9" href="#__codelineno-12-9"></a>    <span class="n">content</span> <span class="o">=</span> <span class="n">Field</span><span class="p">()</span>
+</span><span id="__span-12-3"><a id="__codelineno-12-3" name="__codelineno-12-3" href="#__codelineno-12-3"></a><span class="k">class</span><span class="w"> </span><span class="nc">MyItem</span><span class="p">(</span><span class="n">Item</span><span class="p">):</span>
+</span><span id="__span-12-4"><a id="__codelineno-12-4" name="__codelineno-12-4" href="#__codelineno-12-4"></a>    <span class="n">__table_name__</span> <span class="o">=</span> <span class="s2">&quot;my_table&quot;</span>  <span class="c1"># 数据库表名（可选）</span>
+</span><span id="__span-12-5"><a id="__codelineno-12-5" name="__codelineno-12-5" href="#__codelineno-12-5"></a>
+</span><span id="__span-12-6"><a id="__codelineno-12-6" name="__codelineno-12-6" href="#__codelineno-12-6"></a>    <span class="n">title</span> <span class="o">=</span> <span class="n">Field</span><span class="p">()</span>
+</span><span id="__span-12-7"><a id="__codelineno-12-7" name="__codelineno-12-7" href="#__codelineno-12-7"></a>    <span class="n">url</span> <span class="o">=</span> <span class="n">Field</span><span class="p">()</span>
+</span><span id="__span-12-8"><a id="__codelineno-12-8" name="__codelineno-12-8" href="#__codelineno-12-8"></a>    <span class="n">content</span> <span class="o">=</span> <span class="n">Field</span><span class="p">()</span>
 </span></code></pre></div>
-<h3 id="spidersettings">SpiderSettings（配置）<a class="headerlink" href="#spidersettings" title="Permanent link">&para;</a></h3>
-<p><code>SpiderSettings</code> 是配置类，支持多种配置方式：</p>
-<ul>
-<li>代码配置</li>
-<li>配置文件（支持 .env、.yaml、.toml）</li>
-<li>环境变量</li>
-</ul>
 <h3 id="pipeline">Pipeline（数据管道）<a class="headerlink" href="#pipeline" title="Permanent link">&para;</a></h3>
-<p><code>Pipeline</code> 用于处理采集到的数据，支持自定义数据处理逻辑：</p>
 <ul>
-<li>数据清洗</li>
-<li>数据验证</li>
-<li>数据入库</li>
-<li>数据转换</li>
+<li><strong>Classic 模式</strong>：Pipeline 链，多管道并行处理，自动批量入库</li>
+<li><strong>Lite 模式</strong>：<code>process_item</code> 钩子，轻量数据落盘</li>
 </ul>
+<h3 id="_12">中间件系统<a class="headerlink" href="#_12" title="Permanent link">&para;</a></h3>
+<p>Classic 模式提供三层中间件：下载器中间件、爬虫中间件、管道中间件，
+支持请求/响应处理、URL 过滤、数据清洗等扩展。
+详见 <a href="features/middleware/">中间件系统</a>。</p>
+<h3 id="spidersettings">SpiderSettings（配置）<a class="headerlink" href="#spidersettings" title="Permanent link">&para;</a></h3>
+<p><code>SpiderSettings</code> 支持：代码配置、配置文件（.env/.yaml/.toml）、环境变量。</p>
 <h2 id="_13">下一步<a class="headerlink" href="#_13" title="Permanent link">&para;</a></h2>
 <ul>
 <li><a href="features/lite_spider/">Lite 轻量爬虫</a> - 快速上手轻量级爬虫</li>
 <li><a href="features/spider/">Spider 进阶</a> - Classic Spider 高级特性</li>
 <li><a href="features/settings/">配置说明</a> - 详细的配置选项</li>
+<li><a href="features/middleware/">中间件系统</a> - 中间件配置与自定义</li>
 <li><a href="features/request/">Request 详解</a>：请求参数说明</li>
 <li><a href="features/response/">Response 详解</a>：响应处理方法</li>
 <li><a href="features/pipeline/">Pipeline 管道</a>：数据管道使用</li>
