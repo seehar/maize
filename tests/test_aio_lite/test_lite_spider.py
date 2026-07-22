@@ -2,8 +2,11 @@
 Tests for lite spider
 """
 
+import asyncio
+import logging
 from abc import ABC
 from unittest.mock import AsyncMock, patch
+from urllib.parse import urlparse
 
 import pytest
 
@@ -783,3 +786,250 @@ async def test_graceful_shutdown_calls_on_close():
 
     assert spider.on_close_called is True
     assert len(spider.processed) == 2
+
+
+@pytest.mark.asyncio
+async def test_custom_should_retry():
+    """子类重写 should_retry 对 403 重试，断言 403->200 触发重试"""
+
+    class Retry403Spider(LiteSpider):
+        def __init__(self):
+            super().__init__(retry=3)
+
+        def should_retry(self, response: Response) -> bool:
+            return response.status == 403 or super().should_retry(response)
+
+        async def start_requests(self):
+            yield Request("https://example.com/forbidden")
+
+        async def parse(self, response):
+            pass
+
+    spider = Retry403Spider()
+    req = Request("https://example.com/forbidden")
+    resp_403 = Response(url="https://example.com/forbidden", headers={}, body=b"", status=403, request=req)
+    resp_200 = Response(url="https://example.com/forbidden", headers={}, body=b"", status=200, request=req)
+
+    with patch.object(spider, "fetch", AsyncMock(side_effect=[resp_403, resp_200])):
+        crawler = LiteCrawler(spider)
+        await crawler.crawl()
+
+    assert crawler.stats["retried"] == 1
+    assert crawler.stats["succeeded"] == 1
+
+
+@pytest.mark.asyncio
+async def test_default_should_retry_unchanged():
+    """默认 should_retry 行为与改动前一致：0/5xx/429 重试，4xx 不重试"""
+
+    class DefaultRetrySpider(LiteSpider):
+        def __init__(self):
+            super().__init__(retry=3)
+
+        async def start_requests(self):
+            yield Request("https://example.com/500")
+            yield Request("https://example.com/404")
+            yield Request("https://example.com/429")
+
+        async def parse(self, response):
+            pass
+
+    spider = DefaultRetrySpider()
+    r500 = Request("https://example.com/500")
+    r404 = Request("https://example.com/404")
+    r429 = Request("https://example.com/429")
+    # 500 -> 200, 404 直接返回, 429 -> 200
+    resp_500 = Response(url="https://example.com/500", headers={}, body=b"", status=500, request=r500)
+    resp_500_ok = Response(url="https://example.com/500", headers={}, body=b"", status=200, request=r500)
+    resp_404 = Response(url="https://example.com/404", headers={}, body=b"", status=404, request=r404)
+    resp_429 = Response(url="https://example.com/429", headers={}, body=b"", status=429, request=r429)
+    resp_429_ok = Response(url="https://example.com/429", headers={}, body=b"", status=200, request=r429)
+
+    with patch.object(
+        spider,
+        "fetch",
+        AsyncMock(side_effect=[resp_500, resp_500_ok, resp_404, resp_429, resp_429_ok]),
+    ):
+        crawler = LiteCrawler(spider)
+        await crawler.crawl()
+
+    # 500 重试 1 次，429 重试 1 次，404 不重试
+    assert crawler.stats["retried"] == 2
+    assert crawler.stats["succeeded"] == 2  # 500->200 和 429->200
+    assert crawler.stats["failed"] == 1  # 404
+
+
+@pytest.mark.asyncio
+async def test_per_domain_concurrency_limits():
+    """per_domain_concurrency=1 时同域名请求串行"""
+
+    class PoliteSpider(LiteSpider):
+        per_domain_concurrency = 1
+
+        def __init__(self):
+            super().__init__()
+            self.fetch_times: list[float] = []
+
+        async def start_requests(self):
+            yield Request("https://example.com/a")
+            yield Request("https://example.com/b")
+            yield Request("https://example.com/c")
+
+        async def parse(self, response):
+            pass
+
+        async def fetch(self, request: Request) -> Response:
+            self.fetch_times.append(asyncio.get_event_loop().time())
+            await asyncio.sleep(0.05)
+            return Response(url=request.url, headers={}, body=b"", status=200, request=request)
+
+    spider = PoliteSpider()
+    crawler = LiteCrawler(spider, concurrency=10)
+    await crawler.crawl()
+
+    # 串行：每个 fetch 间隔 >= 0.04s
+    for i in range(1, len(spider.fetch_times)):
+        gap = spider.fetch_times[i] - spider.fetch_times[i - 1]
+        assert gap >= 0.04, f"gap={gap}, expected >= 0.04 (serial)"
+
+
+@pytest.mark.asyncio
+async def test_per_domain_concurrency_zero_unlimited():
+    """per_domain_concurrency=0（默认）时并发不受域名限制"""
+
+    class UnlimitedSpider(LiteSpider):
+        def __init__(self):
+            super().__init__()
+            self.fetch_times: list[float] = []
+
+        async def start_requests(self):
+            yield Request("https://example.com/a")
+            yield Request("https://example.com/b")
+            yield Request("https://example.com/c")
+
+        async def parse(self, response):
+            pass
+
+        async def fetch(self, request: Request) -> Response:
+            self.fetch_times.append(asyncio.get_event_loop().time())
+            await asyncio.sleep(0.05)
+            return Response(url=request.url, headers={}, body=b"", status=200, request=request)
+
+    spider = UnlimitedSpider()
+    crawler = LiteCrawler(spider, concurrency=10)
+    await crawler.crawl()
+
+    # 并发：3 个 fetch 几乎同时开始，间隔 < 0.02s
+    for i in range(1, len(spider.fetch_times)):
+        gap = spider.fetch_times[i] - spider.fetch_times[i - 1]
+        assert gap < 0.02, f"gap={gap}, expected < 0.02 (concurrent)"
+
+
+@pytest.mark.asyncio
+async def test_per_domain_concurrency_multi_domain():
+    """两域名各 per_domain=1，不同域名可并行"""
+
+    class MultiDomainSpider(LiteSpider):
+        per_domain_concurrency = 1
+
+        def __init__(self):
+            super().__init__()
+            self.fetch_times: dict[str, list[float]] = {}
+
+        async def start_requests(self):
+            yield Request("https://a.com/1")
+            yield Request("https://a.com/2")
+            yield Request("https://b.com/1")
+            yield Request("https://b.com/2")
+
+        async def parse(self, response):
+            pass
+
+        async def fetch(self, request: Request) -> Response:
+            netloc = urlparse(request.url).netloc
+            self.fetch_times.setdefault(netloc, []).append(asyncio.get_event_loop().time())
+            await asyncio.sleep(0.05)
+            return Response(url=request.url, headers={}, body=b"", status=200, request=request)
+
+    spider = MultiDomainSpider()
+    crawler = LiteCrawler(spider, concurrency=10)
+    await crawler.crawl()
+
+    # 同域名串行（间隔 >= 0.04s），不同域名第一个请求几乎同时（间隔 < 0.02s）
+    for netloc, times in spider.fetch_times.items():
+        for i in range(1, len(times)):
+            gap = times[i] - times[i - 1]
+            assert gap >= 0.04, f"{netloc} gap={gap}, expected >= 0.04 (serial per domain)"
+    # a.com 和 b.com 的第一个请求应几乎同时
+    gap_cross = abs(spider.fetch_times["a.com"][0] - spider.fetch_times["b.com"][0])
+    assert gap_cross < 0.02, f"cross-domain gap={gap_cross}, expected < 0.02 (parallel)"
+
+
+@pytest.mark.asyncio
+async def test_structured_log_format(caplog):
+    """结构化日志包含 url= status= elapsed= retry= 字段"""
+
+    class LogSpider(LiteSpider):
+        async def start_requests(self):
+            yield Request("https://example.com/test")
+
+        async def parse(self, response):
+            pass
+
+    spider = LogSpider()
+    req = Request("https://example.com/test")
+    resp = Response(url="https://example.com/test", headers={}, body=b"", status=200, request=req)
+
+    with patch.object(spider, "fetch", AsyncMock(return_value=resp)):
+        crawler = LiteCrawler(spider)
+        with caplog.at_level(logging.INFO, logger=crawler.logger.name):
+            await crawler.crawl()
+
+    # 找到 request 行
+    request_logs = [r for r in caplog.records if "request url=" in r.message]
+    assert len(request_logs) >= 1
+    msg = request_logs[0].message
+    assert "url=https://example.com/test" in msg
+    assert "status=200" in msg
+    assert "elapsed=" in msg
+    assert "retry=0" in msg
+
+
+@pytest.mark.asyncio
+async def test_log_level_by_status(caplog):
+    """200 -> INFO, 500 重试 -> WARNING, 404 -> INFO（不重试但记录）"""
+
+    class LogLevelSpider(LiteSpider):
+        def __init__(self):
+            super().__init__(retry=3)
+
+        async def start_requests(self):
+            yield Request("https://example.com/ok")
+            yield Request("https://example.com/err")
+            yield Request("https://example.com/notfound")
+
+        async def parse(self, response):
+            pass
+
+    spider = LogLevelSpider()
+    r_ok = Request("https://example.com/ok")
+    r_err = Request("https://example.com/err")
+    r_nf = Request("https://example.com/notfound")
+    resp_ok = Response(url="https://example.com/ok", headers={}, body=b"", status=200, request=r_ok)
+    resp_500 = Response(url="https://example.com/err", headers={}, body=b"", status=500, request=r_err)
+    resp_500_ok = Response(url="https://example.com/err", headers={}, body=b"", status=200, request=r_err)
+    resp_nf = Response(url="https://example.com/notfound", headers={}, body=b"", status=404, request=r_nf)
+
+    with patch.object(
+        spider,
+        "fetch",
+        AsyncMock(side_effect=[resp_ok, resp_500, resp_500_ok, resp_nf]),
+    ):
+        crawler = LiteCrawler(spider)
+        with caplog.at_level(logging.DEBUG, logger=crawler.logger.name):
+            await crawler.crawl()
+
+    warnings = [r for r in caplog.records if r.levelno == logging.WARNING]
+    infos = [r for r in caplog.records if r.levelno == logging.INFO and "request url=" in r.message]
+    assert any("status=500" in r.message and "retry" in r.message for r in warnings)
+    assert len(infos) == 3  # ok, err(final 200), notfound

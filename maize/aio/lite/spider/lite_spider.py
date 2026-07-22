@@ -82,6 +82,16 @@ class LiteSpider(LiteSpiderInterface):
         return True
 
     @property
+    def per_domain_concurrency(self) -> int:
+        """
+        单域名最大并发数，0 表示不限（用全局 concurrency）。
+
+        按请求 URL 的 netloc 分组限流。设为 1 即单域名串行抓取，
+        适合对友好站点的礼貌抓取。
+        """
+        return 0
+
+    @property
     def default_headers(self) -> dict[str, str]:
         """
         默认请求头，在 ``open()`` 时合入 ClientSession。
@@ -126,6 +136,19 @@ class LiteSpider(LiteSpiderInterface):
 
     async def on_close(self) -> None:
         """爬虫关闭后调用，可在此处清理数据库连接等资源"""
+
+    def should_retry(self, response: Response) -> bool:
+        """
+        判断响应是否需要重试。
+
+        默认对 status==0（连接失败）、status>=500（服务端错误）、
+        status==429（限流）重试。子类可重写以自定义重试策略，
+        例如对 403 反爬重试、对 408 超时重试等。
+
+        :param response: 响应对象
+        :returns: True 表示需要重试
+        """
+        return response.status == 0 or response.status >= 500 or response.status == 429
 
     async def process_item(self, item: Item) -> None:
         """

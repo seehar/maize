@@ -8,7 +8,9 @@ import asyncio
 import contextlib
 import logging
 import signal
+import time
 import typing
+from urllib.parse import urlparse
 
 from maize.common.http import Request, Response
 from maize.common.items import Item
@@ -46,6 +48,7 @@ class LiteCrawler:
             "dropped": 0,
             "items": 0,
         }
+        self._domain_semaphores: dict[str, asyncio.Semaphore] = {}
         self._logger = logging.getLogger(f"maize.lite.crawler.{self.__class__.__name__}")
 
     @property
@@ -182,17 +185,44 @@ class LiteCrawler:
             f"dropped={s['dropped']}, items={s['items']}"
         )
 
+    def _get_domain_semaphore(self, url: str) -> asyncio.Semaphore | None:
+        """按 URL 的 netloc 获取或创建 domain semaphore，返回 None 表示不限流"""
+        limit = self.spider.per_domain_concurrency
+        if limit <= 0:
+            return None
+        netloc = urlparse(url).netloc or "unknown"
+        if netloc not in self._domain_semaphores:
+            self._domain_semaphores[netloc] = asyncio.Semaphore(limit)
+        return self._domain_semaphores[netloc]
+
     async def _process(self, request: Request, request_queue: asyncio.PriorityQueue) -> None:
         """处理单个请求：fetch + parse + 处理产出"""
         parent_depth = request.meta.get("_lite_depth", 0)
+        start_time = time.monotonic()
+        sem = self._get_domain_semaphore(request.url)
+
+        async def _do_fetch() -> Response:
+            if sem:
+                async with sem:
+                    return await self._fetch_with_retry(request)
+            return await self._fetch_with_retry(request)
 
         try:
-            response = await self._fetch_with_retry(request)
+            response = await _do_fetch()
         except Exception as e:
-            self.logger.error(f"Unhandled fetch error for {request.url}: {e}")
+            elapsed = time.monotonic() - start_time
+            self.logger.error(
+                f"fetch_failed url={request.url} elapsed={elapsed:.2f}s retry={request.current_retry_count} error={e}"
+            )
             self._stats["failed"] += 1
             request_queue.task_done()
             return
+
+        elapsed = time.monotonic() - start_time
+        self.logger.info(
+            f"request url={request.url} status={response.status} "
+            f"elapsed={elapsed:.2f}s retry={request.current_retry_count}"
+        )
 
         # 统计成功/失败（status==0 视为连接失败）
         if 0 < response.status < 400:
@@ -215,11 +245,13 @@ class LiteCrawler:
                         try:
                             await self.spider.process_item(output)
                         except Exception as e:
-                            self.logger.error(f"process_item error for {request.url}: {e}")
+                            self.logger.error(f"process_item_failed url={request.url} error={e}")
             else:
                 await result
         except Exception as e:
-            self.logger.error(f"Parse error for {request.url}: {e}")
+            self.logger.error(
+                f"parse_failed url={request.url} status={response.status} elapsed={elapsed:.2f}s error={e}"
+            )
         finally:
             request_queue.task_done()
 
@@ -227,10 +259,7 @@ class LiteCrawler:
         """
         带重试的请求。
 
-        重试条件：
-        - status == 0（连接失败）
-        - status >= 500（服务端错误）
-        - status == 429（限流）
+        重试条件由 ``spider.should_retry`` 决定（默认：status==0 / >=500 / 429）。
         每次重试前递增指数退避延迟（1s, 2s, 4s...）。
 
         :param request: 请求对象
@@ -242,7 +271,7 @@ class LiteCrawler:
             response = await self.spider.fetch(request)
             last_response = response
 
-            if not self._should_retry(response):
+            if not self.spider.should_retry(response):
                 return response
 
             if attempt < self.spider.retry - 1:
@@ -250,8 +279,8 @@ class LiteCrawler:
                 self._stats["retried"] += 1
                 delay = 2**attempt
                 self.logger.warning(
-                    f"Retry {attempt + 1}/{self.spider.retry} for {request.url} "
-                    f"(status={response.status}), waiting {delay}s"
+                    f"retry url={request.url} attempt={attempt + 1}/{self.spider.retry} "
+                    f"status={response.status} delay={delay}s"
                 )
                 await asyncio.sleep(delay)
 
@@ -262,8 +291,3 @@ class LiteCrawler:
             body=b"",
             request=request,
         )
-
-    @staticmethod
-    def _should_retry(response: Response) -> bool:
-        """判断是否需要重试"""
-        return response.status == 0 or response.status >= 500 or response.status == 429
