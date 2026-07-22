@@ -203,12 +203,11 @@ settings = SpiderSettings(concurrency=20)  # 设置20个并发
 
 ### 使用请求优先级
 
-为重要的请求设置更高的优先级：
+为重要的请求设置更高的优先级（数值越小越优先）：
 
 ```python
-# 数值越大，优先级越高
-yield Request(url="http://important.com", priority=10)
-yield Request(url="http://normal.com", priority=1)
+yield Request(url="http://important.com", priority=1)
+yield Request(url="http://normal.com", priority=10)
 ```
 
 ### 减少等待时间

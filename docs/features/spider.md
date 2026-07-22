@@ -279,17 +279,17 @@ class MySpider(Spider):
 ```python
 class MySpider(Spider):
     async def parse(self, response: Response):
-        # 重要请求，优先级高
+        # 重要请求，优先处理（数值越小越优先）
         yield Request(
             url="http://www.example.com/important",
             callback=self.parse_important,
-            priority=10  # 数值越大，优先级越高
+            priority=1
         )
 
         # 普通请求
         yield Request(
             url="http://www.example.com/normal",
-            priority=1
+            priority=10
         )
 ```
 
@@ -397,9 +397,9 @@ class MySpider(Spider):
             await self.pause_spider()  # 暂停所有请求
             self.logger.info("爬虫已暂停")
 
-        # 或者只暂停低优先级的请求
+        # 或者只暂停低优先级的请求（priority < lte_priority 的请求被暂停）
         if another_condition:
-            await self.pause_spider(lte_priority=5)  # 只暂停优先级 <= 5 的请求
+            await self.pause_spider(lte_priority=5)  # 只抓 priority >= 6 的请求
 
     async def other_parse(self, response: Response):
         # 在某个条件下继续爬虫
@@ -409,7 +409,7 @@ class MySpider(Spider):
 
         # 或者只继续高优先级的请求
         if another_resume_condition:
-            await self.proceed_spider(gte_priority=5)  # 只继续优先级 >= 5 的请求
+            await self.proceed_spider(gte_priority=5)  # 只抓 priority >= 5 的请求
 ```
 
 更多详细示例请参考：[暂停和继续示例](../examples/pause_and_proceed_spider/)

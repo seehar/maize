@@ -58,7 +58,7 @@ class MySpider(Spider):
 | `method`  | `Method`   | 否    | `GET`   | 请求方式：GET、POST、PUT、DELETE等 |
 | `callback` | `Callable` | 否    | `parse` | 解析函数，默认为 parse            |
 | `error_callback` | `Callable` | 否    | `None`  | 错误回调函数                    |
-| `priority` | `int`      | 否    | `0`     | 请求优先级，数值越大优先级越高           |
+| `priority` | `int`      | 否    | `0`     | 请求优先级，数值越小越优先           |
 
 ### 请求头和参数
 
@@ -203,16 +203,16 @@ yield Request(
 ### 设置优先级
 
 ```python
-# 重要请求，优先处理
+# 重要请求，优先处理（数值越小越优先）
 yield Request(
     url="http://www.example.com/important",
-    priority=10  # 数值越大，优先级越高
+    priority=1
 )
 
 # 普通请求
 yield Request(
     url="http://www.example.com/normal",
-    priority=1
+    priority=10
 )
 ```
 
@@ -337,6 +337,7 @@ meta = request.meta
 request.retry()
 
 # 获取请求哈希值（用于去重）
+# 参与 hash 计算的字段：method, url, headers, params, data, json
 hash_value = request.hash
 ```
 
@@ -402,7 +403,7 @@ class MySpider(Spider):
 
 ## 注意事项
 
-1. **优先级范围**：priority 可以是任意整数，建议使用 0-100 的范围
+1. **优先级方向**：priority 数值越小越优先（min-heap），默认为 0
 2. **Request 与配置**：Request 中的参数（如 proxy）优先级高于全局配置
 3. **callback 必须是异步函数**：所有的回调函数都必须是 async 函数
 4. **meta 数据传递**：meta 会自动传递到 Response.request.meta 中

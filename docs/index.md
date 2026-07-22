@@ -196,7 +196,7 @@ maize 提供两种爬虫模式：
 
 详见 [Lite 轻量爬虫](features/lite_spider.md)。
 
-### Request（请求）
+### Request / Response 流程
 
 - **start_requests**：生成初始请求
 - **parse**：解析响应，可以 yield Request（新请求）或 Item（数据）
