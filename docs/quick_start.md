@@ -128,7 +128,16 @@ async def parse(self, response: Response):
 
 ## 爬虫配置
 
-maize 提供了三种配置方式，优先级从高到低为：**代码配置 > 配置对象 > 配置文件**
+maize 支持多种配置方式，按优先级从高到低排列（完整说明见 [配置说明](features/settings.md)）：
+
+1. **代码配置**（`custom_settings`）— 最高优先级
+2. **SpiderSettings 对象**（`run(settings=...)`）
+3. **系统环境变量**
+4. **.env 文件**
+5. **YAML 配置文件**
+6. **TOML 配置文件**
+7. **settings.py 配置文件**（`run(settings_path=...)`）
+8. **默认配置** — 最低优先级
 
 ### 方式一：使用 SpiderSettings 对象
 
@@ -215,12 +224,6 @@ class MySpider(Spider):
 ```
 
 **注意**：`custom_settings` 优先级最高，会覆盖配置文件和 SpiderSettings 中的配置。
-
-### 配置优先级
-
-```
-custom_settings > SpiderSettings 对象 > 配置文件 > 默认配置
-```
 
 ## 提高采集速度
 
