@@ -36,11 +36,6 @@
          <changefreq>daily</changefreq>
     </url>
     <url>
-         <loc>https://seehar.github.io/maize/features/middleware_quick_reference/</loc>
-         <lastmod>2026-07-22</lastmod>
-         <changefreq>daily</changefreq>
-    </url>
-    <url>
          <loc>https://seehar.github.io/maize/features/mysql_util/</loc>
          <lastmod>2026-07-22</lastmod>
          <changefreq>daily</changefreq>
@@ -82,26 +77,6 @@
     </url>
     <url>
          <loc>https://seehar.github.io/maize/includes/abbreviations/</loc>
-         <lastmod>2026-07-22</lastmod>
-         <changefreq>daily</changefreq>
-    </url>
-    <url>
-         <loc>https://seehar.github.io/maize/todo/</loc>
-         <lastmod>2026-07-22</lastmod>
-         <changefreq>daily</changefreq>
-    </url>
-    <url>
-         <loc>https://seehar.github.io/maize/todo/ROADMAP/</loc>
-         <lastmod>2026-07-22</lastmod>
-         <changefreq>daily</changefreq>
-    </url>
-    <url>
-         <loc>https://seehar.github.io/maize/todo/TODO/</loc>
-         <lastmod>2026-07-22</lastmod>
-         <changefreq>daily</changefreq>
-    </url>
-    <url>
-         <loc>https://seehar.github.io/maize/todo/spider_directory_structure_redesign/</loc>
          <lastmod>2026-07-22</lastmod>
          <changefreq>daily</changefreq>
     </url>
