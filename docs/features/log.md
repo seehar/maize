@@ -525,8 +525,8 @@ grep -c "ERROR" logs/spider_2024-01-15.log
 ### 使用 Python 分析日志
 
 ```python
+import logging
 import re
-from collections import Counter
 
 
 def analyze_log(log_file):

@@ -397,10 +397,10 @@ from maize import Field, Item
 class ProductItem(Item):
     __table_name__ = "products"  # 数据库表名（可选）
 
-    name = Field()
-    price = Field()
-    url = Field()
-    description = Field()
+    name: str = Field()
+    price: str = Field()
+    url: str = Field()
+    description: str = Field()
 ```
 
 ### 在爬虫中使用

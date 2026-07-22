@@ -241,7 +241,7 @@ response.xpath('//div[contains(text(), "keyword")]')
 
 解析 JSON 格式的响应，基于 `ujson` 实现。
 
-**返回值：** `Dict[str, Any]`
+**返回值：** `Any` — 通常是 `dict[str, Any]`，但如果 JSON 顶层是数组则返回 `list`
 
 **示例：**
 ```python

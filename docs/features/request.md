@@ -317,14 +317,19 @@ yield Request(
 ### 属性
 
 ```python
-request = Request(url="http://www.example.com", meta={"key": "value"})
+from maize import Request, Response, Spider
 
-# 访问属性
-logging.info(request.url)              # URL
-logging.info(request.method)           # 请求方法
-logging.info(request.priority)         # 优先级
-logging.info(request.meta)             # 自定义数据
-logging.info(request.current_retry_count)  # 当前重试次数
+
+class MySpider(Spider):
+    async def parse(self, response: Response):
+        request = response.request
+
+        # 访问属性
+        self.logger.info(request.url)              # URL
+        self.logger.info(request.method)           # 请求方法
+        self.logger.info(request.priority)         # 优先级
+        self.logger.info(request.meta)             # 自定义数据
+        self.logger.info(request.current_retry_count)  # 当前重试次数
 ```
 
 ### 方法

@@ -144,7 +144,7 @@ from maize import SpiderSettings, SpiderDownloaderEnum
 
 
 class Settings(SpiderSettings):
-    downloader = SpiderDownloaderEnum.HTTPX.value
+    downloader: str = SpiderDownloaderEnum.HTTPX.value
 ```
 
 ### 方式三：使用 custom_settings

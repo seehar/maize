@@ -29,6 +29,8 @@ pip install redis
 
 **方式一：使用 URL**
 ```python
+import logging
+
 from maize.utils.redis_util import RedisUtil
 
 

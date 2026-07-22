@@ -570,8 +570,8 @@ from base_settings import BaseSettings
 
 class Spider1Settings(BaseSettings):
     """Spider1 专属配置"""
-    project_name = "爬虫1"
-    concurrency = 5  # 覆盖基础配置
+    project_name: str = "爬虫1"
+    concurrency: int = 5  # 覆盖基础配置
 ```
 
 ## 下一步

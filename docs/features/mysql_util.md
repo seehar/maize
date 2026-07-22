@@ -26,6 +26,8 @@ pip install aiomysql
 ### 1. 创建实例
 
 ```python
+import logging
+
 from maize.utils.mysql_util import MysqlUtil
 
 

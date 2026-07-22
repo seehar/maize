@@ -45,9 +45,9 @@ from maize import Field, Item
 class BaiduItem(Item):
     __table_name__ = "baidu_hot_search"  # 数据库表名（如果使用 MySQL Pipeline）
 
-    title = Field()
-    url = Field()
-    rank = Field()
+    title: str = Field()
+    url: str = Field()
+    rank: int = Field()
 ```
 
 #### 2. 编写爬虫（spiders/baidu_spider.py）
