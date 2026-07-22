@@ -1590,7 +1590,7 @@
 <td style="text-align: left;"><code>int</code></td>
 <td style="text-align: left;">否</td>
 <td style="text-align: left;"><code>0</code></td>
-<td style="text-align: left;">请求优先级，数值越大优先级越高</td>
+<td style="text-align: left;">请求优先级，数值越小越优先</td>
 </tr>
 </tbody>
 </table>
@@ -1824,16 +1824,16 @@
 </span><span id="__span-6-13"><a id="__codelineno-6-13" name="__codelineno-6-13" href="#__codelineno-6-13"></a><span class="p">)</span>
 </span></code></pre></div>
 <h3 id="_11">设置优先级<a class="headerlink" href="#_11" title="Permanent link">&para;</a></h3>
-<div class="language-python highlight"><span class="filename">Python</span><pre><span></span><code><span id="__span-7-1"><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a><span class="c1"># 重要请求，优先处理</span>
+<div class="language-python highlight"><span class="filename">Python</span><pre><span></span><code><span id="__span-7-1"><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a><span class="c1"># 重要请求，优先处理（数值越小越优先）</span>
 </span><span id="__span-7-2"><a id="__codelineno-7-2" name="__codelineno-7-2" href="#__codelineno-7-2"></a><span class="k">yield</span> <span class="n">Request</span><span class="p">(</span>
 </span><span id="__span-7-3"><a id="__codelineno-7-3" name="__codelineno-7-3" href="#__codelineno-7-3"></a>    <span class="n">url</span><span class="o">=</span><span class="s2">&quot;http://www.example.com/important&quot;</span><span class="p">,</span>
-</span><span id="__span-7-4"><a id="__codelineno-7-4" name="__codelineno-7-4" href="#__codelineno-7-4"></a>    <span class="n">priority</span><span class="o">=</span><span class="mi">10</span>  <span class="c1"># 数值越大，优先级越高</span>
+</span><span id="__span-7-4"><a id="__codelineno-7-4" name="__codelineno-7-4" href="#__codelineno-7-4"></a>    <span class="n">priority</span><span class="o">=</span><span class="mi">1</span>
 </span><span id="__span-7-5"><a id="__codelineno-7-5" name="__codelineno-7-5" href="#__codelineno-7-5"></a><span class="p">)</span>
 </span><span id="__span-7-6"><a id="__codelineno-7-6" name="__codelineno-7-6" href="#__codelineno-7-6"></a>
 </span><span id="__span-7-7"><a id="__codelineno-7-7" name="__codelineno-7-7" href="#__codelineno-7-7"></a><span class="c1"># 普通请求</span>
 </span><span id="__span-7-8"><a id="__codelineno-7-8" name="__codelineno-7-8" href="#__codelineno-7-8"></a><span class="k">yield</span> <span class="n">Request</span><span class="p">(</span>
 </span><span id="__span-7-9"><a id="__codelineno-7-9" name="__codelineno-7-9" href="#__codelineno-7-9"></a>    <span class="n">url</span><span class="o">=</span><span class="s2">&quot;http://www.example.com/normal&quot;</span><span class="p">,</span>
-</span><span id="__span-7-10"><a id="__codelineno-7-10" name="__codelineno-7-10" href="#__codelineno-7-10"></a>    <span class="n">priority</span><span class="o">=</span><span class="mi">1</span>
+</span><span id="__span-7-10"><a id="__codelineno-7-10" name="__codelineno-7-10" href="#__codelineno-7-10"></a>    <span class="n">priority</span><span class="o">=</span><span class="mi">10</span>
 </span><span id="__span-7-11"><a id="__codelineno-7-11" name="__codelineno-7-11" href="#__codelineno-7-11"></a><span class="p">)</span>
 </span></code></pre></div>
 <h3 id="meta">使用 meta 传递数据<a class="headerlink" href="#meta" title="Permanent link">&para;</a></h3>
@@ -1939,7 +1939,8 @@
 </span><span id="__span-13-5"><a id="__codelineno-13-5" name="__codelineno-13-5" href="#__codelineno-13-5"></a><span class="n">request</span><span class="o">.</span><span class="n">retry</span><span class="p">()</span>
 </span><span id="__span-13-6"><a id="__codelineno-13-6" name="__codelineno-13-6" href="#__codelineno-13-6"></a>
 </span><span id="__span-13-7"><a id="__codelineno-13-7" name="__codelineno-13-7" href="#__codelineno-13-7"></a><span class="c1"># 获取请求哈希值（用于去重）</span>
-</span><span id="__span-13-8"><a id="__codelineno-13-8" name="__codelineno-13-8" href="#__codelineno-13-8"></a><span class="n">hash_value</span> <span class="o">=</span> <span class="n">request</span><span class="o">.</span><span class="n">hash</span>
+</span><span id="__span-13-8"><a id="__codelineno-13-8" name="__codelineno-13-8" href="#__codelineno-13-8"></a><span class="c1"># 参与 hash 计算的字段：method, url, headers, params, data, json</span>
+</span><span id="__span-13-9"><a id="__codelineno-13-9" name="__codelineno-13-9" href="#__codelineno-13-9"></a><span class="n">hash_value</span> <span class="o">=</span> <span class="n">request</span><span class="o">.</span><span class="n">hash</span>
 </span></code></pre></div>
 <h2 id="_17">高级用法<a class="headerlink" href="#_17" title="Permanent link">&para;</a></h2>
 <h3 id="_18">批量生成请求<a class="headerlink" href="#_18" title="Permanent link">&para;</a></h3>
@@ -1993,7 +1994,7 @@
 </span></code></pre></div>
 <h2 id="_21">注意事项<a class="headerlink" href="#_21" title="Permanent link">&para;</a></h2>
 <ol>
-<li><strong>优先级范围</strong>：priority 可以是任意整数，建议使用 0-100 的范围</li>
+<li><strong>优先级方向</strong>：priority 数值越小越优先（min-heap），默认为 0</li>
 <li><strong>Request 与配置</strong>：Request 中的参数（如 proxy）优先级高于全局配置</li>
 <li><strong>callback 必须是异步函数</strong>：所有的回调函数都必须是 async 函数</li>
 <li><strong>meta 数据传递</strong>：meta 会自动传递到 Response.request.meta 中</li>

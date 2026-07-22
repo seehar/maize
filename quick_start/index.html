@@ -1784,10 +1784,9 @@
 <div class="language-python highlight"><span class="filename">Python</span><pre><span></span><code><span id="__span-10-1"><a id="__codelineno-10-1" name="__codelineno-10-1" href="#__codelineno-10-1"></a><span class="n">settings</span> <span class="o">=</span> <span class="n">SpiderSettings</span><span class="p">(</span><span class="n">concurrency</span><span class="o">=</span><span class="mi">20</span><span class="p">)</span>  <span class="c1"># 设置20个并发</span>
 </span></code></pre></div>
 <h3 id="_12">使用请求优先级<a class="headerlink" href="#_12" title="Permanent link">&para;</a></h3>
-<p>为重要的请求设置更高的优先级：</p>
-<div class="language-python highlight"><span class="filename">Python</span><pre><span></span><code><span id="__span-11-1"><a id="__codelineno-11-1" name="__codelineno-11-1" href="#__codelineno-11-1"></a><span class="c1"># 数值越大，优先级越高</span>
-</span><span id="__span-11-2"><a id="__codelineno-11-2" name="__codelineno-11-2" href="#__codelineno-11-2"></a><span class="k">yield</span> <span class="n">Request</span><span class="p">(</span><span class="n">url</span><span class="o">=</span><span class="s2">&quot;http://important.com&quot;</span><span class="p">,</span> <span class="n">priority</span><span class="o">=</span><span class="mi">10</span><span class="p">)</span>
-</span><span id="__span-11-3"><a id="__codelineno-11-3" name="__codelineno-11-3" href="#__codelineno-11-3"></a><span class="k">yield</span> <span class="n">Request</span><span class="p">(</span><span class="n">url</span><span class="o">=</span><span class="s2">&quot;http://normal.com&quot;</span><span class="p">,</span> <span class="n">priority</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+<p>为重要的请求设置更高的优先级（数值越小越优先）：</p>
+<div class="language-python highlight"><span class="filename">Python</span><pre><span></span><code><span id="__span-11-1"><a id="__codelineno-11-1" name="__codelineno-11-1" href="#__codelineno-11-1"></a><span class="k">yield</span> <span class="n">Request</span><span class="p">(</span><span class="n">url</span><span class="o">=</span><span class="s2">&quot;http://important.com&quot;</span><span class="p">,</span> <span class="n">priority</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+</span><span id="__span-11-2"><a id="__codelineno-11-2" name="__codelineno-11-2" href="#__codelineno-11-2"></a><span class="k">yield</span> <span class="n">Request</span><span class="p">(</span><span class="n">url</span><span class="o">=</span><span class="s2">&quot;http://normal.com&quot;</span><span class="p">,</span> <span class="n">priority</span><span class="o">=</span><span class="mi">10</span><span class="p">)</span>
 </span></code></pre></div>
 <h3 id="_13">减少等待时间<a class="headerlink" href="#_13" title="Permanent link">&para;</a></h3>
 <div class="language-python highlight"><span class="filename">Python</span><pre><span></span><code><span id="__span-12-1"><a id="__codelineno-12-1" name="__codelineno-12-1" href="#__codelineno-12-1"></a><span class="n">settings</span> <span class="o">=</span> <span class="n">SpiderSettings</span><span class="p">()</span>
@@ -1993,7 +1992,7 @@
 </span></code></pre></div>
 <h3 id="pipeline">自定义 Pipeline<a class="headerlink" href="#pipeline" title="Permanent link">&para;</a></h3>
 <p>创建自定义数据管道：</p>
-<div class="language-python highlight"><span class="filename">Python</span><pre><span></span><code><span id="__span-24-1"><a id="__codelineno-24-1" name="__codelineno-24-1" href="#__codelineno-24-1"></a><span class="c1"># pipelines.py</span>
+<div class="language-python highlight"><span class="filename">Python</span><pre><span></span><code><span id="__span-24-1"><a id="__codelineno-24-1" name="__codelineno-24-1" href="#__codelineno-24-1"></a><span class="c1"># pipeline.py</span>
 </span><span id="__span-24-2"><a id="__codelineno-24-2" name="__codelineno-24-2" href="#__codelineno-24-2"></a><span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">List</span>
 </span><span id="__span-24-3"><a id="__codelineno-24-3" name="__codelineno-24-3" href="#__codelineno-24-3"></a>
 </span><span id="__span-24-4"><a id="__codelineno-24-4" name="__codelineno-24-4" href="#__codelineno-24-4"></a><span class="kn">from</span><span class="w"> </span><span class="nn">maize</span><span class="w"> </span><span class="kn">import</span> <span class="n">BasePipeline</span><span class="p">,</span> <span class="n">Item</span>
@@ -2025,7 +2024,7 @@
 <p>在配置中注册：</p>
 <div class="language-python highlight"><span class="filename">Python</span><pre><span></span><code><span id="__span-25-1"><a id="__codelineno-25-1" name="__codelineno-25-1" href="#__codelineno-25-1"></a><span class="n">settings</span> <span class="o">=</span> <span class="n">SpiderSettings</span><span class="p">()</span>
 </span><span id="__span-25-2"><a id="__codelineno-25-2" name="__codelineno-25-2" href="#__codelineno-25-2"></a><span class="n">settings</span><span class="o">.</span><span class="n">pipeline</span><span class="o">.</span><span class="n">pipelines</span> <span class="o">=</span> <span class="p">[</span>
-</span><span id="__span-25-3"><a id="__codelineno-25-3" name="__codelineno-25-3" href="#__codelineno-25-3"></a>    <span class="s2">&quot;your_module.pipelines.CustomPipeline&quot;</span>
+</span><span id="__span-25-3"><a id="__codelineno-25-3" name="__codelineno-25-3" href="#__codelineno-25-3"></a>    <span class="s2">&quot;your_module.pipeline.CustomPipeline&quot;</span>
 </span><span id="__span-25-4"><a id="__codelineno-25-4" name="__codelineno-25-4" href="#__codelineno-25-4"></a><span class="p">]</span>
 </span></code></pre></div>
 <h2 id="_22">错误处理<a class="headerlink" href="#_22" title="Permanent link">&para;</a></h2>

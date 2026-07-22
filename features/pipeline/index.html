@@ -1579,8 +1579,8 @@
 </span><span id="__span-1-9"><a id="__codelineno-1-9" name="__codelineno-1-9" href="#__codelineno-1-9"></a><span class="c1"># 在创建 settings 对象后配置</span>
 </span><span id="__span-1-10"><a id="__codelineno-1-10" name="__codelineno-1-10" href="#__codelineno-1-10"></a><span class="n">settings</span> <span class="o">=</span> <span class="n">Settings</span><span class="p">()</span>
 </span><span id="__span-1-11"><a id="__codelineno-1-11" name="__codelineno-1-11" href="#__codelineno-1-11"></a><span class="n">settings</span><span class="o">.</span><span class="n">pipeline</span><span class="o">.</span><span class="n">pipelines</span> <span class="o">=</span> <span class="p">[</span>
-</span><span id="__span-1-12"><a id="__codelineno-1-12" name="__codelineno-1-12" href="#__codelineno-1-12"></a>    <span class="s2">&quot;my_project.pipelines.CustomPipeline&quot;</span><span class="p">,</span>
-</span><span id="__span-1-13"><a id="__codelineno-1-13" name="__codelineno-1-13" href="#__codelineno-1-13"></a>    <span class="s2">&quot;my_project.pipelines.MysqlPipeline&quot;</span><span class="p">,</span>
+</span><span id="__span-1-12"><a id="__codelineno-1-12" name="__codelineno-1-12" href="#__codelineno-1-12"></a>    <span class="s2">&quot;my_project.pipeline.CustomPipeline&quot;</span><span class="p">,</span>
+</span><span id="__span-1-13"><a id="__codelineno-1-13" name="__codelineno-1-13" href="#__codelineno-1-13"></a>    <span class="s2">&quot;my_project.pipeline.MysqlPipeline&quot;</span><span class="p">,</span>
 </span><span id="__span-1-14"><a id="__codelineno-1-14" name="__codelineno-1-14" href="#__codelineno-1-14"></a><span class="p">]</span>
 </span></code></pre></div>
 <h4 id="spidersettings">方式二：使用 SpiderSettings 对象<a class="headerlink" href="#spidersettings" title="Permanent link">&para;</a></h4>
@@ -1591,14 +1591,14 @@
 </span><span id="__span-2-5"><a id="__codelineno-2-5" name="__codelineno-2-5" href="#__codelineno-2-5"></a>    <span class="n">project_name</span><span class="o">=</span><span class="s2">&quot;我的爬虫&quot;</span>
 </span><span id="__span-2-6"><a id="__codelineno-2-6" name="__codelineno-2-6" href="#__codelineno-2-6"></a><span class="p">)</span>
 </span><span id="__span-2-7"><a id="__codelineno-2-7" name="__codelineno-2-7" href="#__codelineno-2-7"></a><span class="n">settings</span><span class="o">.</span><span class="n">pipeline</span><span class="o">.</span><span class="n">pipelines</span> <span class="o">=</span> <span class="p">[</span>
-</span><span id="__span-2-8"><a id="__codelineno-2-8" name="__codelineno-2-8" href="#__codelineno-2-8"></a>    <span class="s2">&quot;my_project.pipelines.CustomPipeline&quot;</span>
+</span><span id="__span-2-8"><a id="__codelineno-2-8" name="__codelineno-2-8" href="#__codelineno-2-8"></a>    <span class="s2">&quot;my_project.pipeline.CustomPipeline&quot;</span>
 </span><span id="__span-2-9"><a id="__codelineno-2-9" name="__codelineno-2-9" href="#__codelineno-2-9"></a><span class="p">]</span>
 </span></code></pre></div>
 <h4 id="custom_settings">方式三：在 custom_settings 中注册<a class="headerlink" href="#custom_settings" title="Permanent link">&para;</a></h4>
 <div class="language-python highlight"><span class="filename">Python</span><pre><span></span><code><span id="__span-3-1"><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="k">class</span><span class="w"> </span><span class="nc">MySpider</span><span class="p">(</span><span class="n">Spider</span><span class="p">):</span>
 </span><span id="__span-3-2"><a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a>    <span class="n">custom_settings</span> <span class="o">=</span> <span class="p">{</span>
 </span><span id="__span-3-3"><a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a>        <span class="s2">&quot;pipeline&quot;</span><span class="p">:</span> <span class="p">{</span>
-</span><span id="__span-3-4"><a id="__codelineno-3-4" name="__codelineno-3-4" href="#__codelineno-3-4"></a>            <span class="s2">&quot;pipelines&quot;</span><span class="p">:</span> <span class="p">[</span><span class="s2">&quot;my_project.pipelines.CustomPipeline&quot;</span><span class="p">],</span>
+</span><span id="__span-3-4"><a id="__codelineno-3-4" name="__codelineno-3-4" href="#__codelineno-3-4"></a>            <span class="s2">&quot;pipeline&quot;</span><span class="p">:</span> <span class="p">[</span><span class="s2">&quot;my_project.pipeline.CustomPipeline&quot;</span><span class="p">],</span>
 </span><span id="__span-3-5"><a id="__codelineno-3-5" name="__codelineno-3-5" href="#__codelineno-3-5"></a>            <span class="s2">&quot;handle_batch_max_size&quot;</span><span class="p">:</span> <span class="mi">50</span><span class="p">,</span>
 </span><span id="__span-3-6"><a id="__codelineno-3-6" name="__codelineno-3-6" href="#__codelineno-3-6"></a>        <span class="p">}</span>
 </span><span id="__span-3-7"><a id="__codelineno-3-7" name="__codelineno-3-7" href="#__codelineno-3-7"></a>    <span class="p">}</span>
@@ -1892,10 +1892,10 @@
 <p>可以配置多个管道，按顺序执行：</p>
 <div class="language-python highlight"><span class="filename">Python</span><pre><span></span><code><span id="__span-14-1"><a id="__codelineno-14-1" name="__codelineno-14-1" href="#__codelineno-14-1"></a><span class="n">settings</span> <span class="o">=</span> <span class="n">SpiderSettings</span><span class="p">()</span>
 </span><span id="__span-14-2"><a id="__codelineno-14-2" name="__codelineno-14-2" href="#__codelineno-14-2"></a><span class="n">settings</span><span class="o">.</span><span class="n">pipeline</span><span class="o">.</span><span class="n">pipelines</span> <span class="o">=</span> <span class="p">[</span>
-</span><span id="__span-14-3"><a id="__codelineno-14-3" name="__codelineno-14-3" href="#__codelineno-14-3"></a>    <span class="s2">&quot;my_project.pipelines.DataCleaningPipeline&quot;</span><span class="p">,</span>  <span class="c1"># 1. 数据清洗</span>
-</span><span id="__span-14-4"><a id="__codelineno-14-4" name="__codelineno-14-4" href="#__codelineno-14-4"></a>    <span class="s2">&quot;my_project.pipelines.DataValidationPipeline&quot;</span><span class="p">,</span>  <span class="c1"># 2. 数据验证</span>
-</span><span id="__span-14-5"><a id="__codelineno-14-5" name="__codelineno-14-5" href="#__codelineno-14-5"></a>    <span class="s2">&quot;my_project.pipelines.MysqlPipeline&quot;</span><span class="p">,</span>  <span class="c1"># 3. 保存到 MySQL</span>
-</span><span id="__span-14-6"><a id="__codelineno-14-6" name="__codelineno-14-6" href="#__codelineno-14-6"></a>    <span class="s2">&quot;my_project.pipelines.RedisPipeline&quot;</span><span class="p">,</span>  <span class="c1"># 4. 保存到 Redis</span>
+</span><span id="__span-14-3"><a id="__codelineno-14-3" name="__codelineno-14-3" href="#__codelineno-14-3"></a>    <span class="s2">&quot;my_project.pipeline.DataCleaningPipeline&quot;</span><span class="p">,</span>  <span class="c1"># 1. 数据清洗</span>
+</span><span id="__span-14-4"><a id="__codelineno-14-4" name="__codelineno-14-4" href="#__codelineno-14-4"></a>    <span class="s2">&quot;my_project.pipeline.DataValidationPipeline&quot;</span><span class="p">,</span>  <span class="c1"># 2. 数据验证</span>
+</span><span id="__span-14-5"><a id="__codelineno-14-5" name="__codelineno-14-5" href="#__codelineno-14-5"></a>    <span class="s2">&quot;my_project.pipeline.MysqlPipeline&quot;</span><span class="p">,</span>  <span class="c1"># 3. 保存到 MySQL</span>
+</span><span id="__span-14-6"><a id="__codelineno-14-6" name="__codelineno-14-6" href="#__codelineno-14-6"></a>    <span class="s2">&quot;my_project.pipeline.RedisPipeline&quot;</span><span class="p">,</span>  <span class="c1"># 4. 保存到 Redis</span>
 </span><span id="__span-14-7"><a id="__codelineno-14-7" name="__codelineno-14-7" href="#__codelineno-14-7"></a><span class="p">]</span>
 </span></code></pre></div>
 <p><strong>注意</strong>：如果某个管道的 <code>process_item</code> 返回 <code>False</code>，数据不会传递到后续管道，而是进入重试队列。</p>

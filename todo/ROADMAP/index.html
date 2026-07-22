@@ -939,15 +939,6 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#6" class="md-nav__link">
-    <span class="md-ellipsis">
-      6. 数据验证系统
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
   <a href="#7" class="md-nav__link">
     <span class="md-ellipsis">
       7. 分布式爬虫增强
@@ -1468,39 +1459,8 @@
 <li>每个下载器的统计</li>
 <li>HTTP 状态码分布</li>
 <li>响应时间分布</li>
-<li>错误类型统计</li>
-<li>内存使用情况</li>
 <li>
-<p>CPU 使用率</p>
-</li>
-<li>
-<p><strong>实时监控 API</strong>
-   <div class="language-python highlight"><span class="filename">Python</span><pre><span></span><code><span id="__span-5-1"><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a><span class="c1"># 提供 HTTP API 查看实时统计</span>
-</span><span id="__span-5-2"><a id="__codelineno-5-2" name="__codelineno-5-2" href="#__codelineno-5-2"></a><span class="n">GET</span> <span class="o">/</span><span class="n">api</span><span class="o">/</span><span class="n">stats</span>
-</span><span id="__span-5-3"><a id="__codelineno-5-3" name="__codelineno-5-3" href="#__codelineno-5-3"></a><span class="p">{</span>
-</span><span id="__span-5-4"><a id="__codelineno-5-4" name="__codelineno-5-4" href="#__codelineno-5-4"></a>    <span class="s2">&quot;requests&quot;</span><span class="p">:</span> <span class="p">{</span>
-</span><span id="__span-5-5"><a id="__codelineno-5-5" name="__codelineno-5-5" href="#__codelineno-5-5"></a>        <span class="s2">&quot;total&quot;</span><span class="p">:</span> <span class="mi">1000</span><span class="p">,</span>
-</span><span id="__span-5-6"><a id="__codelineno-5-6" name="__codelineno-5-6" href="#__codelineno-5-6"></a>        <span class="s2">&quot;success&quot;</span><span class="p">:</span> <span class="mi">950</span><span class="p">,</span>
-</span><span id="__span-5-7"><a id="__codelineno-5-7" name="__codelineno-5-7" href="#__codelineno-5-7"></a>        <span class="s2">&quot;failed&quot;</span><span class="p">:</span> <span class="mi">50</span><span class="p">,</span>
-</span><span id="__span-5-8"><a id="__codelineno-5-8" name="__codelineno-5-8" href="#__codelineno-5-8"></a>        <span class="s2">&quot;rate&quot;</span><span class="p">:</span> <span class="mf">10.5</span>  <span class="c1"># 请求/秒</span>
-</span><span id="__span-5-9"><a id="__codelineno-5-9" name="__codelineno-5-9" href="#__codelineno-5-9"></a>    <span class="p">},</span>
-</span><span id="__span-5-10"><a id="__codelineno-5-10" name="__codelineno-5-10" href="#__codelineno-5-10"></a>    <span class="s2">&quot;items&quot;</span><span class="p">:</span> <span class="p">{</span>
-</span><span id="__span-5-11"><a id="__codelineno-5-11" name="__codelineno-5-11" href="#__codelineno-5-11"></a>        <span class="s2">&quot;scraped&quot;</span><span class="p">:</span> <span class="mi">800</span><span class="p">,</span>
-</span><span id="__span-5-12"><a id="__codelineno-5-12" name="__codelineno-5-12" href="#__codelineno-5-12"></a>        <span class="s2">&quot;dropped&quot;</span><span class="p">:</span> <span class="mi">20</span>
-</span><span id="__span-5-13"><a id="__codelineno-5-13" name="__codelineno-5-13" href="#__codelineno-5-13"></a>    <span class="p">},</span>
-</span><span id="__span-5-14"><a id="__codelineno-5-14" name="__codelineno-5-14" href="#__codelineno-5-14"></a>    <span class="s2">&quot;downloader&quot;</span><span class="p">:</span> <span class="p">{</span>
-</span><span id="__span-5-15"><a id="__codelineno-5-15" name="__codelineno-5-15" href="#__codelineno-5-15"></a>        <span class="s2">&quot;active&quot;</span><span class="p">:</span> <span class="mi">10</span><span class="p">,</span>
-</span><span id="__span-5-16"><a id="__codelineno-5-16" name="__codelineno-5-16" href="#__codelineno-5-16"></a>        <span class="s2">&quot;idle&quot;</span><span class="p">:</span> <span class="mi">0</span>
-</span><span id="__span-5-17"><a id="__codelineno-5-17" name="__codelineno-5-17" href="#__codelineno-5-17"></a>    <span class="p">}</span>
-</span><span id="__span-5-18"><a id="__codelineno-5-18" name="__codelineno-5-18" href="#__codelineno-5-18"></a><span class="p">}</span>
-</span></code></pre></div></p>
-</li>
-<li>
-<p><strong>集成 Prometheus/Grafana</strong></p>
-</li>
-<li>导出 Prometheus 格式的指标</li>
-<li>
-<p>提供预制的 Grafana Dashboard</p>
+<p>错误类型统计</p>
 </li>
 <li>
 <p><strong>邮件/钉钉/企业微信告警</strong></p>
@@ -1510,21 +1470,21 @@
 <li>完成通知</li>
 </ol>
 <p><strong>实现参考：</strong>
-<div class="language-python highlight"><span class="filename">Python</span><pre><span></span><code><span id="__span-6-1"><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a><span class="n">settings</span> <span class="o">=</span> <span class="n">SpiderSettings</span><span class="p">(</span>
-</span><span id="__span-6-2"><a id="__codelineno-6-2" name="__codelineno-6-2" href="#__codelineno-6-2"></a>    <span class="n">monitoring</span><span class="o">=</span><span class="p">{</span>
-</span><span id="__span-6-3"><a id="__codelineno-6-3" name="__codelineno-6-3" href="#__codelineno-6-3"></a>        <span class="s1">&#39;enabled&#39;</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span>
-</span><span id="__span-6-4"><a id="__codelineno-6-4" name="__codelineno-6-4" href="#__codelineno-6-4"></a>        <span class="s1">&#39;api_port&#39;</span><span class="p">:</span> <span class="mi">8080</span><span class="p">,</span>
-</span><span id="__span-6-5"><a id="__codelineno-6-5" name="__codelineno-6-5" href="#__codelineno-6-5"></a>        <span class="s1">&#39;prometheus&#39;</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span>
-</span><span id="__span-6-6"><a id="__codelineno-6-6" name="__codelineno-6-6" href="#__codelineno-6-6"></a>        <span class="s1">&#39;alerts&#39;</span><span class="p">:</span> <span class="p">{</span>
-</span><span id="__span-6-7"><a id="__codelineno-6-7" name="__codelineno-6-7" href="#__codelineno-6-7"></a>            <span class="s1">&#39;email&#39;</span><span class="p">:</span> <span class="p">[</span><span class="s1">&#39;admin@example.com&#39;</span><span class="p">],</span>
-</span><span id="__span-6-8"><a id="__codelineno-6-8" name="__codelineno-6-8" href="#__codelineno-6-8"></a>            <span class="s1">&#39;dingtalk_webhook&#39;</span><span class="p">:</span> <span class="s1">&#39;https://...&#39;</span><span class="p">,</span>
-</span><span id="__span-6-9"><a id="__codelineno-6-9" name="__codelineno-6-9" href="#__codelineno-6-9"></a>            <span class="s1">&#39;conditions&#39;</span><span class="p">:</span> <span class="p">{</span>
-</span><span id="__span-6-10"><a id="__codelineno-6-10" name="__codelineno-6-10" href="#__codelineno-6-10"></a>                <span class="s1">&#39;error_rate &gt; 0.1&#39;</span><span class="p">:</span> <span class="s1">&#39;high&#39;</span><span class="p">,</span>  <span class="c1"># 错误率超过10%</span>
-</span><span id="__span-6-11"><a id="__codelineno-6-11" name="__codelineno-6-11" href="#__codelineno-6-11"></a>                <span class="s1">&#39;requests_per_second &lt; 1&#39;</span><span class="p">:</span> <span class="s1">&#39;low&#39;</span><span class="p">,</span>  <span class="c1"># 速度过慢</span>
-</span><span id="__span-6-12"><a id="__codelineno-6-12" name="__codelineno-6-12" href="#__codelineno-6-12"></a>            <span class="p">}</span>
-</span><span id="__span-6-13"><a id="__codelineno-6-13" name="__codelineno-6-13" href="#__codelineno-6-13"></a>        <span class="p">}</span>
-</span><span id="__span-6-14"><a id="__codelineno-6-14" name="__codelineno-6-14" href="#__codelineno-6-14"></a>    <span class="p">}</span>
-</span><span id="__span-6-15"><a id="__codelineno-6-15" name="__codelineno-6-15" href="#__codelineno-6-15"></a><span class="p">)</span>
+<div class="language-python highlight"><span class="filename">Python</span><pre><span></span><code><span id="__span-5-1"><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a><span class="n">settings</span> <span class="o">=</span> <span class="n">SpiderSettings</span><span class="p">(</span>
+</span><span id="__span-5-2"><a id="__codelineno-5-2" name="__codelineno-5-2" href="#__codelineno-5-2"></a>    <span class="n">monitoring</span><span class="o">=</span><span class="p">{</span>
+</span><span id="__span-5-3"><a id="__codelineno-5-3" name="__codelineno-5-3" href="#__codelineno-5-3"></a>        <span class="s1">&#39;enabled&#39;</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span>
+</span><span id="__span-5-4"><a id="__codelineno-5-4" name="__codelineno-5-4" href="#__codelineno-5-4"></a>        <span class="s1">&#39;api_port&#39;</span><span class="p">:</span> <span class="mi">8080</span><span class="p">,</span>
+</span><span id="__span-5-5"><a id="__codelineno-5-5" name="__codelineno-5-5" href="#__codelineno-5-5"></a>        <span class="s1">&#39;prometheus&#39;</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span>
+</span><span id="__span-5-6"><a id="__codelineno-5-6" name="__codelineno-5-6" href="#__codelineno-5-6"></a>        <span class="s1">&#39;alerts&#39;</span><span class="p">:</span> <span class="p">{</span>
+</span><span id="__span-5-7"><a id="__codelineno-5-7" name="__codelineno-5-7" href="#__codelineno-5-7"></a>            <span class="s1">&#39;email&#39;</span><span class="p">:</span> <span class="p">[</span><span class="s1">&#39;admin@example.com&#39;</span><span class="p">],</span>
+</span><span id="__span-5-8"><a id="__codelineno-5-8" name="__codelineno-5-8" href="#__codelineno-5-8"></a>            <span class="s1">&#39;dingtalk_webhook&#39;</span><span class="p">:</span> <span class="s1">&#39;https://...&#39;</span><span class="p">,</span>
+</span><span id="__span-5-9"><a id="__codelineno-5-9" name="__codelineno-5-9" href="#__codelineno-5-9"></a>            <span class="s1">&#39;conditions&#39;</span><span class="p">:</span> <span class="p">{</span>
+</span><span id="__span-5-10"><a id="__codelineno-5-10" name="__codelineno-5-10" href="#__codelineno-5-10"></a>                <span class="s1">&#39;error_rate &gt; 0.1&#39;</span><span class="p">:</span> <span class="s1">&#39;high&#39;</span><span class="p">,</span>  <span class="c1"># 错误率超过10%</span>
+</span><span id="__span-5-11"><a id="__codelineno-5-11" name="__codelineno-5-11" href="#__codelineno-5-11"></a>                <span class="s1">&#39;requests_per_second &lt; 1&#39;</span><span class="p">:</span> <span class="s1">&#39;low&#39;</span><span class="p">,</span>  <span class="c1"># 速度过慢</span>
+</span><span id="__span-5-12"><a id="__codelineno-5-12" name="__codelineno-5-12" href="#__codelineno-5-12"></a>            <span class="p">}</span>
+</span><span id="__span-5-13"><a id="__codelineno-5-13" name="__codelineno-5-13" href="#__codelineno-5-13"></a>        <span class="p">}</span>
+</span><span id="__span-5-14"><a id="__codelineno-5-14" name="__codelineno-5-14" href="#__codelineno-5-14"></a>    <span class="p">}</span>
+</span><span id="__span-5-15"><a id="__codelineno-5-15" name="__codelineno-5-15" href="#__codelineno-5-15"></a><span class="p">)</span>
 </span></code></pre></div></p>
 <hr />
 <h3 id="5-cli">5. 命令行工具增强（CLI）<a class="headerlink" href="#5-cli" title="Permanent link">&para;</a></h3>
@@ -1536,106 +1496,56 @@
 <ol>
 <li>
 <p><strong>项目管理命令</strong>
-   <div class="language-bash highlight"><span class="filename">Bash</span><pre><span></span><code><span id="__span-7-1"><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a><span class="c1"># 创建新项目（脚手架）</span>
-</span><span id="__span-7-2"><a id="__codelineno-7-2" name="__codelineno-7-2" href="#__codelineno-7-2"></a>maize<span class="w"> </span>startproject<span class="w"> </span>myproject
-</span><span id="__span-7-3"><a id="__codelineno-7-3" name="__codelineno-7-3" href="#__codelineno-7-3"></a>
-</span><span id="__span-7-4"><a id="__codelineno-7-4" name="__codelineno-7-4" href="#__codelineno-7-4"></a><span class="c1"># 生成爬虫模板</span>
-</span><span id="__span-7-5"><a id="__codelineno-7-5" name="__codelineno-7-5" href="#__codelineno-7-5"></a>maize<span class="w"> </span>genspider<span class="w"> </span>myspider<span class="w"> </span>example.com
-</span><span id="__span-7-6"><a id="__codelineno-7-6" name="__codelineno-7-6" href="#__codelineno-7-6"></a>
-</span><span id="__span-7-7"><a id="__codelineno-7-7" name="__codelineno-7-7" href="#__codelineno-7-7"></a><span class="c1"># 生成 Pipeline/Middleware 模板</span>
-</span><span id="__span-7-8"><a id="__codelineno-7-8" name="__codelineno-7-8" href="#__codelineno-7-8"></a>maize<span class="w"> </span>genpipeline<span class="w"> </span>mypipeline
-</span><span id="__span-7-9"><a id="__codelineno-7-9" name="__codelineno-7-9" href="#__codelineno-7-9"></a>maize<span class="w"> </span>genmiddleware<span class="w"> </span>mymiddleware
+   <div class="language-bash highlight"><span class="filename">Bash</span><pre><span></span><code><span id="__span-6-1"><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a><span class="c1"># 创建新项目（脚手架）</span>
+</span><span id="__span-6-2"><a id="__codelineno-6-2" name="__codelineno-6-2" href="#__codelineno-6-2"></a>maize<span class="w"> </span>startproject<span class="w"> </span>myproject
+</span><span id="__span-6-3"><a id="__codelineno-6-3" name="__codelineno-6-3" href="#__codelineno-6-3"></a>
+</span><span id="__span-6-4"><a id="__codelineno-6-4" name="__codelineno-6-4" href="#__codelineno-6-4"></a><span class="c1"># 生成爬虫模板</span>
+</span><span id="__span-6-5"><a id="__codelineno-6-5" name="__codelineno-6-5" href="#__codelineno-6-5"></a>maize<span class="w"> </span>genspider<span class="w"> </span>myspider<span class="w"> </span>example.com
+</span><span id="__span-6-6"><a id="__codelineno-6-6" name="__codelineno-6-6" href="#__codelineno-6-6"></a>
+</span><span id="__span-6-7"><a id="__codelineno-6-7" name="__codelineno-6-7" href="#__codelineno-6-7"></a><span class="c1"># 生成 Pipeline/Middleware 模板</span>
+</span><span id="__span-6-8"><a id="__codelineno-6-8" name="__codelineno-6-8" href="#__codelineno-6-8"></a>maize<span class="w"> </span>genpipeline<span class="w"> </span>mypipeline
+</span><span id="__span-6-9"><a id="__codelineno-6-9" name="__codelineno-6-9" href="#__codelineno-6-9"></a>maize<span class="w"> </span>genmiddleware<span class="w"> </span>mymiddleware
 </span></code></pre></div></p>
 </li>
 <li>
 <p><strong>调试命令</strong>
-   <div class="language-bash highlight"><span class="filename">Bash</span><pre><span></span><code><span id="__span-8-1"><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a><span class="c1"># 交互式 Shell</span>
-</span><span id="__span-8-2"><a id="__codelineno-8-2" name="__codelineno-8-2" href="#__codelineno-8-2"></a>maize<span class="w"> </span>shell
-</span><span id="__span-8-3"><a id="__codelineno-8-3" name="__codelineno-8-3" href="#__codelineno-8-3"></a>
-</span><span id="__span-8-4"><a id="__codelineno-8-4" name="__codelineno-8-4" href="#__codelineno-8-4"></a><span class="c1"># 测试单个 URL</span>
-</span><span id="__span-8-5"><a id="__codelineno-8-5" name="__codelineno-8-5" href="#__codelineno-8-5"></a>maize<span class="w"> </span>fetch<span class="w"> </span>http://example.com
-</span><span id="__span-8-6"><a id="__codelineno-8-6" name="__codelineno-8-6" href="#__codelineno-8-6"></a>
-</span><span id="__span-8-7"><a id="__codelineno-8-7" name="__codelineno-8-7" href="#__codelineno-8-7"></a><span class="c1"># 解析响应（类似 Scrapy shell）</span>
-</span><span id="__span-8-8"><a id="__codelineno-8-8" name="__codelineno-8-8" href="#__codelineno-8-8"></a>maize<span class="w"> </span>parse<span class="w"> </span>http://example.com<span class="w"> </span>--spider<span class="o">=</span>MySpider
-</span><span id="__span-8-9"><a id="__codelineno-8-9" name="__codelineno-8-9" href="#__codelineno-8-9"></a>
-</span><span id="__span-8-10"><a id="__codelineno-8-10" name="__codelineno-8-10" href="#__codelineno-8-10"></a><span class="c1"># 查看配置</span>
-</span><span id="__span-8-11"><a id="__codelineno-8-11" name="__codelineno-8-11" href="#__codelineno-8-11"></a>maize<span class="w"> </span>settings
+   <div class="language-bash highlight"><span class="filename">Bash</span><pre><span></span><code><span id="__span-7-1"><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a><span class="c1"># 交互式 Shell</span>
+</span><span id="__span-7-2"><a id="__codelineno-7-2" name="__codelineno-7-2" href="#__codelineno-7-2"></a>maize<span class="w"> </span>shell
+</span><span id="__span-7-3"><a id="__codelineno-7-3" name="__codelineno-7-3" href="#__codelineno-7-3"></a>
+</span><span id="__span-7-4"><a id="__codelineno-7-4" name="__codelineno-7-4" href="#__codelineno-7-4"></a><span class="c1"># 测试单个 URL</span>
+</span><span id="__span-7-5"><a id="__codelineno-7-5" name="__codelineno-7-5" href="#__codelineno-7-5"></a>maize<span class="w"> </span>fetch<span class="w"> </span>http://example.com
+</span><span id="__span-7-6"><a id="__codelineno-7-6" name="__codelineno-7-6" href="#__codelineno-7-6"></a>
+</span><span id="__span-7-7"><a id="__codelineno-7-7" name="__codelineno-7-7" href="#__codelineno-7-7"></a><span class="c1"># 解析响应（类似 Scrapy shell）</span>
+</span><span id="__span-7-8"><a id="__codelineno-7-8" name="__codelineno-7-8" href="#__codelineno-7-8"></a>maize<span class="w"> </span>parse<span class="w"> </span>http://example.com<span class="w"> </span>--spider<span class="o">=</span>MySpider
+</span><span id="__span-7-9"><a id="__codelineno-7-9" name="__codelineno-7-9" href="#__codelineno-7-9"></a>
+</span><span id="__span-7-10"><a id="__codelineno-7-10" name="__codelineno-7-10" href="#__codelineno-7-10"></a><span class="c1"># 查看配置</span>
+</span><span id="__span-7-11"><a id="__codelineno-7-11" name="__codelineno-7-11" href="#__codelineno-7-11"></a>maize<span class="w"> </span>settings
 </span></code></pre></div></p>
 </li>
 <li>
 <p><strong>运行和部署命令</strong>
-   <div class="language-bash highlight"><span class="filename">Bash</span><pre><span></span><code><span id="__span-9-1"><a id="__codelineno-9-1" name="__codelineno-9-1" href="#__codelineno-9-1"></a><span class="c1"># 列出所有爬虫</span>
-</span><span id="__span-9-2"><a id="__codelineno-9-2" name="__codelineno-9-2" href="#__codelineno-9-2"></a>maize<span class="w"> </span>list
-</span><span id="__span-9-3"><a id="__codelineno-9-3" name="__codelineno-9-3" href="#__codelineno-9-3"></a>
-</span><span id="__span-9-4"><a id="__codelineno-9-4" name="__codelineno-9-4" href="#__codelineno-9-4"></a><span class="c1"># 运行爬虫（支持参数）</span>
-</span><span id="__span-9-5"><a id="__codelineno-9-5" name="__codelineno-9-5" href="#__codelineno-9-5"></a>maize<span class="w"> </span>crawl<span class="w"> </span>myspider<span class="w"> </span>-a<span class="w"> </span><span class="nv">arg1</span><span class="o">=</span>value1
-</span><span id="__span-9-6"><a id="__codelineno-9-6" name="__codelineno-9-6" href="#__codelineno-9-6"></a>
-</span><span id="__span-9-7"><a id="__codelineno-9-7" name="__codelineno-9-7" href="#__codelineno-9-7"></a><span class="c1"># 检查代码风格</span>
-</span><span id="__span-9-8"><a id="__codelineno-9-8" name="__codelineno-9-8" href="#__codelineno-9-8"></a>maize<span class="w"> </span>check
-</span><span id="__span-9-9"><a id="__codelineno-9-9" name="__codelineno-9-9" href="#__codelineno-9-9"></a>
-</span><span id="__span-9-10"><a id="__codelineno-9-10" name="__codelineno-9-10" href="#__codelineno-9-10"></a><span class="c1"># 版本信息</span>
-</span><span id="__span-9-11"><a id="__codelineno-9-11" name="__codelineno-9-11" href="#__codelineno-9-11"></a>maize<span class="w"> </span>version
+   <div class="language-bash highlight"><span class="filename">Bash</span><pre><span></span><code><span id="__span-8-1"><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a><span class="c1"># 列出所有爬虫</span>
+</span><span id="__span-8-2"><a id="__codelineno-8-2" name="__codelineno-8-2" href="#__codelineno-8-2"></a>maize<span class="w"> </span>list
+</span><span id="__span-8-3"><a id="__codelineno-8-3" name="__codelineno-8-3" href="#__codelineno-8-3"></a>
+</span><span id="__span-8-4"><a id="__codelineno-8-4" name="__codelineno-8-4" href="#__codelineno-8-4"></a><span class="c1"># 运行爬虫（支持参数）</span>
+</span><span id="__span-8-5"><a id="__codelineno-8-5" name="__codelineno-8-5" href="#__codelineno-8-5"></a>maize<span class="w"> </span>crawl<span class="w"> </span>myspider<span class="w"> </span>-a<span class="w"> </span><span class="nv">arg1</span><span class="o">=</span>value1
+</span><span id="__span-8-6"><a id="__codelineno-8-6" name="__codelineno-8-6" href="#__codelineno-8-6"></a>
+</span><span id="__span-8-7"><a id="__codelineno-8-7" name="__codelineno-8-7" href="#__codelineno-8-7"></a><span class="c1"># 检查代码风格</span>
+</span><span id="__span-8-8"><a id="__codelineno-8-8" name="__codelineno-8-8" href="#__codelineno-8-8"></a>maize<span class="w"> </span>check
+</span><span id="__span-8-9"><a id="__codelineno-8-9" name="__codelineno-8-9" href="#__codelineno-8-9"></a>
+</span><span id="__span-8-10"><a id="__codelineno-8-10" name="__codelineno-8-10" href="#__codelineno-8-10"></a><span class="c1"># 版本信息</span>
+</span><span id="__span-8-11"><a id="__codelineno-8-11" name="__codelineno-8-11" href="#__codelineno-8-11"></a>maize<span class="w"> </span>version
 </span></code></pre></div></p>
 </li>
 <li>
 <p><strong>基准测试命令</strong>
-   <div class="language-bash highlight"><span class="filename">Bash</span><pre><span></span><code><span id="__span-10-1"><a id="__codelineno-10-1" name="__codelineno-10-1" href="#__codelineno-10-1"></a><span class="c1"># 性能基准测试</span>
-</span><span id="__span-10-2"><a id="__codelineno-10-2" name="__codelineno-10-2" href="#__codelineno-10-2"></a>maize<span class="w"> </span>bench<span class="w"> </span>myspider
+   <div class="language-bash highlight"><span class="filename">Bash</span><pre><span></span><code><span id="__span-9-1"><a id="__codelineno-9-1" name="__codelineno-9-1" href="#__codelineno-9-1"></a><span class="c1"># 性能基准测试</span>
+</span><span id="__span-9-2"><a id="__codelineno-9-2" name="__codelineno-9-2" href="#__codelineno-9-2"></a>maize<span class="w"> </span>bench<span class="w"> </span>myspider
 </span></code></pre></div></p>
 </li>
 </ol>
 <hr />
 <h2 id="_3">🌟 中优先级<a class="headerlink" href="#_3" title="Permanent link">&para;</a></h2>
-<h3 id="6">6. 数据验证系统<a class="headerlink" href="#6" title="Permanent link">&para;</a></h3>
-<p><strong>状态：</strong> ❌ 未实现</p>
-<p><strong>重要性：</strong> ⭐⭐⭐⭐</p>
-<p><strong>描述：</strong>
-当前的 Item 系统比较简单，缺少数据验证能力。应该增强 Item 的验证功能。</p>
-<p><strong>需要实现的功能：</strong></p>
-<ol>
-<li>
-<p><strong>字段验证器</strong>
-   <div class="language-python highlight"><span class="filename">Python</span><pre><span></span><code><span id="__span-11-1"><a id="__codelineno-11-1" name="__codelineno-11-1" href="#__codelineno-11-1"></a><span class="kn">from</span><span class="w"> </span><span class="nn">maize</span><span class="w"> </span><span class="kn">import</span> <span class="n">Field</span><span class="p">,</span> <span class="n">Item</span>
-</span><span id="__span-11-2"><a id="__codelineno-11-2" name="__codelineno-11-2" href="#__codelineno-11-2"></a><span class="kn">from</span><span class="w"> </span><span class="nn">pydantic</span><span class="w"> </span><span class="kn">import</span> <span class="n">validator</span><span class="p">,</span> <span class="n">EmailStr</span><span class="p">,</span> <span class="n">HttpUrl</span>
-</span><span id="__span-11-3"><a id="__codelineno-11-3" name="__codelineno-11-3" href="#__codelineno-11-3"></a>
-</span><span id="__span-11-4"><a id="__codelineno-11-4" name="__codelineno-11-4" href="#__codelineno-11-4"></a><span class="k">class</span><span class="w"> </span><span class="nc">ProductItem</span><span class="p">(</span><span class="n">Item</span><span class="p">):</span>
-</span><span id="__span-11-5"><a id="__codelineno-11-5" name="__codelineno-11-5" href="#__codelineno-11-5"></a>    <span class="n">__table_name__</span> <span class="o">=</span> <span class="s2">&quot;products&quot;</span>
-</span><span id="__span-11-6"><a id="__codelineno-11-6" name="__codelineno-11-6" href="#__codelineno-11-6"></a>
-</span><span id="__span-11-7"><a id="__codelineno-11-7" name="__codelineno-11-7" href="#__codelineno-11-7"></a>    <span class="n">name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="n">min_length</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">max_length</span><span class="o">=</span><span class="mi">200</span><span class="p">)</span>
-</span><span id="__span-11-8"><a id="__codelineno-11-8" name="__codelineno-11-8" href="#__codelineno-11-8"></a>    <span class="n">price</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="n">gt</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="s2">&quot;价格必须大于0&quot;</span><span class="p">)</span>
-</span><span id="__span-11-9"><a id="__codelineno-11-9" name="__codelineno-11-9" href="#__codelineno-11-9"></a>    <span class="n">url</span><span class="p">:</span> <span class="n">HttpUrl</span> <span class="o">=</span> <span class="n">Field</span><span class="p">()</span>
-</span><span id="__span-11-10"><a id="__codelineno-11-10" name="__codelineno-11-10" href="#__codelineno-11-10"></a>    <span class="n">email</span><span class="p">:</span> <span class="n">EmailStr</span> <span class="o">=</span> <span class="n">Field</span><span class="p">()</span>
-</span><span id="__span-11-11"><a id="__codelineno-11-11" name="__codelineno-11-11" href="#__codelineno-11-11"></a>
-</span><span id="__span-11-12"><a id="__codelineno-11-12" name="__codelineno-11-12" href="#__codelineno-11-12"></a>    <span class="nd">@validator</span><span class="p">(</span><span class="s1">&#39;price&#39;</span><span class="p">)</span>
-</span><span id="__span-11-13"><a id="__codelineno-11-13" name="__codelineno-11-13" href="#__codelineno-11-13"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">validate_price</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">v</span><span class="p">):</span>
-</span><span id="__span-11-14"><a id="__codelineno-11-14" name="__codelineno-11-14" href="#__codelineno-11-14"></a>        <span class="k">if</span> <span class="n">v</span> <span class="o">&gt;</span> <span class="mi">100000</span><span class="p">:</span>
-</span><span id="__span-11-15"><a id="__codelineno-11-15" name="__codelineno-11-15" href="#__codelineno-11-15"></a>            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;价格过高&#39;</span><span class="p">)</span>
-</span><span id="__span-11-16"><a id="__codelineno-11-16" name="__codelineno-11-16" href="#__codelineno-11-16"></a>        <span class="k">return</span> <span class="n">v</span>
-</span></code></pre></div></p>
-</li>
-<li>
-<p><strong>自动类型转换</strong></p>
-</li>
-<li>字符串转数字</li>
-<li>日期时间解析</li>
-<li>
-<p>JSON 字符串解析</p>
-</li>
-<li>
-<p><strong>必填字段检查</strong></p>
-</li>
-<li>自动检查必填字段</li>
-<li>
-<p>缺失字段时的处理策略</p>
-</li>
-<li>
-<p><strong>数据清洗集成</strong></p>
-</li>
-<li>去除空白字符</li>
-<li>HTML 标签清理</li>
-<li>标准化处理</li>
-</ol>
-<hr />
 <h3 id="7">7. 分布式爬虫增强<a class="headerlink" href="#7" title="Permanent link">&para;</a></h3>
 <p><strong>状态：</strong> ⚠️ 基础实现，需要增强</p>
 <p><strong>重要性：</strong> ⭐⭐⭐⭐</p>
@@ -1673,15 +1583,15 @@
 <li>故障转移</li>
 </ol>
 <p><strong>实现参考：</strong>
-<div class="language-python highlight"><span class="filename">Python</span><pre><span></span><code><span id="__span-12-1"><a id="__codelineno-12-1" name="__codelineno-12-1" href="#__codelineno-12-1"></a><span class="n">settings</span> <span class="o">=</span> <span class="n">SpiderSettings</span><span class="p">(</span>
-</span><span id="__span-12-2"><a id="__codelineno-12-2" name="__codelineno-12-2" href="#__codelineno-12-2"></a>    <span class="n">distributed</span><span class="o">=</span><span class="p">{</span>
-</span><span id="__span-12-3"><a id="__codelineno-12-3" name="__codelineno-12-3" href="#__codelineno-12-3"></a>        <span class="s1">&#39;enabled&#39;</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span>
-</span><span id="__span-12-4"><a id="__codelineno-12-4" name="__codelineno-12-4" href="#__codelineno-12-4"></a>        <span class="s1">&#39;mode&#39;</span><span class="p">:</span> <span class="s1">&#39;worker&#39;</span><span class="p">,</span>  <span class="c1"># &#39;master&#39; or &#39;worker&#39;</span>
-</span><span id="__span-12-5"><a id="__codelineno-12-5" name="__codelineno-12-5" href="#__codelineno-12-5"></a>        <span class="s1">&#39;redis_url&#39;</span><span class="p">:</span> <span class="s1">&#39;redis://localhost:6379/0&#39;</span><span class="p">,</span>
-</span><span id="__span-12-6"><a id="__codelineno-12-6" name="__codelineno-12-6" href="#__codelineno-12-6"></a>        <span class="s1">&#39;queue_name&#39;</span><span class="p">:</span> <span class="s1">&#39;maize:tasks&#39;</span><span class="p">,</span>
-</span><span id="__span-12-7"><a id="__codelineno-12-7" name="__codelineno-12-7" href="#__codelineno-12-7"></a>        <span class="s1">&#39;heartbeat_interval&#39;</span><span class="p">:</span> <span class="mi">30</span><span class="p">,</span>
-</span><span id="__span-12-8"><a id="__codelineno-12-8" name="__codelineno-12-8" href="#__codelineno-12-8"></a>    <span class="p">}</span>
-</span><span id="__span-12-9"><a id="__codelineno-12-9" name="__codelineno-12-9" href="#__codelineno-12-9"></a><span class="p">)</span>
+<div class="language-python highlight"><span class="filename">Python</span><pre><span></span><code><span id="__span-10-1"><a id="__codelineno-10-1" name="__codelineno-10-1" href="#__codelineno-10-1"></a><span class="n">settings</span> <span class="o">=</span> <span class="n">SpiderSettings</span><span class="p">(</span>
+</span><span id="__span-10-2"><a id="__codelineno-10-2" name="__codelineno-10-2" href="#__codelineno-10-2"></a>    <span class="n">distributed</span><span class="o">=</span><span class="p">{</span>
+</span><span id="__span-10-3"><a id="__codelineno-10-3" name="__codelineno-10-3" href="#__codelineno-10-3"></a>        <span class="s1">&#39;enabled&#39;</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span>
+</span><span id="__span-10-4"><a id="__codelineno-10-4" name="__codelineno-10-4" href="#__codelineno-10-4"></a>        <span class="s1">&#39;mode&#39;</span><span class="p">:</span> <span class="s1">&#39;worker&#39;</span><span class="p">,</span>  <span class="c1"># &#39;master&#39; or &#39;worker&#39;</span>
+</span><span id="__span-10-5"><a id="__codelineno-10-5" name="__codelineno-10-5" href="#__codelineno-10-5"></a>        <span class="s1">&#39;redis_url&#39;</span><span class="p">:</span> <span class="s1">&#39;redis://localhost:6379/0&#39;</span><span class="p">,</span>
+</span><span id="__span-10-6"><a id="__codelineno-10-6" name="__codelineno-10-6" href="#__codelineno-10-6"></a>        <span class="s1">&#39;queue_name&#39;</span><span class="p">:</span> <span class="s1">&#39;maize:tasks&#39;</span><span class="p">,</span>
+</span><span id="__span-10-7"><a id="__codelineno-10-7" name="__codelineno-10-7" href="#__codelineno-10-7"></a>        <span class="s1">&#39;heartbeat_interval&#39;</span><span class="p">:</span> <span class="mi">30</span><span class="p">,</span>
+</span><span id="__span-10-8"><a id="__codelineno-10-8" name="__codelineno-10-8" href="#__codelineno-10-8"></a>    <span class="p">}</span>
+</span><span id="__span-10-9"><a id="__codelineno-10-9" name="__codelineno-10-9" href="#__codelineno-10-9"></a><span class="p">)</span>
 </span></code></pre></div></p>
 <hr />
 <h3 id="8">8. 更多下载器支持<a class="headerlink" href="#8" title="Permanent link">&para;</a></h3>
@@ -1729,23 +1639,23 @@
 <ol>
 <li>
 <p><strong>PostgreSQL Pipeline</strong>
-   <div class="language-python highlight"><span class="filename">Python</span><pre><span></span><code><span id="__span-13-1"><a id="__codelineno-13-1" name="__codelineno-13-1" href="#__codelineno-13-1"></a><span class="n">settings</span><span class="o">.</span><span class="n">pipeline</span><span class="o">.</span><span class="n">pipelines</span> <span class="o">=</span> <span class="p">[</span>
-</span><span id="__span-13-2"><a id="__codelineno-13-2" name="__codelineno-13-2" href="#__codelineno-13-2"></a>    <span class="s2">&quot;maize.pipelines.PostgresqlPipeline&quot;</span>
-</span><span id="__span-13-3"><a id="__codelineno-13-3" name="__codelineno-13-3" href="#__codelineno-13-3"></a><span class="p">]</span>
+   <div class="language-python highlight"><span class="filename">Python</span><pre><span></span><code><span id="__span-11-1"><a id="__codelineno-11-1" name="__codelineno-11-1" href="#__codelineno-11-1"></a><span class="n">settings</span><span class="o">.</span><span class="n">pipeline</span><span class="o">.</span><span class="n">pipelines</span> <span class="o">=</span> <span class="p">[</span>
+</span><span id="__span-11-2"><a id="__codelineno-11-2" name="__codelineno-11-2" href="#__codelineno-11-2"></a>    <span class="s2">&quot;maize.pipeline.PostgresqlPipeline&quot;</span>
+</span><span id="__span-11-3"><a id="__codelineno-11-3" name="__codelineno-11-3" href="#__codelineno-11-3"></a><span class="p">]</span>
 </span></code></pre></div></p>
 </li>
 <li>
 <p><strong>MongoDB Pipeline</strong>
-   <div class="language-python highlight"><span class="filename">Python</span><pre><span></span><code><span id="__span-14-1"><a id="__codelineno-14-1" name="__codelineno-14-1" href="#__codelineno-14-1"></a><span class="n">settings</span><span class="o">.</span><span class="n">pipeline</span><span class="o">.</span><span class="n">pipelines</span> <span class="o">=</span> <span class="p">[</span>
-</span><span id="__span-14-2"><a id="__codelineno-14-2" name="__codelineno-14-2" href="#__codelineno-14-2"></a>    <span class="s2">&quot;maize.pipelines.MongoPipeline&quot;</span>
-</span><span id="__span-14-3"><a id="__codelineno-14-3" name="__codelineno-14-3" href="#__codelineno-14-3"></a><span class="p">]</span>
+   <div class="language-python highlight"><span class="filename">Python</span><pre><span></span><code><span id="__span-12-1"><a id="__codelineno-12-1" name="__codelineno-12-1" href="#__codelineno-12-1"></a><span class="n">settings</span><span class="o">.</span><span class="n">pipeline</span><span class="o">.</span><span class="n">pipelines</span> <span class="o">=</span> <span class="p">[</span>
+</span><span id="__span-12-2"><a id="__codelineno-12-2" name="__codelineno-12-2" href="#__codelineno-12-2"></a>    <span class="s2">&quot;maize.pipeline.MongoPipeline&quot;</span>
+</span><span id="__span-12-3"><a id="__codelineno-12-3" name="__codelineno-12-3" href="#__codelineno-12-3"></a><span class="p">]</span>
 </span></code></pre></div></p>
 </li>
 <li>
 <p><strong>Elasticsearch Pipeline</strong>
-   <div class="language-python highlight"><span class="filename">Python</span><pre><span></span><code><span id="__span-15-1"><a id="__codelineno-15-1" name="__codelineno-15-1" href="#__codelineno-15-1"></a><span class="n">settings</span><span class="o">.</span><span class="n">pipeline</span><span class="o">.</span><span class="n">pipelines</span> <span class="o">=</span> <span class="p">[</span>
-</span><span id="__span-15-2"><a id="__codelineno-15-2" name="__codelineno-15-2" href="#__codelineno-15-2"></a>    <span class="s2">&quot;maize.pipelines.ElasticsearchPipeline&quot;</span>
-</span><span id="__span-15-3"><a id="__codelineno-15-3" name="__codelineno-15-3" href="#__codelineno-15-3"></a><span class="p">]</span>
+   <div class="language-python highlight"><span class="filename">Python</span><pre><span></span><code><span id="__span-13-1"><a id="__codelineno-13-1" name="__codelineno-13-1" href="#__codelineno-13-1"></a><span class="n">settings</span><span class="o">.</span><span class="n">pipeline</span><span class="o">.</span><span class="n">pipelines</span> <span class="o">=</span> <span class="p">[</span>
+</span><span id="__span-13-2"><a id="__codelineno-13-2" name="__codelineno-13-2" href="#__codelineno-13-2"></a>    <span class="s2">&quot;maize.pipeline.ElasticsearchPipeline&quot;</span>
+</span><span id="__span-13-3"><a id="__codelineno-13-3" name="__codelineno-13-3" href="#__codelineno-13-3"></a><span class="p">]</span>
 </span></code></pre></div></p>
 </li>
 <li>
@@ -1753,17 +1663,17 @@
 </li>
 <li>
 <p>实时数据流处理
-   <div class="language-python highlight"><span class="filename">Python</span><pre><span></span><code><span id="__span-16-1"><a id="__codelineno-16-1" name="__codelineno-16-1" href="#__codelineno-16-1"></a><span class="n">settings</span><span class="o">.</span><span class="n">pipeline</span><span class="o">.</span><span class="n">pipelines</span> <span class="o">=</span> <span class="p">[</span>
-</span><span id="__span-16-2"><a id="__codelineno-16-2" name="__codelineno-16-2" href="#__codelineno-16-2"></a>    <span class="s2">&quot;maize.pipelines.KafkaPipeline&quot;</span>
-</span><span id="__span-16-3"><a id="__codelineno-16-3" name="__codelineno-16-3" href="#__codelineno-16-3"></a><span class="p">]</span>
+   <div class="language-python highlight"><span class="filename">Python</span><pre><span></span><code><span id="__span-14-1"><a id="__codelineno-14-1" name="__codelineno-14-1" href="#__codelineno-14-1"></a><span class="n">settings</span><span class="o">.</span><span class="n">pipeline</span><span class="o">.</span><span class="n">pipelines</span> <span class="o">=</span> <span class="p">[</span>
+</span><span id="__span-14-2"><a id="__codelineno-14-2" name="__codelineno-14-2" href="#__codelineno-14-2"></a>    <span class="s2">&quot;maize.pipeline.KafkaPipeline&quot;</span>
+</span><span id="__span-14-3"><a id="__codelineno-14-3" name="__codelineno-14-3" href="#__codelineno-14-3"></a><span class="p">]</span>
 </span></code></pre></div></p>
 </li>
 <li>
 <p><strong>CSV/Excel Pipeline</strong>
-   <div class="language-python highlight"><span class="filename">Python</span><pre><span></span><code><span id="__span-17-1"><a id="__codelineno-17-1" name="__codelineno-17-1" href="#__codelineno-17-1"></a><span class="n">settings</span><span class="o">.</span><span class="n">pipeline</span><span class="o">.</span><span class="n">pipelines</span> <span class="o">=</span> <span class="p">[</span>
-</span><span id="__span-17-2"><a id="__codelineno-17-2" name="__codelineno-17-2" href="#__codelineno-17-2"></a>    <span class="s2">&quot;maize.pipelines.CsvPipeline&quot;</span><span class="p">,</span>
-</span><span id="__span-17-3"><a id="__codelineno-17-3" name="__codelineno-17-3" href="#__codelineno-17-3"></a>    <span class="s2">&quot;maize.pipelines.ExcelPipeline&quot;</span>
-</span><span id="__span-17-4"><a id="__codelineno-17-4" name="__codelineno-17-4" href="#__codelineno-17-4"></a><span class="p">]</span>
+   <div class="language-python highlight"><span class="filename">Python</span><pre><span></span><code><span id="__span-15-1"><a id="__codelineno-15-1" name="__codelineno-15-1" href="#__codelineno-15-1"></a><span class="n">settings</span><span class="o">.</span><span class="n">pipeline</span><span class="o">.</span><span class="n">pipelines</span> <span class="o">=</span> <span class="p">[</span>
+</span><span id="__span-15-2"><a id="__codelineno-15-2" name="__codelineno-15-2" href="#__codelineno-15-2"></a>    <span class="s2">&quot;maize.pipeline.CsvPipeline&quot;</span><span class="p">,</span>
+</span><span id="__span-15-3"><a id="__codelineno-15-3" name="__codelineno-15-3" href="#__codelineno-15-3"></a>    <span class="s2">&quot;maize.pipeline.ExcelPipeline&quot;</span>
+</span><span id="__span-15-4"><a id="__codelineno-15-4" name="__codelineno-15-4" href="#__codelineno-15-4"></a><span class="p">]</span>
 </span></code></pre></div></p>
 </li>
 <li>
@@ -1771,11 +1681,11 @@
 </li>
 <li>自动下载图片和文件</li>
 <li>生成缩略图
-   <div class="language-python highlight"><span class="filename">Python</span><pre><span></span><code><span id="__span-18-1"><a id="__codelineno-18-1" name="__codelineno-18-1" href="#__codelineno-18-1"></a><span class="k">class</span><span class="w"> </span><span class="nc">ImagesPipeline</span><span class="p">(</span><span class="n">BasePipeline</span><span class="p">):</span>
-</span><span id="__span-18-2"><a id="__codelineno-18-2" name="__codelineno-18-2" href="#__codelineno-18-2"></a>    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">process_item</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">items</span><span class="p">):</span>
-</span><span id="__span-18-3"><a id="__codelineno-18-3" name="__codelineno-18-3" href="#__codelineno-18-3"></a>        <span class="k">for</span> <span class="n">item</span> <span class="ow">in</span> <span class="n">items</span><span class="p">:</span>
-</span><span id="__span-18-4"><a id="__codelineno-18-4" name="__codelineno-18-4" href="#__codelineno-18-4"></a>            <span class="n">image_url</span> <span class="o">=</span> <span class="n">item</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;image_url&#39;</span><span class="p">)</span>
-</span><span id="__span-18-5"><a id="__codelineno-18-5" name="__codelineno-18-5" href="#__codelineno-18-5"></a>            <span class="c1"># 下载并保存图片</span>
+   <div class="language-python highlight"><span class="filename">Python</span><pre><span></span><code><span id="__span-16-1"><a id="__codelineno-16-1" name="__codelineno-16-1" href="#__codelineno-16-1"></a><span class="k">class</span><span class="w"> </span><span class="nc">ImagesPipeline</span><span class="p">(</span><span class="n">BasePipeline</span><span class="p">):</span>
+</span><span id="__span-16-2"><a id="__codelineno-16-2" name="__codelineno-16-2" href="#__codelineno-16-2"></a>    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">process_item</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">items</span><span class="p">):</span>
+</span><span id="__span-16-3"><a id="__codelineno-16-3" name="__codelineno-16-3" href="#__codelineno-16-3"></a>        <span class="k">for</span> <span class="n">item</span> <span class="ow">in</span> <span class="n">items</span><span class="p">:</span>
+</span><span id="__span-16-4"><a id="__codelineno-16-4" name="__codelineno-16-4" href="#__codelineno-16-4"></a>            <span class="n">image_url</span> <span class="o">=</span> <span class="n">item</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;image_url&#39;</span><span class="p">)</span>
+</span><span id="__span-16-5"><a id="__codelineno-16-5" name="__codelineno-16-5" href="#__codelineno-16-5"></a>            <span class="c1"># 下载并保存图片</span>
 </span></code></pre></div></li>
 </ol>
 <hr />
@@ -1788,12 +1698,12 @@
 <ol>
 <li>
 <p><strong>基于时间戳的增量</strong>
-   <div class="language-python highlight"><span class="filename">Python</span><pre><span></span><code><span id="__span-19-1"><a id="__codelineno-19-1" name="__codelineno-19-1" href="#__codelineno-19-1"></a><span class="k">class</span><span class="w"> </span><span class="nc">IncrementalSpider</span><span class="p">(</span><span class="n">Spider</span><span class="p">):</span>
-</span><span id="__span-19-2"><a id="__codelineno-19-2" name="__codelineno-19-2" href="#__codelineno-19-2"></a>    <span class="n">incremental_key</span> <span class="o">=</span> <span class="s1">&#39;last_update&#39;</span>
-</span><span id="__span-19-3"><a id="__codelineno-19-3" name="__codelineno-19-3" href="#__codelineno-19-3"></a>
-</span><span id="__span-19-4"><a id="__codelineno-19-4" name="__codelineno-19-4" href="#__codelineno-19-4"></a>    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">should_crawl</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">item_data</span><span class="p">):</span>
-</span><span id="__span-19-5"><a id="__codelineno-19-5" name="__codelineno-19-5" href="#__codelineno-19-5"></a>        <span class="n">last_crawl_time</span> <span class="o">=</span> <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_last_crawl_time</span><span class="p">()</span>
-</span><span id="__span-19-6"><a id="__codelineno-19-6" name="__codelineno-19-6" href="#__codelineno-19-6"></a>        <span class="k">return</span> <span class="n">item_data</span><span class="p">[</span><span class="s1">&#39;update_time&#39;</span><span class="p">]</span> <span class="o">&gt;</span> <span class="n">last_crawl_time</span>
+   <div class="language-python highlight"><span class="filename">Python</span><pre><span></span><code><span id="__span-17-1"><a id="__codelineno-17-1" name="__codelineno-17-1" href="#__codelineno-17-1"></a><span class="k">class</span><span class="w"> </span><span class="nc">IncrementalSpider</span><span class="p">(</span><span class="n">Spider</span><span class="p">):</span>
+</span><span id="__span-17-2"><a id="__codelineno-17-2" name="__codelineno-17-2" href="#__codelineno-17-2"></a>    <span class="n">incremental_key</span> <span class="o">=</span> <span class="s1">&#39;last_update&#39;</span>
+</span><span id="__span-17-3"><a id="__codelineno-17-3" name="__codelineno-17-3" href="#__codelineno-17-3"></a>
+</span><span id="__span-17-4"><a id="__codelineno-17-4" name="__codelineno-17-4" href="#__codelineno-17-4"></a>    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">should_crawl</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">item_data</span><span class="p">):</span>
+</span><span id="__span-17-5"><a id="__codelineno-17-5" name="__codelineno-17-5" href="#__codelineno-17-5"></a>        <span class="n">last_crawl_time</span> <span class="o">=</span> <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_last_crawl_time</span><span class="p">()</span>
+</span><span id="__span-17-6"><a id="__codelineno-17-6" name="__codelineno-17-6" href="#__codelineno-17-6"></a>        <span class="k">return</span> <span class="n">item_data</span><span class="p">[</span><span class="s1">&#39;update_time&#39;</span><span class="p">]</span> <span class="o">&gt;</span> <span class="n">last_crawl_time</span>
 </span></code></pre></div></p>
 </li>
 <li>
@@ -1841,16 +1751,16 @@
 </li>
 <li>
 <p><strong>代理池管理</strong>
-   <div class="language-python highlight"><span class="filename">Python</span><pre><span></span><code><span id="__span-20-1"><a id="__codelineno-20-1" name="__codelineno-20-1" href="#__codelineno-20-1"></a><span class="n">settings</span> <span class="o">=</span> <span class="n">SpiderSettings</span><span class="p">(</span>
-</span><span id="__span-20-2"><a id="__codelineno-20-2" name="__codelineno-20-2" href="#__codelineno-20-2"></a>    <span class="n">proxy_pool</span><span class="o">=</span><span class="p">{</span>
-</span><span id="__span-20-3"><a id="__codelineno-20-3" name="__codelineno-20-3" href="#__codelineno-20-3"></a>        <span class="s1">&#39;enabled&#39;</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span>
-</span><span id="__span-20-4"><a id="__codelineno-20-4" name="__codelineno-20-4" href="#__codelineno-20-4"></a>        <span class="s1">&#39;providers&#39;</span><span class="p">:</span> <span class="p">[</span><span class="s1">&#39;free&#39;</span><span class="p">,</span> <span class="s1">&#39;api&#39;</span><span class="p">],</span>
-</span><span id="__span-20-5"><a id="__codelineno-20-5" name="__codelineno-20-5" href="#__codelineno-20-5"></a>        <span class="s1">&#39;api_url&#39;</span><span class="p">:</span> <span class="s1">&#39;http://proxy-api.com/get&#39;</span><span class="p">,</span>
-</span><span id="__span-20-6"><a id="__codelineno-20-6" name="__codelineno-20-6" href="#__codelineno-20-6"></a>        <span class="s1">&#39;validation_url&#39;</span><span class="p">:</span> <span class="s1">&#39;http://httpbin.org/ip&#39;</span><span class="p">,</span>
-</span><span id="__span-20-7"><a id="__codelineno-20-7" name="__codelineno-20-7" href="#__codelineno-20-7"></a>        <span class="s1">&#39;min_score&#39;</span><span class="p">:</span> <span class="mf">0.8</span><span class="p">,</span>  <span class="c1"># 最低成功率</span>
-</span><span id="__span-20-8"><a id="__codelineno-20-8" name="__codelineno-20-8" href="#__codelineno-20-8"></a>        <span class="s1">&#39;rotation&#39;</span><span class="p">:</span> <span class="s1">&#39;per_request&#39;</span><span class="p">,</span>  <span class="c1"># &#39;per_request&#39;, &#39;per_spider&#39;</span>
-</span><span id="__span-20-9"><a id="__codelineno-20-9" name="__codelineno-20-9" href="#__codelineno-20-9"></a>    <span class="p">}</span>
-</span><span id="__span-20-10"><a id="__codelineno-20-10" name="__codelineno-20-10" href="#__codelineno-20-10"></a><span class="p">)</span>
+   <div class="language-python highlight"><span class="filename">Python</span><pre><span></span><code><span id="__span-18-1"><a id="__codelineno-18-1" name="__codelineno-18-1" href="#__codelineno-18-1"></a><span class="n">settings</span> <span class="o">=</span> <span class="n">SpiderSettings</span><span class="p">(</span>
+</span><span id="__span-18-2"><a id="__codelineno-18-2" name="__codelineno-18-2" href="#__codelineno-18-2"></a>    <span class="n">proxy_pool</span><span class="o">=</span><span class="p">{</span>
+</span><span id="__span-18-3"><a id="__codelineno-18-3" name="__codelineno-18-3" href="#__codelineno-18-3"></a>        <span class="s1">&#39;enabled&#39;</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span>
+</span><span id="__span-18-4"><a id="__codelineno-18-4" name="__codelineno-18-4" href="#__codelineno-18-4"></a>        <span class="s1">&#39;providers&#39;</span><span class="p">:</span> <span class="p">[</span><span class="s1">&#39;free&#39;</span><span class="p">,</span> <span class="s1">&#39;api&#39;</span><span class="p">],</span>
+</span><span id="__span-18-5"><a id="__codelineno-18-5" name="__codelineno-18-5" href="#__codelineno-18-5"></a>        <span class="s1">&#39;api_url&#39;</span><span class="p">:</span> <span class="s1">&#39;http://proxy-api.com/get&#39;</span><span class="p">,</span>
+</span><span id="__span-18-6"><a id="__codelineno-18-6" name="__codelineno-18-6" href="#__codelineno-18-6"></a>        <span class="s1">&#39;validation_url&#39;</span><span class="p">:</span> <span class="s1">&#39;http://httpbin.org/ip&#39;</span><span class="p">,</span>
+</span><span id="__span-18-7"><a id="__codelineno-18-7" name="__codelineno-18-7" href="#__codelineno-18-7"></a>        <span class="s1">&#39;min_score&#39;</span><span class="p">:</span> <span class="mf">0.8</span><span class="p">,</span>  <span class="c1"># 最低成功率</span>
+</span><span id="__span-18-8"><a id="__codelineno-18-8" name="__codelineno-18-8" href="#__codelineno-18-8"></a>        <span class="s1">&#39;rotation&#39;</span><span class="p">:</span> <span class="s1">&#39;per_request&#39;</span><span class="p">,</span>  <span class="c1"># &#39;per_request&#39;, &#39;per_spider&#39;</span>
+</span><span id="__span-18-9"><a id="__codelineno-18-9" name="__codelineno-18-9" href="#__codelineno-18-9"></a>    <span class="p">}</span>
+</span><span id="__span-18-10"><a id="__codelineno-18-10" name="__codelineno-18-10" href="#__codelineno-18-10"></a><span class="p">)</span>
 </span></code></pre></div></p>
 </li>
 </ol>
@@ -1866,13 +1776,13 @@
 <li>自动解析和遵守 robots.txt</li>
 <li>
 <p>可配置是否遵守
-   <div class="language-python highlight"><span class="filename">Python</span><pre><span></span><code><span id="__span-21-1"><a id="__codelineno-21-1" name="__codelineno-21-1" href="#__codelineno-21-1"></a><span class="n">settings</span> <span class="o">=</span> <span class="n">SpiderSettings</span><span class="p">(</span>
-</span><span id="__span-21-2"><a id="__codelineno-21-2" name="__codelineno-21-2" href="#__codelineno-21-2"></a>    <span class="n">robotstxt</span><span class="o">=</span><span class="p">{</span>
-</span><span id="__span-21-3"><a id="__codelineno-21-3" name="__codelineno-21-3" href="#__codelineno-21-3"></a>        <span class="s1">&#39;enabled&#39;</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span>
-</span><span id="__span-21-4"><a id="__codelineno-21-4" name="__codelineno-21-4" href="#__codelineno-21-4"></a>        <span class="s1">&#39;obey&#39;</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span>
-</span><span id="__span-21-5"><a id="__codelineno-21-5" name="__codelineno-21-5" href="#__codelineno-21-5"></a>        <span class="s1">&#39;user_agent&#39;</span><span class="p">:</span> <span class="s1">&#39;MaizeBot&#39;</span><span class="p">,</span>
-</span><span id="__span-21-6"><a id="__codelineno-21-6" name="__codelineno-21-6" href="#__codelineno-21-6"></a>    <span class="p">}</span>
-</span><span id="__span-21-7"><a id="__codelineno-21-7" name="__codelineno-21-7" href="#__codelineno-21-7"></a><span class="p">)</span>
+   <div class="language-python highlight"><span class="filename">Python</span><pre><span></span><code><span id="__span-19-1"><a id="__codelineno-19-1" name="__codelineno-19-1" href="#__codelineno-19-1"></a><span class="n">settings</span> <span class="o">=</span> <span class="n">SpiderSettings</span><span class="p">(</span>
+</span><span id="__span-19-2"><a id="__codelineno-19-2" name="__codelineno-19-2" href="#__codelineno-19-2"></a>    <span class="n">robotstxt</span><span class="o">=</span><span class="p">{</span>
+</span><span id="__span-19-3"><a id="__codelineno-19-3" name="__codelineno-19-3" href="#__codelineno-19-3"></a>        <span class="s1">&#39;enabled&#39;</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span>
+</span><span id="__span-19-4"><a id="__codelineno-19-4" name="__codelineno-19-4" href="#__codelineno-19-4"></a>        <span class="s1">&#39;obey&#39;</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span>
+</span><span id="__span-19-5"><a id="__codelineno-19-5" name="__codelineno-19-5" href="#__codelineno-19-5"></a>        <span class="s1">&#39;user_agent&#39;</span><span class="p">:</span> <span class="s1">&#39;MaizeBot&#39;</span><span class="p">,</span>
+</span><span id="__span-19-6"><a id="__codelineno-19-6" name="__codelineno-19-6" href="#__codelineno-19-6"></a>    <span class="p">}</span>
+</span><span id="__span-19-7"><a id="__codelineno-19-7" name="__codelineno-19-7" href="#__codelineno-19-7"></a><span class="p">)</span>
 </span></code></pre></div></p>
 </li>
 <li>
@@ -1987,20 +1897,20 @@
 <p><strong>描述：</strong>
 提供专门的 GraphQL 请求支持。</p>
 <p><strong>功能设想：</strong>
-<div class="language-python highlight"><span class="filename">Python</span><pre><span></span><code><span id="__span-22-1"><a id="__codelineno-22-1" name="__codelineno-22-1" href="#__codelineno-22-1"></a><span class="kn">from</span><span class="w"> </span><span class="nn">maize</span><span class="w"> </span><span class="kn">import</span> <span class="n">GraphQLRequest</span>
-</span><span id="__span-22-2"><a id="__codelineno-22-2" name="__codelineno-22-2" href="#__codelineno-22-2"></a>
-</span><span id="__span-22-3"><a id="__codelineno-22-3" name="__codelineno-22-3" href="#__codelineno-22-3"></a><span class="k">yield</span> <span class="n">GraphQLRequest</span><span class="p">(</span>
-</span><span id="__span-22-4"><a id="__codelineno-22-4" name="__codelineno-22-4" href="#__codelineno-22-4"></a>    <span class="n">url</span><span class="o">=</span><span class="s2">&quot;https://api.github.com/graphql&quot;</span><span class="p">,</span>
-</span><span id="__span-22-5"><a id="__codelineno-22-5" name="__codelineno-22-5" href="#__codelineno-22-5"></a>    <span class="n">query</span><span class="o">=</span><span class="s2">&quot;&quot;&quot;</span>
-</span><span id="__span-22-6"><a id="__codelineno-22-6" name="__codelineno-22-6" href="#__codelineno-22-6"></a><span class="s2">        query {</span>
-</span><span id="__span-22-7"><a id="__codelineno-22-7" name="__codelineno-22-7" href="#__codelineno-22-7"></a><span class="s2">            viewer {</span>
-</span><span id="__span-22-8"><a id="__codelineno-22-8" name="__codelineno-22-8" href="#__codelineno-22-8"></a><span class="s2">                login</span>
-</span><span id="__span-22-9"><a id="__codelineno-22-9" name="__codelineno-22-9" href="#__codelineno-22-9"></a><span class="s2">                name</span>
-</span><span id="__span-22-10"><a id="__codelineno-22-10" name="__codelineno-22-10" href="#__codelineno-22-10"></a><span class="s2">            }</span>
-</span><span id="__span-22-11"><a id="__codelineno-22-11" name="__codelineno-22-11" href="#__codelineno-22-11"></a><span class="s2">        }</span>
-</span><span id="__span-22-12"><a id="__codelineno-22-12" name="__codelineno-22-12" href="#__codelineno-22-12"></a><span class="s2">    &quot;&quot;&quot;</span><span class="p">,</span>
-</span><span id="__span-22-13"><a id="__codelineno-22-13" name="__codelineno-22-13" href="#__codelineno-22-13"></a>    <span class="n">variables</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;var1&#39;</span><span class="p">:</span> <span class="s1">&#39;value1&#39;</span><span class="p">},</span>
-</span><span id="__span-22-14"><a id="__codelineno-22-14" name="__codelineno-22-14" href="#__codelineno-22-14"></a><span class="p">)</span>
+<div class="language-python highlight"><span class="filename">Python</span><pre><span></span><code><span id="__span-20-1"><a id="__codelineno-20-1" name="__codelineno-20-1" href="#__codelineno-20-1"></a><span class="kn">from</span><span class="w"> </span><span class="nn">maize</span><span class="w"> </span><span class="kn">import</span> <span class="n">GraphQLRequest</span>
+</span><span id="__span-20-2"><a id="__codelineno-20-2" name="__codelineno-20-2" href="#__codelineno-20-2"></a>
+</span><span id="__span-20-3"><a id="__codelineno-20-3" name="__codelineno-20-3" href="#__codelineno-20-3"></a><span class="k">yield</span> <span class="n">GraphQLRequest</span><span class="p">(</span>
+</span><span id="__span-20-4"><a id="__codelineno-20-4" name="__codelineno-20-4" href="#__codelineno-20-4"></a>    <span class="n">url</span><span class="o">=</span><span class="s2">&quot;https://api.github.com/graphql&quot;</span><span class="p">,</span>
+</span><span id="__span-20-5"><a id="__codelineno-20-5" name="__codelineno-20-5" href="#__codelineno-20-5"></a>    <span class="n">query</span><span class="o">=</span><span class="s2">&quot;&quot;&quot;</span>
+</span><span id="__span-20-6"><a id="__codelineno-20-6" name="__codelineno-20-6" href="#__codelineno-20-6"></a><span class="s2">        query {</span>
+</span><span id="__span-20-7"><a id="__codelineno-20-7" name="__codelineno-20-7" href="#__codelineno-20-7"></a><span class="s2">            viewer {</span>
+</span><span id="__span-20-8"><a id="__codelineno-20-8" name="__codelineno-20-8" href="#__codelineno-20-8"></a><span class="s2">                login</span>
+</span><span id="__span-20-9"><a id="__codelineno-20-9" name="__codelineno-20-9" href="#__codelineno-20-9"></a><span class="s2">                name</span>
+</span><span id="__span-20-10"><a id="__codelineno-20-10" name="__codelineno-20-10" href="#__codelineno-20-10"></a><span class="s2">            }</span>
+</span><span id="__span-20-11"><a id="__codelineno-20-11" name="__codelineno-20-11" href="#__codelineno-20-11"></a><span class="s2">        }</span>
+</span><span id="__span-20-12"><a id="__codelineno-20-12" name="__codelineno-20-12" href="#__codelineno-20-12"></a><span class="s2">    &quot;&quot;&quot;</span><span class="p">,</span>
+</span><span id="__span-20-13"><a id="__codelineno-20-13" name="__codelineno-20-13" href="#__codelineno-20-13"></a>    <span class="n">variables</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;var1&#39;</span><span class="p">:</span> <span class="s1">&#39;value1&#39;</span><span class="p">},</span>
+</span><span id="__span-20-14"><a id="__codelineno-20-14" name="__codelineno-20-14" href="#__codelineno-20-14"></a><span class="p">)</span>
 </span></code></pre></div></p>
 <hr />
 <h3 id="17">17. 多语言支持（国际化）<a class="headerlink" href="#17" title="Permanent link">&para;</a></h3>
