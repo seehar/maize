@@ -147,7 +147,7 @@ class Settings(SpiderSettings):
 
 ```python
 settings = SpiderSettings(
-    logger_handler: str = "your_project.logger_util.InterceptHandler"
+    logger_handler="your_project.logger_util.InterceptHandler"
 )
 ```
 

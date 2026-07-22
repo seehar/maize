@@ -174,7 +174,7 @@ class ProxySpider(LiteSpider):
 
 ## 请求去重
 
-LiteSpider 默认启用请求去重，基于请求的 method+url+params+data 计算 hash 去重，
+LiteSpider 默认启用请求去重，基于请求的 method+url+headers+params+data+json 计算 hash 去重，
 避免递归爬取时重复抓取同一 URL。
 
 ### 全局关闭去重

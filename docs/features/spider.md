@@ -414,7 +414,7 @@ class MySpider(Spider):
             await self.proceed_spider(gte_priority=5)  # 只抓 priority >= 5 的请求
 ```
 
-更多详细示例请参考：[暂停和继续示例](../examples/pause_and_proceed_spider/)
+更多详细示例请参考：[暂停和继续示例](../../examples/pause_and_proceed_spider/)
 
 ## 下一步
 
