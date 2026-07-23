@@ -339,8 +339,9 @@ class AioEngine:
                 return None
 
         callback: Callable = request.callback or self.spider.parse
-        if _output := callback(response):
-            try:
+        try:
+            _output = callback(response)
+            if _output:
                 if iscoroutine(_output):
                     await _output
                     await self.spider.stats_collector.record_parse_success()
@@ -355,9 +356,9 @@ class AioEngine:
 
                     await self.spider.stats_collector.record_parse_success()
                     return transform_output
-            except Exception as e:
-                self.logger.error(f"Error during callback: {e}")
-                await self.spider.stats_collector.record_parse_fail()
+        except Exception as e:
+            self.logger.error(f"Error during callback: {e}")
+            await self.spider.stats_collector.record_parse_fail()
 
         if self.__redis_util:
             self.logger.debug(f"redis delete {self.__redis_key_running}:{request.hash}")
@@ -370,8 +371,9 @@ class AioEngine:
         if not error_callback:
             return None
 
-        if _error_output := error_callback(request):
-            try:
+        try:
+            _error_output = error_callback(request)
+            if _error_output:
                 if iscoroutine(_error_output):
                     await _error_output
                     await self.spider.stats_collector.record_parse_fail()
@@ -379,9 +381,8 @@ class AioEngine:
                     transform_output = transform(_error_output)
                     await self.spider.stats_collector.record_parse_fail()
                     return transform_output
-            except Exception as e:
-                self.logger.error(f"Error during error_callback: {e}")
-
+        except Exception as e:
+            self.logger.error(f"Error during error_callback: {e}")
         if self.__redis_util:
             self.logger.debug(f"redis delete {self.__redis_key_running}:{request.hash}")
             await self.__redis_util.delete(f"{self.__redis_key_running}:{request.hash}")
