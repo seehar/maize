@@ -31,7 +31,7 @@ class TestGetContainerId:
         Logic: text before "/resolv.conf" split by "/", last element is the id.
         """
         lines = [
-            "100 99 98:0 /docker/containers/abc123def/resolv.conf" " /etc/resolv.conf rw - tmpfs tmpfs\n",
+            "100 99 98:0 /docker/containers/abc123def/resolv.conf /etc/resolv.conf rw - tmpfs tmpfs\n",
         ]
         with (
             patch("maize.utils.system_util.Path.exists", return_value=True),
@@ -43,8 +43,8 @@ class TestGetContainerId:
     def test_returns_first_matching_container_id(self):
         """When multiple lines match, the first container id is returned."""
         lines = [
-            "100 99 98:0 /docker/containers/first_id/resolv.conf" " /etc/resolv.conf rw - tmpfs tmpfs\n",
-            "101 98 98:0 /docker/containers/second_id/resolv.conf" " /etc/resolv.conf rw - tmpfs tmpfs\n",
+            "100 99 98:0 /docker/containers/first_id/resolv.conf /etc/resolv.conf rw - tmpfs tmpfs\n",
+            "101 98 98:0 /docker/containers/second_id/resolv.conf /etc/resolv.conf rw - tmpfs tmpfs\n",
         ]
         with (
             patch("maize.utils.system_util.Path.exists", return_value=True),
