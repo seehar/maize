@@ -146,7 +146,7 @@ graph LR
 - `Request.priority` 使用 min-heap，**数值越小越优先**
 - `Request.meta` 用于在回调间传递数据，Lite 内部用 `_lite_` 前缀传递框架状态
 
-详见 [Request 详解](../features/request.md) 和 [Response 详解](../features/response.md)。
+详见 [Request 详解](features/request.md) 和 [Response 详解](features/response.md)。
 
 ### Item
 
@@ -156,7 +156,7 @@ graph LR
 - `to_dict()` / `model_dump()` 序列化
 - `Field` 支持所有 Pydantic 字段特性（`default`、`default_factory`、`ge`、`description`）
 
-详见 [Item 数据项](../features/item.md)。
+详见 [Item 数据项](features/item.md)。
 
 ### Downloader
 
@@ -169,7 +169,7 @@ graph LR
 | `PlaywrightDownloader` | Playwright | JS 渲染，RPA 自动化 |
 | `PatchrightDownloader` | Patchright | 反检测能力更强 |
 
-详见 [下载器](../features/downloader.md)。
+详见 [下载器](features/downloader.md)。
 
 ### 中间件系统（Classic 专有）
 
@@ -193,7 +193,7 @@ graph LR
 | `ItemValidationMiddleware` | 管道 | Item 字段验证 |
 | `CleanerMiddleware` | 管道 | 数据清洗 |
 
-详见 [中间件系统](../features/middleware.md)。
+详见 [中间件系统](features/middleware.md)。
 
 ### Pipeline（Classic 专有）
 
@@ -204,7 +204,7 @@ graph LR
 - **错误重试**：`process_item` 返回 `False` 触发重试，超限进入 `process_error_item`
 - **内置 Pipeline**：`EmptyPipeline`（默认空实现）、MySQL Pipeline（`maize[mysql]`）
 
-详见 [Pipeline 管道](../features/pipeline.md)。
+详见 [Pipeline 管道](features/pipeline.md)。
 
 ### Scheduler（Classic 专有）
 
@@ -246,7 +246,7 @@ graph TB
     EB -.->|"获取锁"| RL
 ```
 
-配置方式见 [配置说明 - Redis 配置](../features/settings.md#redis-配置redissettings)。
+配置方式见 [配置说明 - Redis 配置](features/settings.md#redis-redissettings)。
 
 ## 配置系统
 
@@ -261,11 +261,11 @@ graph TB
 7. `settings.py` 配置文件（`run(settings_path=...)`）
 8. 默认配置
 
-详见 [配置说明](../features/settings.md)。
+详见 [配置说明](features/settings.md)。
 
 ## 下一步
 
-- [使用前必读](../use/before_use.md) — 模式选择决策
-- [快速上手](../quick_start.md) — 完整入门教程
-- [Lite 轻量爬虫](../features/lite_spider.md) — Lite 模式详解
-- [Spider 进阶](../features/spider.md) — Classic 模式详解
+- [使用前必读](use/before_use.md) — 模式选择决策
+- [快速上手](quick_start.md) — 完整入门教程
+- [Lite 轻量爬虫](features/lite_spider.md) — Lite 模式详解
+- [Spider 进阶](features/spider.md) — Classic 模式详解

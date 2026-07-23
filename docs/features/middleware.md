@@ -660,5 +660,5 @@ class StatsMiddleware(DownloaderMiddleware):
 
 ## 参考资料
 
-- [示例代码](../../examples/middleware_example.py)
-- [源代码](../../maize/middlewares/)
+- [示例代码](https://github.com/seehar/maize/blob/main/examples/middleware_example.py)
+- [源代码](https://github.com/seehar/maize/tree/main/maize/middlewares)

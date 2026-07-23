@@ -51,8 +51,10 @@ theme:
 
 nav:
   - 简介: index.md
+  - 架构概览: architecture.md
   - 使用前必读: use/before_use.md
   - 快速上手: quick_start.md
+  - 示例索引: examples.md
   - 使用指南:
       - 配置说明: features/settings.md
   - 核心组件:
@@ -69,6 +71,8 @@ nav:
       - MysqlUtil: features/mysql_util.md
       - RedisUtil: features/redis_util.md
       - 日志配置: features/log.md
+  - API Reference: api_reference.md
+  - FAQ: faq.md
 markdown_extensions:
   - abbr
   - admonition
@@ -121,6 +125,17 @@ plugins:
       lang:
         - zh
         - en
+  - mkdocstrings:
+      handlers:
+        python:
+          options:
+            show_source: false
+            show_root_heading: true
+            heading_level: 2
+            merge_init_into_class: true
+            docstring_style: google
+            separate_signature: true
+            show_signature_annotations: true
 
 extra:
   version:

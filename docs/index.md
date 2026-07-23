@@ -1,22 +1,108 @@
-# 简介及安装
+---
+hide:
+  - toc
+---
 
-> maize 是一个基于 asyncio 的轻量级异步 Python 爬虫框架，提供 Lite 和 Classic 两种使用模式。
+# maize
+
+> 基于 asyncio 的轻量级异步 Python 爬虫框架
+
+**双模式设计**：Lite 单文件即跑，Classic 完整中间件/管道/调度器。
+
+```python
+from maize.aio.lite import LiteSpider, Request, Response
+
+class MySpider(LiteSpider):
+    async def start_requests(self):
+        yield Request(url="https://example.com")
+
+    async def parse(self, response: Response):
+        self.logger.info(response.xpath("//title/text()").get())
+
+if __name__ == "__main__":
+    MySpider().run()  # 就这么简单
+```
+
+<div class="grid cards" markdown>
+
+- :material-rocket-launch:{ .lg .middle } **快速开始**
+
+    ---
+
+    5 分钟写一个能跑的爬虫。Lite 模式无需配置文件。
+
+    [:octicons-arrow-right-24: 快速上手](quick_start.md)
+
+- :material-sitemap:{ .lg .middle } **架构概览**
+
+    ---
+
+    理解请求生命周期、组件关系、Lite vs Classic 数据流。
+
+    [:octicons-arrow-right-24: 架构概览](architecture.md)
+
+- :material-lightbulb-on:{ .lg .middle } **选择模式**
+
+    ---
+
+    Lite 还是 Classic？按场景选择。
+
+    [:octicons-arrow-right-24: 使用前必读](use/before_use.md)
+
+- :material-code-braces:{ .lg .middle } **示例代码**
+
+    ---
+
+    6 个完整示例：Lite、Classic、中间件、RPA、暂停继续。
+
+    [:octicons-arrow-right-24: 示例索引](examples.md)
+
+- :material-help-circle:{ .lg .middle } **FAQ**
+
+    ---
+
+    常见问题、安装报错、运行时异常、故障排查。
+
+    [:octicons-arrow-right-24: FAQ](faq.md)
+
+- :material-api:{ .lg .middle } **API Reference**
+
+    ---
+
+    自动生成的 API 文档，直接从源码 docstring 提取。
+
+    [:octicons-arrow-right-24: API Reference](api_reference.md)
+
+</div>
 
 ## 特性
 
-- **异步高性能** — 基于 asyncio 实现，高并发采集
-- **双模式** — Lite 轻量开箱即用，Classic 完整中间件/管道/调度器
-- **中间件系统** — 下载器/爬虫/管道三层中间件，可插拔扩展
-- **插件化下载器** — 内置 aiohttp、httpx、playwright、patchright
-- **RPA 支持** — 浏览器自动化，动态页面采集与反检测
-- **数据管道** — 多管道并行，批量入库，支持 MySQL/Redis/CSV 等
-- **分布式支持** — 基于 Redis 实现分布式爬虫
-- **暂停/继续** — 爬虫运行时暂停和恢复
-- **灵活配置** — 代码、配置文件、环境变量、YAML/TOML 多方式配置
+- :material-lightning-bolt: **异步高性能** — 基于 asyncio 实现，全链路 async/await
+- :material-scale-balance: **双模式** — Lite 轻量开箱即用，Classic 完整中间件/管道/调度器
+- :material-layers-triple: **中间件系统** — 下载器/爬虫/管道三层中间件，可插拔扩展
+- :material-download: **插件化下载器** — 内置 aiohttp、httpx、playwright、patchright
+- :material-robot: **RPA 支持** — 浏览器自动化，动态页面采集与反检测
+- :material-database: **数据管道** — 多管道并行，批量入库，支持 MySQL/Redis/CSV
+- :material-server-network: **分布式支持** — 基于 Redis 实现分布式爬虫
+- :material-pause: **暂停/继续** — 爬虫运行时暂停和恢复
+- :material-cog: **灵活配置** — 代码、配置文件、环境变量、YAML/TOML 多方式配置
+
+## 安装
+
+```shell
+pip install maize
+```
+
+可选依赖：
+
+| 命令 | 说明 |
+|------|------|
+| `pip install maize[rpa]` | Playwright/Patchright 浏览器自动化 |
+| `pip install maize[mysql]` | MySQL Pipeline 支持 |
+| `pip install maize[redis]` | Redis 分布式支持 |
+| `pip install maize[all]` | 完整安装 |
 
 ## 两种爬虫模式
-
-maize 提供 Lite 和 Classic 两种模式，按场景选择：
 
 | 维度 | Lite Spider | Classic Spider |
 |------|-------------|----------------|
@@ -31,95 +117,6 @@ maize 提供 Lite 和 Classic 两种模式，按场景选择：
 - **Lite 模式**：5 分钟上手，适合简单抓取。详见 [Lite 轻量爬虫](features/lite_spider.md)。
 - **Classic 模式**：完整功能，适合大型项目。详见 [Spider 进阶](features/spider.md)。
 
-模式选择决策表和模块对照表详见 [使用前必读](use/before_use.md)。
-
-## 环境要求
-
-- Python 3.10+
-- Linux, Windows, macOS
-
-## 安装
-
-### 基础安装
-
-=== "pip"
-    ```shell
-    pip install maize
-    ```
-
-=== "poetry"
-    ```shell
-    poetry add maize
-    ```
-
-=== "uv"
-    ```shell
-    uv add maize
-    ```
-
-### 可选依赖
-
-=== "RPA 支持（Playwright/Patchright）"
-    ```shell
-    pip install maize[rpa]
-    # 安装浏览器驱动
-    playwright install
-    ```
-
-=== "MySQL 支持"
-    ```shell
-    pip install maize[mysql]
-    ```
-
-=== "Redis 分布式支持"
-    ```shell
-    pip install maize[redis]
-    ```
-
-=== "完整安装"
-    ```shell
-    pip install maize[all]
-    ```
-
-## 快速开始
-
-### Lite 爬虫（推荐入门）
-
-最轻量的用法，无需配置文件，构造函数即用：
-
-```python
-from maize.aio.lite import LiteSpider, Request, Response
-
-class MySpider(LiteSpider):
-    async def start_requests(self):
-        yield Request(url="https://example.com")
-
-    async def parse(self, response: Response):
-        self.logger.info(f"状态码: {response.status}")
-        self.logger.info(f"标题: {response.xpath('//title/text()').get()}")
-
-if __name__ == "__main__":
-    MySpider().run()
-```
-
-### Classic Spider
-
-```python
-from maize import Request, Response, Spider, SpiderSettings
-
-class MySpider(Spider):
-    async def start_requests(self):
-        yield Request(url="http://www.baidu.com")
-
-    async def parse(self, response: Response):
-        self.logger.info(response.text[:100])
-
-if __name__ == "__main__":
-    MySpider().run(settings=SpiderSettings(project_name="my_spider", concurrency=5))
-```
-
-更多示例（装饰器、配置文件、CrawlerProcess）详见 [快速上手](quick_start.md)。
-
 ## 核心概念
 
 | 概念 | 说明 | 文档 |
@@ -133,10 +130,16 @@ if __name__ == "__main__":
 | 配置 | 代码 / 配置文件 / 环境变量 / YAML / TOML | [配置说明](features/settings.md) |
 | 下载器 | aiohttp / httpx / playwright / patchright | [下载器](features/downloader.md) |
 
+## 环境要求
+
+- Python 3.10+
+- Linux, Windows, macOS
+
 ## 下一步
 
+- [架构概览](architecture.md) - 理解框架结构
 - [使用前必读](use/before_use.md) - 模式选择与项目结构
 - [快速上手](quick_start.md) - 完整入门教程
-- [Lite 轻量爬虫](features/lite_spider.md) - Lite 模式详解
-- [Spider 进阶](features/spider.md) - Classic 模式详解
-- [配置说明](features/settings.md) - 详细的配置选项
+- [示例索引](examples.md) - 完整代码示例
+- [FAQ](faq.md) - 常见问题解答
+- [更新日志](https://github.com/seehar/maize/blob/main/CHANGELOG.md) - 版本变更记录
