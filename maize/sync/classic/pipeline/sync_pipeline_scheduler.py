@@ -9,6 +9,7 @@ import time
 from typing import TYPE_CHECKING
 
 from maize.common.model.pipeline_model import PipelineProcessResult
+from maize.sync.classic.pipeline.sync_empty_pipeline import SyncEmptyPipeline
 from maize.utils.log_util import get_logger
 from maize.utils.project_util import load_class
 
@@ -53,11 +54,18 @@ class SyncPipelineScheduler:
     def open(self):
         pipeline_path_list = self.settings.pipeline.pipelines
         if not pipeline_path_list:
+            # 默认使用同步空管道
+            pipeline_instance = SyncEmptyPipeline(self.settings)
+            pipeline_instance.open()
+            self.item_pipelines.append(pipeline_instance)
             return
 
         for pipeline_path in pipeline_path_list:
             self.logger.info(f"Loading pipeline: {pipeline_path}")
-            pipeline_instance = load_class(pipeline_path)(self.settings)
+            if isinstance(pipeline_path, str):
+                pipeline_instance = load_class(pipeline_path)(self.settings)
+            else:
+                pipeline_instance = pipeline_path(self.settings)
             pipeline_instance.open()
             self.item_pipelines.append(pipeline_instance)
 

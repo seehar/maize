@@ -34,6 +34,13 @@ class PipelineEnum(str, Enum):
 
 
 @unique
+class SyncPipelineEnum(str, Enum):
+    """同步爬虫管道枚举"""
+
+    EMPTY = "maize.sync.classic.pipeline.sync_empty_pipeline.SyncEmptyPipeline"
+
+
+@unique
 class RPAResourceTypeEnum(str, Enum):
     """RPA 资源类型枚举"""
 
