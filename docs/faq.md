@@ -70,11 +70,11 @@ pip install maize[redis]
 在 `SpiderSettings` 子类中覆盖父类字段时，**必须带类型注解**。
 
 ```python
-# ❌ 错误：缺少类型注解
+# 错误：缺少类型注解
 class Settings(SpiderSettings):
     project_name = "my_spider"
 
-# ✅ 正确：带类型注解
+# 正确：带类型注解
 class Settings(SpiderSettings):
     project_name: str = "my_spider"
 ```
@@ -84,11 +84,11 @@ class Settings(SpiderSettings):
 需要。Pydantic v2 要求所有字段都有类型注解：
 
 ```python
-# ❌ 错误
+# 错误
 class MyItem(Item):
     title = Field()
 
-# ✅ 正确
+# 正确
 class MyItem(Item):
     title: str = Field()
 ```

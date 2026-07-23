@@ -6,12 +6,12 @@
 
 ### 主要特性
 
-- ✅ **异步操作**：完全异步，不会阻塞事件循环
-- ✅ **连接池管理**：自动管理数据库连接，提高性能
-- ✅ **简单易用**：封装了常用的 CRUD 操作
-- ✅ **单例模式**：支持单例模式，避免重复创建连接
-- ✅ **参数化查询**：防止 SQL 注入
-- ✅ **批量操作**：支持批量插入、更新等操作
+- **异步操作**：完全异步，不会阻塞事件循环
+- **连接池管理**：自动管理数据库连接，提高性能
+- **简单易用**：封装了常用的 CRUD 操作
+- **单例模式**：支持单例模式，避免重复创建连接
+- **参数化查询**：防止 SQL 注入
+- **批量操作**：支持批量插入、更新等操作
 
 ## 安装依赖
 
@@ -459,11 +459,11 @@ mysql = MysqlUtil(
 ### 2. 参数化查询（防止 SQL 注入）
 
 ```python
-# ❌ 错误：字符串拼接（有 SQL 注入风险）
+# 错误：字符串拼接（有 SQL 注入风险）
 user_input = "1 OR 1=1"
 sql = f"SELECT * FROM users WHERE id = {user_input}"
 
-# ✅ 正确：参数化查询
+# 正确：参数化查询
 user_input = "1 OR 1=1"
 result = await mysql.fetchone(
     "SELECT * FROM users WHERE id = %s",
@@ -474,14 +474,14 @@ result = await mysql.fetchone(
 ### 3. 批量操作优化
 
 ```python
-# ❌ 低效：逐条插入
+# 低效：逐条插入
 for item in items:
     await mysql.execute(
         "INSERT INTO products (name, price) VALUES (%s, %s)",
         args=(item['name'], item['price'])
     )
 
-# ✅ 高效：批量插入
+# 高效：批量插入
 data = [(item['name'], item['price']) for item in items]
 await mysql.executemany(
     "INSERT INTO products (name, price) VALUES (%s, %s)",

@@ -477,10 +477,10 @@ class MySpider(Spider):
 ### 3. 记录有用的信息
 
 ```python
-# ❌ 不好：信息不足
+# 不好：信息不足
 self.logger.info("处理完成")
 
-# ✅ 好：包含关键信息
+# 好：包含关键信息
 self.logger.info(f"处理完成 - URL: {response.url}, 耗时: {elapsed}s, 提取: {item_count}条")
 ```
 
@@ -499,10 +499,10 @@ except Exception as e:
 ### 5. 性能考虑
 
 ```python
-# ❌ 不好：每次都格式化
+# 不好：每次都格式化
 self.logger.debug(f"数据: {large_data}")  # 即使不输出 DEBUG 日志也会格式化
 
-# ✅ 好：使用延迟格式化
+# 好：使用延迟格式化
 if self.logger.isEnabledFor(logging.DEBUG):
     self.logger.debug(f"数据: {large_data}")
 ```

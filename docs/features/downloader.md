@@ -31,10 +31,10 @@ maize 内置了 4 种下载器，满足不同的使用场景。
 基于 aiohttp 实现，性能优秀，是框架的默认下载器。
 
 **特点：**
-- ✅ 高性能异步 HTTP 客户端
-- ✅ 连接池管理
-- ✅ 会话保持
-- ✅ 良好的稳定性
+- 高性能异步 HTTP 客户端
+- 连接池管理
+- 会话保持
+- 良好的稳定性
 
 **使用方式：**
 ```python
@@ -50,10 +50,10 @@ settings = SpiderSettings(
 基于 httpx 实现，支持 HTTP/2 协议。
 
 **特点：**
-- ✅ 支持 HTTP/2
-- ✅ 现代化的 API 设计
-- ✅ 与 requests 库类似的接口
-- ⚠️ 不支持会话保持（`use_session` 配置无效）
+- 支持 HTTP/2
+- 现代化的 API 设计
+- 与 requests 库类似的接口
+- 不支持会话保持（`use_session` 配置无效）
 
 **使用方式：**
 ```python
@@ -69,11 +69,11 @@ settings = SpiderSettings(
 基于 Playwright 实现的浏览器自动化下载器。
 
 **特点：**
-- ✅ 支持 JavaScript 渲染
-- ✅ 可以执行复杂的页面交互
-- ✅ 支持多种浏览器（Chromium、Firefox、WebKit）
-- ✅ 截图、PDF 生成等功能
-- ⚠️ 性能相对较低，资源占用大
+- 支持 JavaScript 渲染
+- 可以执行复杂的页面交互
+- 支持多种浏览器（Chromium、Firefox、WebKit）
+- 截图、PDF 生成等功能
+- 性能相对较低，资源占用大
 
 **安装：**
 ```bash
@@ -101,10 +101,10 @@ settings.rpa.skip_resource_types = ["image", "media", "font"]  # 不加载图片
 基于 Patchright 实现，是 Playwright 的增强版本，具有更强的反检测能力。
 
 **特点：**
-- ✅ 所有 Playwright 的功能
-- ✅ 更强的反爬虫检测能力
-- ✅ 绕过大部分浏览器指纹识别
-- ⚠️ 性能和资源占用与 Playwright 相同
+- 所有 Playwright 的功能
+- 更强的反爬虫检测能力
+- 绕过大部分浏览器指纹识别
+- 性能和资源占用与 Playwright 相同
 
 **安装：**
 ```bash
@@ -394,22 +394,22 @@ class RequestsDownloader(BaseDownloader):
 
 | 下载器                    | 并发性能  | 内存占用 | 适合并发数 |
 |:-----------------------|:------|:-----|:------|
-| `AioHttpDownloader`    | ⭐⭐⭐⭐⭐ | 低    | 100+  |
-| `HTTPXDownloader`      | ⭐⭐⭐⭐  | 低    | 50+   |
-| `PlaywrightDownloader` | ⭐⭐    | 高    | 5-10  |
-| `PatchrightDownloader` | ⭐⭐    | 高    | 5-10  |
+| `AioHttpDownloader`    | 高     | 低    | 100+  |
+| `HTTPXDownloader`      | 高     | 低    | 50+   |
+| `PlaywrightDownloader` | 低     | 高    | 5-10  |
+| `PatchrightDownloader` | 低     | 高    | 5-10  |
 
 ### 功能对比
 
 | 功能       | AioHttp | HTTPX | Playwright | Patchright |
 |:---------|:--------|:------|:-----------|:-----------|
-| HTTP/1.1 | ✅       | ✅     | ✅          | ✅          |
-| HTTP/2   | ❌       | ✅     | ✅          | ✅          |
-| 会话保持     | ✅       | ❌     | ✅          | ✅          |
-| JS 渲染    | ❌       | ❌     | ✅          | ✅          |
-| 页面交互     | ❌       | ❌     | ✅          | ✅          |
-| 反检测      | ❌       | ❌     | ⭐          | ⭐⭐⭐        |
-| 截图功能     | ❌       | ❌     | ✅          | ✅          |
+| HTTP/1.1 | 支持    | 支持   | 支持        | 支持         |
+| HTTP/2   | 不支持   | 支持   | 支持        | 支持         |
+| 会话保持     | 支持    | 不支持  | 支持        | 支持         |
+| JS 渲染    | 不支持   | 不支持  | 支持        | 支持         |
+| 页面交互     | 不支持   | 不支持  | 支持        | 支持         |
+| 反检测      | 不支持   | 不支持  | 基础         | 强           |
+| 截图功能     | 不支持   | 不支持  | 支持        | 支持         |
 
 ## 下载器选择建议
 
