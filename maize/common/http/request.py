@@ -120,3 +120,7 @@ class Request:
 
     async def get_headers(self) -> dict:
         return await self.headers_func() if self.headers_func else self.headers
+
+    def get_headers_sync(self) -> dict:
+        """同步获取请求头，用于同步爬虫。"""
+        return self.headers_func() if self.headers_func else self.headers

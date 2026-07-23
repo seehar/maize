@@ -10,6 +10,14 @@ class SpiderDownloaderEnum(str, Enum):
 
 
 @unique
+class SyncSpiderDownloaderEnum(str, Enum):
+    """同步爬虫下载器枚举"""
+
+    HTTPX = "maize.sync.classic.downloader.sync_httpx_downloader.SyncHttpxDownloader"
+    REQUESTS = "maize.sync.classic.downloader.sync_requests_downloader.SyncRequestsDownloader"
+
+
+@unique
 class LogLevelEnum(str, Enum):
     CRITICAL = "CRITICAL"
     ERROR = "ERROR"

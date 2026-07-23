@@ -7,4 +7,5 @@ from .setting_constant import (
     RPAResourceTypeEnum,
     RPAWaitUntilEnum,
     SpiderDownloaderEnum,
+    SyncSpiderDownloaderEnum,
 )

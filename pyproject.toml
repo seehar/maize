@@ -108,7 +108,7 @@ ignore = [
 
 [tool.ruff.lint.per-file-ignores]
 "__init__.py" = ["F401", "E402"]  # allow unused imports and import not at top
-"tests/**/*.py" = ["PLR2004", "ARG001", "S101"]  # allow magic values, unused args, and asserts in tests
+"tests/**/*.py" = ["PLR2004", "ARG001", "S101", "N802"]  # allow magic values, unused args, asserts, and do_GET in tests
 "scripts/**/*.py" = ["PLC0415"]  # allow imports inside functions for verification scripts
 
 [tool.ruff.lint.isort]
