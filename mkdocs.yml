@@ -63,6 +63,7 @@ nav:
       - 配置说明: features/settings.md
   - 核心组件:
       - Lite 轻量爬虫: features/lite_spider.md
+      - 同步爬虫: features/sync_spider.md
       - Spider 进阶: features/spider.md
       - TaskSpider 任务爬虫: features/task_spider.md
       - Request 请求: features/request.md
