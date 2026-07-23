@@ -121,8 +121,10 @@ class SyncLiteCrawler:
                 self._stop_event.set()
 
         signal_handlers_registered: list[int] = []
+        previous_handlers: dict[int, typing.Any] = {}
         for sig in (signal.SIGINT, signal.SIGTERM):
             try:
+                previous_handlers[sig] = signal.getsignal(sig)
                 signal.signal(sig, _signal_handler)
                 signal_handlers_registered.append(sig)
             except (ValueError, OSError):
@@ -168,21 +170,26 @@ class SyncLiteCrawler:
         for w in workers:
             w.start()
 
-        # 等待 feed 完成
-        feed_thread.join()
+        try:
+            # 等待 feed 完成
+            feed_thread.join()
 
-        # 推入哨兵
-        for _ in workers:
-            with self._lock:
-                self._tie_breaker += 1
-            request_queue.put((float("inf"), self._tie_breaker, None))
+            # 推入哨兵
+            for _ in workers:
+                with self._lock:
+                    self._tie_breaker += 1
+                request_queue.put((float("inf"), self._tie_breaker, None))
 
-        for w in workers:
-            w.join()
+            for w in workers:
+                w.join()
+        finally:
+            # 恢复之前的信号处理器，避免嵌入式场景中 handler 残留
+            for sig in signal_handlers_registered:
+                signal.signal(sig, previous_handlers[sig])
 
-        self.spider.on_close()
-        self.spider.close()
-        self._log_stats()
+            self.spider.on_close()
+            self.spider.close()
+            self._log_stats()
 
     def _log_stats(self) -> None:
         """输出运行时统计汇总"""
@@ -270,7 +277,8 @@ class SyncLiteCrawler:
         带重试的请求。
 
         重试条件由 ``spider.should_retry`` 决定（默认：status==0 / >=500 / 429）。
-        每次重试前递增指数退避延迟（1s, 2s, 4s...）。
+        每次重试前递增指数退避延迟（1s, 2s, 4s...），``time.sleep`` 阻塞当前 worker 线程，
+        收到停止信号时需等待 sleep 结束才能退出。
 
         :param request: 请求对象
         :returns: 最终的响应对象

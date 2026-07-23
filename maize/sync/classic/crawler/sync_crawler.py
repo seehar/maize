@@ -69,7 +69,6 @@ class SyncCrawlerProcess:
         settings: typing.Optional["SpiderSettings"] = None,
         settings_path: str | None = "settings.Settings",
     ):
-        self.crawlers: typing.Final[set[SyncCrawler]] = set()
         self._active: typing.Final[list[SyncCrawler]] = []
         self.settings: SpiderSettings = settings if settings else self.__get_settings(settings_path)
 
@@ -91,7 +90,6 @@ class SyncCrawlerProcess:
         :param spider: Spider 类或实例
         """
         crawler: SyncCrawler = self._create_crawler(spider)
-        self.crawlers.add(crawler)
         self._active.append(crawler)
 
     def start(self):

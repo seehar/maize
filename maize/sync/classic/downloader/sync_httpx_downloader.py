@@ -2,6 +2,9 @@
 
 与异步版 ``HTTPXDownloader`` 对应，使用 ``httpx.Client`` 发起同步请求。
 httpx 同步模式与异步模式 API 一致，零额外依赖。
+
+连接池复用：``open()`` 时创建共享 ``httpx.Client``，``download()`` 复用该 client。
+仅当 per-request proxy 与全局 proxy 不同时，创建临时 client（与 SyncLiteSpider.fetch 一致）。
 """
 
 import typing
@@ -19,12 +22,13 @@ if typing.TYPE_CHECKING:
 
 
 class SyncHttpxDownloader(SyncBaseDownloader):
-    """基于 httpx.Client 的同步下载器。"""
+    """基于 httpx.Client 的同步下载器，复用连接池。"""
 
     def __init__(self, crawler: "SyncCrawler"):
         super().__init__(crawler)
         self._timeout: httpx.Timeout | None = None
         self.httpx_proxy: Proxy | None = None
+        self._client: httpx.Client | None = None
 
     def open(self):
         super().open()
@@ -42,14 +46,32 @@ class SyncHttpxDownloader(SyncBaseDownloader):
 
         self._timeout = httpx.Timeout(timeout=request_timeout)
 
+        # 创建共享 client，复用连接池
+        self._client = httpx.Client(
+            timeout=self._timeout,
+            proxy=self.httpx_proxy,
+        )
+
     def download(self, request: Request) -> typing.Union[DownloadResponse, Request]:
-        proxies = self._get_proxy(request)
+        if not self._client:
+            raise RuntimeError("Client not initialized. Did you call open()?")
+
+        request_proxy = self._get_proxy(request)
+
         try:
-            with httpx.Client(
-                timeout=self._timeout,
-                proxy=proxies,
-                max_redirects=request.max_redirects,
-            ) as client:
+            # per-request proxy 与全局不同时，创建临时 client
+            if request_proxy is not None and request_proxy != self.httpx_proxy:
+                client = httpx.Client(
+                    timeout=self._timeout,
+                    proxy=request_proxy,
+                    max_redirects=request.max_redirects,
+                )
+                should_close = True
+            else:
+                client = self._client
+                should_close = False
+
+            try:
                 self.logger.debug(rf"request downloading: {request.url}, method: {request.method}")
                 headers = request.get_headers_sync()
                 response = client.request(
@@ -63,6 +85,9 @@ class SyncHttpxDownloader(SyncBaseDownloader):
                     follow_redirects=request.follow_redirects,
                 )
                 body = response.content
+            finally:
+                if should_close:
+                    client.close()
         except Exception as e:
             if new_request := self._download_retry(request, e):
                 return new_request
@@ -93,3 +118,9 @@ class SyncHttpxDownloader(SyncBaseDownloader):
             request=request,
             source_response=response,
         )
+
+    def close(self):
+        super().close()
+        if self._client:
+            self._client.close()
+            self._client = None

@@ -22,7 +22,7 @@ if TYPE_CHECKING:
 class SyncBaseMiddleware(ABC):
     """同步中间件基类。"""
 
-    def __init__(self, settings: "SpiderSettings" = None):
+    def __init__(self, settings: "SpiderSettings | None" = None):
         """
         :param settings: SpiderSettings 实例
         """

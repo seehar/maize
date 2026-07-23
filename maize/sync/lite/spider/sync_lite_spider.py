@@ -21,7 +21,7 @@ class SyncLiteSpider(SyncLiteSpiderInterface):
     使用方式：继承此类，实现 ``start_requests`` 和 ``parse`` 方法（同步生成器）。
 
     :param concurrency: 最大并发数，默认 5
-    :param retry: 请求失败重试次数，默认 3
+    :param retry: 最大请求尝试次数（含首次），默认 3。设为 0 则不发起任何请求
     :param proxy: 代理地址，默认 None
     :param timeout: 请求超时时间（秒），默认 30.0
     :param log_level: 日志级别，默认 "INFO"
@@ -52,7 +52,7 @@ class SyncLiteSpider(SyncLiteSpiderInterface):
 
     @property
     def retry(self) -> int:
-        """请求失败重试次数"""
+        """最大请求尝试次数（含首次），0 表示不发起请求"""
         return self._retry if self._retry is not None else 3
 
     @property
