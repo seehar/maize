@@ -45,7 +45,7 @@ class SyncMiddlewareManager:
                 middleware_cls.__name__ if hasattr(middleware_cls, "__name__") else str(middleware_path_or_cls)
             )
             self.logger.debug(f"Loaded middleware: {middleware_name} (priority: {priority})")
-            return middleware
+            return middleware  # type: ignore[no-any-return]
         except Exception as e:
             self.logger.error(f"Failed to load middleware {middleware_path_or_cls}: {e}")
             return None
@@ -81,7 +81,7 @@ class SyncDownloaderMiddlewareManager(SyncMiddlewareManager):
                 continue
             try:
                 result = middleware.process_request(request, spider)
-                if result.__class__.__name__ == "Response":
+                if isinstance(result, Response):
                     self.logger.debug(
                         f"Middleware {middleware.__class__.__name__} returned Response, stopping request processing"
                     )
@@ -103,7 +103,7 @@ class SyncDownloaderMiddlewareManager(SyncMiddlewareManager):
                 continue
             try:
                 result = middleware.process_response(request, response, spider)
-                if result.__class__.__name__ == "Request":
+                if isinstance(result, Request):
                     self.logger.debug(f"Middleware {middleware.__class__.__name__} returned Request, will retry")
                     return result
                 if result is None:
@@ -193,7 +193,7 @@ class SyncSpiderMiddlewareManager(SyncMiddlewareManager):
 class SyncPipelineMiddlewareManager(SyncMiddlewareManager):
     """同步管道中间件管理器。"""
 
-    def process_item_before(self, item: "Item", spider: "SyncSpider") -> "Item | None":
+    def process_item_before(self, item: "Item | None", spider: "SyncSpider") -> "Item | None":
         for middleware, _ in self.middlewares:
             if not isinstance(middleware, SyncPipelineMiddleware):
                 continue
@@ -207,7 +207,7 @@ class SyncPipelineMiddlewareManager(SyncMiddlewareManager):
                 continue
         return item
 
-    def process_item_after(self, item: "Item", spider: "SyncSpider") -> "Item | None":
+    def process_item_after(self, item: "Item | None", spider: "SyncSpider") -> "Item | None":
         for middleware, _ in reversed(self.middlewares):
             if not isinstance(middleware, SyncPipelineMiddleware):
                 continue

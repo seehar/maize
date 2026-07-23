@@ -51,11 +51,16 @@ class SyncProcessor:
             while not self.idle():
                 result = self.queue.get()
                 if isinstance(result, Request):
+                    assert self.crawler.engine is not None
                     self.crawler.engine.enqueue_request(result)
                 else:
                     assert isinstance(result, Item)
 
-                    item = self.pipeline_middleware_manager.process_item_before(result, self.crawler.spider)
+                    assert self.crawler.spider is not None
+                    item = self.pipeline_middleware_manager.process_item_before(
+                        result,
+                        self.crawler.spider,  # type: ignore[arg-type]
+                    )
 
                     if item is None:
                         self.logger.debug("Item was dropped by pipeline middleware")
@@ -63,7 +68,11 @@ class SyncProcessor:
 
                     process_result = self.pipeline_scheduler.process(item)
 
-                    self.pipeline_middleware_manager.process_item_after(item, self.crawler.spider)
+                    assert self.crawler.spider is not None
+                    self.pipeline_middleware_manager.process_item_after(
+                        item,
+                        self.crawler.spider,  # type: ignore[arg-type]
+                    )
 
                     if self.crawler.spider and self.crawler.spider.stats_collector:
                         self.crawler.spider.stats_collector.record_pipeline_success(process_result.success_count)

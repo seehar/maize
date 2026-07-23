@@ -28,17 +28,20 @@ class SyncScheduler:
     def open(self):
         self.request_queue = SyncSpiderPriorityQueue()
 
-    def next_request(self, gte_priority: int | None = None):
+    def next_request(self, gte_priority: int | None = None) -> "Request | None":
         """
         获取下一个请求。
 
         :param gte_priority: 大于等于优先级，为 None 时不指定优先级
         :return: Request 或 None
         """
+        if self.request_queue is None:
+            return None
         if gte_priority is None:
             return self.request_queue.get()
 
         return self.request_queue.get_by_priority(gte_priority)
 
     def enqueue_request(self, request: "Request"):
-        self.request_queue.put(request)
+        if self.request_queue is not None:
+            self.request_queue.put(request)

@@ -17,7 +17,7 @@ if typing.TYPE_CHECKING:
 try:
     import requests
 except ImportError:
-    requests = None  # type: ignore[assignment]
+    requests = None  # type: ignore[assignment,unused-ignore]
 
 
 class SyncRequestsDownloader(SyncBaseDownloader):

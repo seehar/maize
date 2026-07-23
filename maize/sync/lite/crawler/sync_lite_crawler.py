@@ -57,7 +57,7 @@ class SyncLiteCrawler:
     @property
     def logger(self) -> logging.Logger:
         """日志记录器（复用 spider 的 logger）"""
-        return self._logger
+        return self._logger  # type: ignore[no-any-return]
 
     @property
     def items(self) -> list[Item]:
@@ -120,8 +120,8 @@ class SyncLiteCrawler:
                 self.logger.info("收到停止信号，等待当前请求处理完毕后退出...")
                 self._stop_event.set()
 
-        signal_handlers_registered: list[int] = []
-        previous_handlers: dict[int, typing.Any] = {}
+        signal_handlers_registered: list[signal.Signals] = []
+        previous_handlers: dict[signal.Signals, typing.Any] = {}
         for sig in (signal.SIGINT, signal.SIGTERM):
             try:
                 previous_handlers[sig] = signal.getsignal(sig)
@@ -290,7 +290,7 @@ class SyncLiteCrawler:
             last_response = response
 
             if not self.spider.should_retry(response):
-                return response
+                return response  # type: ignore[no-any-return]
 
             if attempt < self.spider.retry - 1:
                 request.retry()
@@ -303,7 +303,9 @@ class SyncLiteCrawler:
                 )
                 time.sleep(delay)
 
-        return last_response or Response(
+        if last_response is not None:
+            return last_response
+        return Response(
             url=request.url,
             headers={},
             status=0,

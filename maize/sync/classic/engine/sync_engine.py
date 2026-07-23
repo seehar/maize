@@ -82,8 +82,7 @@ class SyncEngine:
         self.logger.info(f"spider started. (project name: {self.settings.project_name})")
         self.spider = spider
         self.scheduler = SyncScheduler()
-        if self.scheduler.open:
-            self.scheduler.open()
+        self.scheduler.open()
 
         # 初始化中间件管理器
         self.downloader_middleware_manager = SyncDownloaderMiddlewareManager(
@@ -98,8 +97,7 @@ class SyncEngine:
 
         downloader_cls = load_class(self.settings.downloader)
         self.downloader = downloader_cls(self.crawler)
-        if self.downloader.open:
-            self.downloader.open()
+        self.downloader.open()
 
         self.processor = SyncProcessor(self.crawler)
         self.processor.open()
@@ -154,8 +152,12 @@ class SyncEngine:
 
     def _crawl_start_requests(self):
         """普通爬虫的 start_requests 处理逻辑"""
+        start_requests: Generator | None = None
         if self.spider_middleware_manager and self.start_requests:
-            start_requests = self.spider_middleware_manager.process_start_requests(self.start_requests, self.spider)
+            start_requests = self.spider_middleware_manager.process_start_requests(
+                self.start_requests,
+                self.spider,  # type: ignore[arg-type]
+            )
         else:
             start_requests = self.start_requests
 
@@ -257,6 +259,7 @@ class SyncEngine:
         """处理请求中间件"""
         if not self.downloader_middleware_manager:
             return request
+        assert self.spider is not None
         result = self.downloader_middleware_manager.process_request(request, self.spider)
         if result is None:
             return None
@@ -272,6 +275,7 @@ class SyncEngine:
         except Exception as e:
             if not self.downloader_middleware_manager:
                 raise
+            assert self.spider is not None
             result = self.downloader_middleware_manager.process_exception(request, e, self.spider)
             if result is None:
                 raise
@@ -286,6 +290,7 @@ class SyncEngine:
         """处理响应中间件"""
         if not self.downloader_middleware_manager:
             return response
+        assert self.spider is not None
         result = self.downloader_middleware_manager.process_response(request, response, self.spider)
         if result is None:
             return None
@@ -300,6 +305,7 @@ class SyncEngine:
         """处理成功的响应"""
         if self.spider_middleware_manager:
             try:
+                assert self.spider is not None
                 should_continue = self.spider_middleware_manager.process_spider_input(response, self.spider)
                 if not should_continue:
                     return None

@@ -35,7 +35,7 @@ class SyncCrawler:
         self.spider.open()
 
         self.engine = self._create_engine()
-        self.engine.start_spider(self.spider)
+        self.engine.start_spider(self.spider)  # type: ignore[arg-type]
 
         self.spider.close()
 
@@ -43,7 +43,7 @@ class SyncCrawler:
         """创建 Spider 实例并注入 custom_settings。"""
         spider = self.spider_cls.create_instance(self)
         self._set_spider(spider)
-        return spider
+        return spider  # type: ignore[no-any-return]
 
     def _create_engine(self):
         return SyncEngine(self)
@@ -54,6 +54,8 @@ class SyncCrawler:
             self.settings.merge_settings_from_dict(spider.custom_settings)
 
     def idle(self) -> bool:
+        if self.spider is None:
+            return True
         return self.spider.idle()
 
 
@@ -89,7 +91,7 @@ class SyncCrawlerProcess:
 
         :param spider: Spider 类或实例
         """
-        crawler: SyncCrawler = self._create_crawler(spider)
+        crawler: SyncCrawler = self._create_crawler(spider)  # type: ignore[arg-type]
         self._active.append(crawler)
 
     def start(self):

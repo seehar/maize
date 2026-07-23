@@ -127,10 +127,10 @@ class SyncPipelineMiddleware(SyncBaseMiddleware):
     def close(self):
         pass
 
-    def process_item_before(self, item: "Item", spider: "SyncSpider") -> "Item | None":
+    def process_item_before(self, item: "Item | None", spider: "SyncSpider") -> "Item | None":
         """Item 进入管道前处理。返回 None 丢弃。"""
         return item
 
-    def process_item_after(self, item: "Item", spider: "SyncSpider") -> "Item | None":
+    def process_item_after(self, item: "Item | None", spider: "SyncSpider") -> "Item | None":
         """Item 离开管道后处理。返回 None 丢弃。"""
         return item

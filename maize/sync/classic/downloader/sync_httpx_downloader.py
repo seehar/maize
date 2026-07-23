@@ -78,10 +78,10 @@ class SyncHttpxDownloader(SyncBaseDownloader):
                     request.method,
                     request.url,
                     headers=headers,
-                    data=request.data,
+                    data=request.data,  # type: ignore[arg-type]
                     json=request.json,
                     params=request.params,
-                    cookies=request.cookies,
+                    cookies=request.cookies,  # type: ignore[arg-type]
                     follow_redirects=request.follow_redirects,
                 )
                 body = response.content

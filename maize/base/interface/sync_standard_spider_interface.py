@@ -10,14 +10,14 @@ from typing import TYPE_CHECKING, Optional
 from maize.base.interface.sync_spider_interface import SyncSpiderInterface
 
 if TYPE_CHECKING:
-    from maize.core.stats.stats_collector import StatsCollector
     from maize.settings import SpiderSettings
     from maize.sync.classic.crawler.sync_crawler import SyncCrawler, SyncCrawlerProcess
+    from maize.sync.classic.stats.sync_stats_collector import SyncStatsCollector
 
 
 class SyncStandardSpiderInterface(SyncSpiderInterface, ABC):
     __spider_type__: str
-    stats_collector: Optional["StatsCollector"]
+    stats_collector: "SyncStatsCollector | None"
     gte_priority: int | None
 
     @classmethod
