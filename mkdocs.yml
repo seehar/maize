@@ -1,5 +1,5 @@
 site_name: Maize
-site_description: 一个基于异步、强大易用的 Python 爬虫框架
+site_description: 一个基于 asyncio 的轻量级异步 Python 爬虫框架
 site_author: seehar
 
 theme:
@@ -9,8 +9,11 @@ theme:
     - announce.dismiss
     - content.code.annotate
     - content.code.copy
+    - content.action.edit
+    - content.action.view
     - content.tabs.link
     - content.tooltips
+    - header.autohide
     - navigation.expand
     - navigation.footer
     - navigation.indexes
@@ -18,6 +21,7 @@ theme:
     - navigation.instant.prefetch
     - navigation.instant.progress
     - navigation.path
+    - navigation.prune
     - navigation.sections
     - navigation.tabs
     - navigation.tabs.sticky
@@ -106,7 +110,9 @@ markdown_extensions:
       repo: maize
   - pymdownx.mark
   - pymdownx.smartsymbols
-  - pymdownx.snippets
+  - pymdownx.snippets:
+      auto_append:
+        - includes/abbreviations.md
   - pymdownx.superfences:
       custom_fences:
         - name: mermaid
@@ -115,16 +121,13 @@ markdown_extensions:
   - pymdownx.tabbed:
       alternate_style: true
       combine_header_slug: true
-  - pymdownx.tasklist:
-      custom_checkbox: true
-  - pymdownx.tilde
-
 plugins:
   - search:
       separator: '[\s\u200b\-_,:!=\[\]()"`/]+|\.(?!\d)|&[lg]t;|(?!\b)(?=[A-Z][a-z])'
       lang:
         - zh
         - en
+  - tags
   - mkdocstrings:
       handlers:
         python:
