@@ -11,17 +11,15 @@ jobs:
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: Set up Python 3.10
-        uses: actions/setup-python@v4
+        uses: actions/setup-python@v5
         with:
           python-version: '3.10'
 
-      - name: Install UV
-        run: |
-          curl -LsSf https://astral.sh/uv/install.sh | sh
-          export PATH=$PATH:$HOME/.cargo/bin
+      - name: Install uv
+        uses: astral-sh/setup-uv@v5
 
       - name: Install project dependencies
         run: uv sync --all-groups
@@ -30,12 +28,12 @@ jobs:
         run: uv run pytest --cov=maize --cov-report=xml
 
       - name: Upload coverage to Codecov
-        uses: codecov/codecov-action@v3
+        uses: codecov/codecov-action@v4
         env:
           CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
         with:
           flags: unittests
-          file: ./coverage.xml
+          files: ./coverage.xml
 
       - name: Multi version test
         run: uv run nox
