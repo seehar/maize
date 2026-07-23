@@ -16,12 +16,12 @@ class PagePool:
         self.max_pages = max_pages
         self.available_pages: list[Page] = []
         self.in_use_pages: set[Page] = set()
-        self._lock = asyncio.Lock()
+        self._cond = asyncio.Condition()
         self.logger = get_logger(crawler.settings, self.__class__.__name__, crawler.settings.log_level)
 
     async def acquire_page(self, context: "BrowserContext") -> "Page":
         """获取一个页面"""
-        async with self._lock:
+        async with self._cond:
             if self.available_pages:
                 # 复用可用页面
                 page = self.available_pages.pop()
@@ -39,7 +39,7 @@ class PagePool:
             else:
                 # 等待有页面可用
                 while not self.available_pages:
-                    await asyncio.sleep(0.1)
+                    await self._cond.wait()
                 page = self.available_pages.pop()
 
             self.in_use_pages.add(page)
@@ -47,7 +47,7 @@ class PagePool:
 
     async def release_page(self, page: "Page"):
         """释放页面回连接池"""
-        async with self._lock:
+        async with self._cond:
             if page in self.in_use_pages:
                 self.in_use_pages.remove(page)
                 # 移除事件监听器，避免重复绑定
@@ -57,10 +57,11 @@ class PagePool:
                 except Exception as e:
                     self.logger.debug(f"Failed to remove event listeners: {e}")
                 self.available_pages.append(page)
+                self._cond.notify()
 
     async def close_all(self):
         """关闭所有页面"""
-        async with self._lock:
+        async with self._cond:
             for page in self.available_pages + list(self.in_use_pages):
                 try:
                     await page.close()
@@ -68,3 +69,4 @@ class PagePool:
                     self.logger.warning(f"Failed to close page: {e}")
             self.available_pages.clear()
             self.in_use_pages.clear()
+            self._cond.notify_all()
