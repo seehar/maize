@@ -89,11 +89,8 @@ class CrawlerProcess:
         :return:
         """
         try:
-            return get_settings(settings_path)
-        except ModuleNotFoundError as e:
-            logging.warning(f"{e} use default settings")
-            return get_settings()
-        except NameError as e:
+            return get_settings(settings_path)  # type: ignore[arg-type]
+        except (ModuleNotFoundError, NameError, TypeError) as e:
             logging.warning(f"{e} use default settings")
             return get_settings()
 

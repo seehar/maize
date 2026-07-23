@@ -52,7 +52,7 @@ class MysqlPipeline(BasePipeline):
         item_key = first_item.model_dump().keys()
         item_data_list = []
         for item in items:
-            item_data_list.append([item[key] for key in item_key])
+            item_data_list.append([getattr(item, key) for key in item_key])
 
         item_key_str = ",".join(item_key)
         placeholder = ",".join(["%s"] * len(item_key))

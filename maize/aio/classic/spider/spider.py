@@ -16,10 +16,12 @@ if TYPE_CHECKING:
 
 
 class Spider(StandardSpiderInterface):
+    __spider_type__: str = "spider"
+
     def __init__(self):
         super().__init__()
         self._lock = asyncio.Lock()
-        self.__spider_type__: str = "spider"
+        # __spider_type__ is a class-level attribute; subclasses override it.
 
         self.crawler: Crawler | None = None
         self.stats_collector: StatsCollector | None = None

@@ -11,6 +11,8 @@ class Scheduler:
         self.request_queue: SpiderPriorityQueue | None = None
 
     def __len__(self):
+        if self.request_queue is None:
+            return 0
         return self.request_queue.qsize()
 
     def idle(self) -> bool:

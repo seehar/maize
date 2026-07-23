@@ -94,7 +94,7 @@ class Request:
         request_data_list = [
             self.method,
             self.url,
-            self.headers or "",
+            repr(self.headers) or "",
             repr(self.params) or "",
             repr(self.data) or "",
             repr(self.json) or "",

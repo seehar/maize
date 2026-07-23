@@ -21,10 +21,12 @@ class CodeGenerate:
         if base_path.exists():
             raise click.ClickException("目录已存在！")
 
+        # Use the directory name for file naming, not the full path
+        dir_name = base_path.name
         files = {
             base_path / "__init__.py": "",
-            base_path / f"{spider_name}.py": self.get_spider_template(spider_name, url),
-            base_path / f"{spider_name}_item.py": self.get_item_template(spider_name),
+            base_path / f"{dir_name}.py": self.get_spider_template(dir_name, url),
+            base_path / f"{dir_name}_item.py": self.get_item_template(dir_name),
         }
 
         base_path.mkdir(parents=True, exist_ok=True)

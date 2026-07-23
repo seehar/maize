@@ -277,11 +277,18 @@ class SpiderSettings(BaseSettings):
         :param settings_dict: dict 类型的配置
         :return: 当前实例
         """
-        # 创建更新后的实例
-        updated_self = self.model_copy(update=settings_dict, deep=True)
+        for field_name, new_value in settings_dict.items():
+            if field_name not in self.__class__.model_fields:
+                continue
+            current_value = getattr(self, field_name)
 
-        # 使用 __dict__.update() 直接更新当前实例的字段，保持模型实例类型
-        self.__dict__.update(updated_self.__dict__)
+            # If the field is a nested BaseModel and new_value is a dict,
+            # merge into the existing model instead of replacing with a raw dict
+            if isinstance(new_value, dict) and isinstance(current_value, BaseModel):
+                updated = current_value.model_copy(update=new_value)
+                current_value.__dict__.update(updated.__dict__)
+            else:
+                setattr(self, field_name, new_value)
 
         return self
 

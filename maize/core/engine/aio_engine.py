@@ -32,9 +32,10 @@ from maize.utils.string_util import StringUtil
 
 if TYPE_CHECKING:
     from maize.aio.classic.crawler.crawler import Crawler
-    from maize.base.downloader.base_downloader import BaseDownloader
     from maize.base.interface.standard_spider_interface import StandardSpiderInterface
     from maize.settings import SpiderSettings
+
+from maize.base.downloader.base_downloader import BaseDownloader
 
 
 class AioEngine:
