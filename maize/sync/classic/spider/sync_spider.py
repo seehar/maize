@@ -12,7 +12,7 @@ from typing import TYPE_CHECKING, Any
 from maize.base.interface.sync_standard_spider_interface import SyncStandardSpiderInterface
 from maize.common.http import Response
 from maize.common.http.request import Request
-from maize.core.stats.stats_collector import StatsCollector
+from maize.sync.classic.stats.sync_stats_collector import SyncStatsCollector
 from maize.utils.log_util import get_logger
 
 if TYPE_CHECKING:
@@ -31,7 +31,7 @@ class SyncSpider(SyncStandardSpiderInterface):
         self._lock = threading.Lock()
 
         self.crawler: SyncCrawler | None = None
-        self.stats_collector: StatsCollector | None = None
+        self.stats_collector: SyncStatsCollector | None = None
         self.logger: Logger | None = None
 
         self.gte_priority: int | None = None
@@ -40,13 +40,12 @@ class SyncSpider(SyncStandardSpiderInterface):
         """在 Spider 启动时执行初始化操作。"""
         self.logger = get_logger()
 
-        self.stats_collector = StatsCollector(self.__class__.__name__)
-        if self.stats_collector.open:
-            self.stats_collector.open()
+        self.stats_collector = SyncStatsCollector(self.__class__.__name__)
+        self.stats_collector.open()
 
     def close(self):
         """在 Spider 关闭时执行清理操作。"""
-        if self.stats_collector and self.stats_collector.close:
+        if self.stats_collector:
             self.stats_collector.close()
 
     @abstractmethod
@@ -80,7 +79,7 @@ class SyncSpider(SyncStandardSpiderInterface):
             self.gte_priority = gte_priority
 
     def idle(self) -> bool:
-        return self.stats_collector.idle() and not self.is_pause()
+        return self.stats_collector.idle() if self.stats_collector else True
 
     def is_pause(self):
         """判断爬虫是否暂停。"""

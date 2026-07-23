@@ -2,9 +2,13 @@
 
 与异步版 ``Processor`` 对应，使用 ``queue.Queue`` 替代 ``asyncio.Queue``。
 处理 Item（走管道）和 Request（回调度器）。
+
+线程安全：``enqueue``/``process`` 可在 SyncEngine 线程池的多个 worker 中并发调用，
+内部用 ``threading.Lock`` 保证管道处理的互斥。
 """
 
 import queue
+import threading
 from typing import TYPE_CHECKING, Union
 
 from maize.common.http.request import Request
@@ -18,13 +22,14 @@ if TYPE_CHECKING:
 
 
 class SyncProcessor:
-    """同步处理器。"""
+    """同步处理器，线程安全。"""
 
     def __init__(self, crawler: "SyncCrawler"):
         self.crawler: SyncCrawler = crawler
         self.logger = get_logger(crawler.settings, self.__class__.__name__)
 
         self.queue: queue.Queue = queue.Queue()
+        self._lock = threading.Lock()
         self.item_pipelines: list = []
 
         self.pipeline_scheduler: SyncPipelineScheduler = SyncPipelineScheduler(self.crawler.settings)
@@ -41,30 +46,34 @@ class SyncProcessor:
         self.pipeline_scheduler.open()
 
     def process(self):
-        while not self.idle():
-            result = self.queue.get()
-            if isinstance(result, Request):
-                self.crawler.engine.enqueue_request(result)
-            else:
-                assert isinstance(result, Item)
+        """排空队列中的所有产出，线程安全。"""
+        with self._lock:
+            while not self.idle():
+                result = self.queue.get()
+                if isinstance(result, Request):
+                    self.crawler.engine.enqueue_request(result)
+                else:
+                    assert isinstance(result, Item)
 
-                item = self.pipeline_middleware_manager.process_item_before(result, self.crawler.spider)
+                    item = self.pipeline_middleware_manager.process_item_before(result, self.crawler.spider)
 
-                if item is None:
-                    self.logger.debug("Item was dropped by pipeline middleware")
-                    continue
+                    if item is None:
+                        self.logger.debug("Item was dropped by pipeline middleware")
+                        continue
 
-                process_result = self.pipeline_scheduler.process(item)
+                    process_result = self.pipeline_scheduler.process(item)
 
-                self.pipeline_middleware_manager.process_item_after(item, self.crawler.spider)
+                    self.pipeline_middleware_manager.process_item_after(item, self.crawler.spider)
 
-                self.crawler.spider.stats_collector.record_pipeline_success(process_result.success_count)
-                self.crawler.spider.stats_collector.record_pipeline_fail(process_result.fail_count)
+                    if self.crawler.spider and self.crawler.spider.stats_collector:
+                        self.crawler.spider.stats_collector.record_pipeline_success(process_result.success_count)
+                        self.crawler.spider.stats_collector.record_pipeline_fail(process_result.fail_count)
 
     def close(self):
         close_process_result = self.pipeline_scheduler.close()
-        self.crawler.spider.stats_collector.record_pipeline_success(close_process_result.success_count)
-        self.crawler.spider.stats_collector.record_pipeline_fail(close_process_result.fail_count)
+        if self.crawler.spider and self.crawler.spider.stats_collector:
+            self.crawler.spider.stats_collector.record_pipeline_success(close_process_result.success_count)
+            self.crawler.spider.stats_collector.record_pipeline_fail(close_process_result.fail_count)
         self.pipeline_middleware_manager.close()
         self.logger.debug("processor closed")
 

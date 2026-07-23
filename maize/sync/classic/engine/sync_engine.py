@@ -131,7 +131,7 @@ class SyncEngine:
             self._crawl_start_requests()
 
             # 任务爬虫
-            if self.spider.__spider_type__ == "task_spider":
+            if self.spider and self.spider.__spider_type__ == "task_spider":
                 self.logger.info("Task spider start get task requests")
                 spider_task_requests: Generator[Request, Any, None] = self.spider.start_requests()
                 if spider_task_requests:
@@ -154,7 +154,7 @@ class SyncEngine:
 
     def _crawl_start_requests(self):
         """普通爬虫的 start_requests 处理逻辑"""
-        if self.spider_middleware_manager:
+        if self.spider_middleware_manager and self.start_requests:
             start_requests = self.spider_middleware_manager.process_start_requests(self.start_requests, self.spider)
         else:
             start_requests = self.start_requests
@@ -165,6 +165,7 @@ class SyncEngine:
                 continue
 
             try:
+                assert start_requests is not None
                 start_request: Request = next(start_requests)
             except StopIteration:
                 self.start_requests = None
@@ -195,12 +196,10 @@ class SyncEngine:
                 continue
 
             try:
-                self.task_requests: Generator[Request, Any, None]
+                assert self.task_requests is not None
                 task_request = next(self.task_requests)
             except StopIteration:
                 self.task_requests = None
-            except RuntimeError:
-                self.task_requests_running = False
             except Exception as e:
                 self.task_requests = None
                 if not self._idle():
@@ -241,7 +240,8 @@ class SyncEngine:
             return None
 
         if download_result.response is None:
-            self.spider.stats_collector.record_download_fail(download_result.reason)
+            if self.spider and self.spider.stats_collector:
+                self.spider.stats_collector.record_download_fail(download_result.reason)
             return self._handle_error_response(request)
 
         # Apply downloader middleware process_response
@@ -249,23 +249,25 @@ class SyncEngine:
         if response is None:
             return None
 
-        self.spider.stats_collector.record_download_success(response.status)
+        if self.spider and self.spider.stats_collector:
+            self.spider.stats_collector.record_download_success(response.status)
         return self._handle_success_response(response, request)
 
-    def _process_request_middleware(self, request: Request) -> Request | Response | None:
+    def _process_request_middleware(self, request: Request) -> Union[Request, Response] | None:
         """处理请求中间件"""
         if not self.downloader_middleware_manager:
             return request
         result = self.downloader_middleware_manager.process_request(request, self.spider)
         if result is None:
             return None
-        if result.__class__.__name__ == "Response":
+        if isinstance(result, Response):
             return result
         return result
 
     def _do_download(self, request: Request):
         """执行下载"""
         try:
+            assert self.downloader is not None
             return self.downloader.fetch(request)
         except Exception as e:
             if not self.downloader_middleware_manager:
@@ -273,10 +275,10 @@ class SyncEngine:
             result = self.downloader_middleware_manager.process_exception(request, e, self.spider)
             if result is None:
                 raise
-            if result.__class__.__name__ == "Request":
+            if isinstance(result, Request):
                 self.enqueue_request(result)
                 return None
-            if result.__class__.__name__ == "Response":
+            if isinstance(result, Response):
                 return type("DownloadResult", (), {"response": result, "reason": None})()
             return None
 
@@ -287,7 +289,7 @@ class SyncEngine:
         result = self.downloader_middleware_manager.process_response(request, response, self.spider)
         if result is None:
             return None
-        if result.__class__.__name__ == "Request":
+        if isinstance(result, Request):
             self.enqueue_request(result)
             return None
         return result
@@ -305,25 +307,26 @@ class SyncEngine:
                 self.logger.error(f"Error in spider middleware process_spider_input: {e}")
                 return None
 
+        assert self.spider is not None
         callback = request.callback or self.spider.parse
         try:
             _output = callback(response)
             if _output:
-                # 同步爬虫中 callback 返回生成器
-                if hasattr(_output, "__next__") or hasattr(_output, "__iter__"):
-                    transform_output = transform_sync(_output)
+                # 直接交给 transform_sync 判断是否为 generator，避免 list 等 __iter__ 误入
+                transform_output = transform_sync(_output)
 
-                    if self.spider_middleware_manager:
-                        transform_output = self.spider_middleware_manager.process_spider_output(
-                            response, transform_output, self.spider
-                        )
+                if self.spider_middleware_manager:
+                    transform_output = self.spider_middleware_manager.process_spider_output(
+                        response, transform_output, self.spider
+                    )
 
+                if self.spider.stats_collector:
                     self.spider.stats_collector.record_parse_success()
-                    return transform_output
-                self.spider.stats_collector.record_parse_success()
+                return transform_output
         except Exception as e:
             self.logger.error(f"Error during callback: {e}")
-            self.spider.stats_collector.record_parse_fail()
+            if self.spider.stats_collector:
+                self.spider.stats_collector.record_parse_fail()
 
         return None
 
@@ -335,9 +338,11 @@ class SyncEngine:
 
         try:
             _error_output = error_callback(request)
-            if _error_output and (hasattr(_error_output, "__next__") or hasattr(_error_output, "__iter__")):
+            if _error_output:
                 transform_output = transform_sync(_error_output)
-                self.spider.stats_collector.record_parse_fail()
+                assert self.spider is not None
+                if self.spider.stats_collector:
+                    self.spider.stats_collector.record_parse_fail()
                 return transform_output
         except Exception as e:
             self.logger.error(f"Error during error_callback: {e}")
@@ -347,13 +352,17 @@ class SyncEngine:
         self._schedule_request(request)
 
     def _schedule_request(self, request: Request):
+        assert self.scheduler is not None
         self.scheduler.enqueue_request(request)
 
     def _get_next_request(self) -> Request | None:
+        assert self.scheduler is not None
+        assert self.crawler.spider is not None
         request: Request | None = self.scheduler.next_request(self.crawler.spider.gte_priority)
         return request
 
     def _handle_spider_output(self, outputs: Generator[Union[Request, Item], Any, None]):
+        assert self.processor is not None
         for spider_output in outputs:
             if isinstance(spider_output, Request | Item):
                 self.processor.enqueue(spider_output)
@@ -362,9 +371,12 @@ class SyncEngine:
 
     def _idle(self) -> bool:
         return (
-            self.scheduler.idle()
+            self.scheduler is not None
+            and self.scheduler.idle()
+            and self.downloader is not None
             and self.downloader.idle()
             and self.task_manager.all_done()
+            and self.processor is not None
             and self.processor.idle()
             and self.crawler.idle()
         )
@@ -379,6 +391,8 @@ class SyncEngine:
             self.downloader_middleware_manager.close()
         if self.spider_middleware_manager:
             self.spider_middleware_manager.close()
+        assert self.downloader is not None
         self.downloader.close()
+        assert self.processor is not None
         self.processor.close()
         self.task_manager.close()
