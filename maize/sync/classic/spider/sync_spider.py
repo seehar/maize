@@ -63,11 +63,13 @@ class SyncSpider(SyncStandardSpiderInterface):
     def pause_spider(self, lte_priority: int | None = None):
         """暂停爬虫。"""
         with self._lock:
-            if self.logger:
-                self.logger.warning("爬虫已暂停，请勿重复暂停")
+            if self.gte_priority is not None:
+                if self.logger:
+                    self.logger.warning("爬虫已暂停，请勿重复暂停")
                 return
             if lte_priority is None:
-                lte_priority = 0
+                self.gte_priority = 0
+                return
             self.gte_priority = lte_priority + 1
 
     def proceed_spider(self, gte_priority: int | None = None):
@@ -79,7 +81,7 @@ class SyncSpider(SyncStandardSpiderInterface):
             self.gte_priority = gte_priority
 
     def idle(self) -> bool:
-        return self.stats_collector.idle() if self.stats_collector else True
+        return (self.stats_collector.idle() if self.stats_collector else True) and not self.is_pause()
 
     def is_pause(self):
         """判断爬虫是否暂停。"""

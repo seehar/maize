@@ -202,6 +202,9 @@ class SyncEngine:
                 task_request = next(self.task_requests)
             except StopIteration:
                 self.task_requests = None
+                self._single_task_requests_running = False
+                self.task_requests_running = False
+                self.logger.info("All task requests have been processed.")
             except Exception as e:
                 self.task_requests = None
                 if not self._idle():

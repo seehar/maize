@@ -8,10 +8,11 @@ from abc import ABC
 from typing import TYPE_CHECKING, Optional
 
 from maize.base.interface.sync_spider_interface import SyncSpiderInterface
+from maize.sync.classic.crawler.sync_crawler import SyncCrawlerProcess
 
 if TYPE_CHECKING:
     from maize.settings import SpiderSettings
-    from maize.sync.classic.crawler.sync_crawler import SyncCrawler, SyncCrawlerProcess
+    from maize.sync.classic.crawler.sync_crawler import SyncCrawler
     from maize.sync.classic.stats.sync_stats_collector import SyncStatsCollector
 
 
