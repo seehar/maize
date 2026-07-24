@@ -18,12 +18,15 @@ import threading
 from collections.abc import Generator
 from http.server import BaseHTTPRequestHandler, HTTPServer
 from typing import Any
+from unittest.mock import patch
 
 import pytest
 
 from maize import Request, Response, SpiderSettings, SyncSpider, SyncSpiderDownloaderEnum
+from maize.common.model.download_response_model import DownloadResponse
 from maize.exceptions.spider_exception import SpiderTypeException, StartRequestsNotImplementedException
 from maize.sync.classic.crawler.sync_crawler import SyncCrawler, SyncCrawlerProcess
+from maize.sync.classic.downloader.sync_httpx_downloader import SyncHttpxDownloader
 from maize.sync.classic.engine.sync_engine import SyncEngine
 from maize.sync.classic.middleware.sync_base_middleware import SyncDownloaderMiddleware
 from maize.sync.classic.spider.sync_task_spider import SyncTaskSpider
@@ -219,9 +222,21 @@ class TestSyncEngineMiddlewareBranches:
             downloader=SyncSpiderDownloaderEnum.HTTPX.value,
         )
         settings.request.max_retry_count = 0
-        process = SyncCrawlerProcess(settings=settings)
-        process.crawl(MySpider)
-        process.start()
+
+        # mock 下载层：对不可达 URL 返回失败结果（response=None），
+        # 避免本机代理拦截 127.0.0.1:1 返回 502 导致走成功分支
+        original_download = SyncHttpxDownloader.download
+
+        def fake_download(self, request):
+            if request.url.startswith("http://127.0.0.1:1"):
+                return DownloadResponse(reason="connection refused")
+            return original_download(self, request)
+
+        with patch.object(SyncHttpxDownloader, "download", fake_download):
+            process = SyncCrawlerProcess(settings=settings)
+            process.crawl(MySpider)
+            process.start()
+
         assert len(error_urls) == 1
 
 

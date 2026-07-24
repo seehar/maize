@@ -7,6 +7,7 @@
 
 import threading
 from http.server import BaseHTTPRequestHandler, HTTPServer
+from unittest.mock import patch
 
 import httpx
 import pytest
@@ -125,7 +126,9 @@ class TestSyncHttpxDownloader:
         dl.open()
         try:
             req = Request(url="http://127.0.0.1:1/unreachable")
-            result = dl.download(req)
+            # mock 网络层抛连接异常，避免本机代理拦截 127.0.0.1:1 返回 502 干扰
+            with patch.object(dl._client, "request", side_effect=httpx.ConnectError("connection refused")):
+                result = dl.download(req)
             assert isinstance(result, DownloadResponse)
             assert result.response is None
             assert result.reason is not None
