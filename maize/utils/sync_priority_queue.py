@@ -4,6 +4,7 @@
 与异步版 `SpiderPriorityQueue` 对应：min-heap，priority 数值越小越优先出队。
 """
 
+import itertools
 import queue
 from typing import TYPE_CHECKING
 
@@ -16,7 +17,7 @@ class SyncSpiderPriorityQueue:
 
     def __init__(self, maxsize: int = 0):
         self._queue: queue.PriorityQueue[tuple[int, int, Request]] = queue.PriorityQueue(maxsize=maxsize)
-        self._tie_breaker: int = 0
+        self._counter = itertools.count()
 
     def qsize(self) -> int:
         return self._queue.qsize()
@@ -28,9 +29,8 @@ class SyncSpiderPriorityQueue:
         return self._queue.empty()
 
     def put(self, request: "Request") -> None:
-        """入队，按 priority 排序；tie_breaker 保证同 priority 时 FIFO，避免 Request 比较报错。"""
-        self._tie_breaker += 1
-        self._queue.put((request.priority, self._tie_breaker, request))
+        """入队，按 priority 排序；counter 保证同 priority 时 FIFO，避免 Request 比较报错。"""
+        self._queue.put((request.priority, next(self._counter), request))
 
     def get(self, timeout: float | None = 0.1) -> "Request | None":
         """出队，超时返回 None（模仿异步版 0.1s timeout 语义）。"""
@@ -49,6 +49,3 @@ class SyncSpiderPriorityQueue:
             return request
         self.put(request)
         return None
-
-    def task_done(self) -> None:
-        self._queue.task_done()

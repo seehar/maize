@@ -1,6 +1,6 @@
 # 同步爬虫
 
-maize 从 v0.6.0 起提供同步爬虫模块 `maize.sync`，与异步爬虫 `maize.aio` 一一对应。
+maize 从 v0.5.0 起提供同步爬虫模块 `maize.sync`，与异步爬虫 `maize.aio` 一一对应。
 同步爬虫使用 `httpx.Client`（同步模式）发起请求，`threading` 线程池实现并发，
 适合不希望使用 asyncio 的场景，或在同步代码库中快速集成爬虫功能。
 
@@ -31,7 +31,7 @@ maize 从 v0.6.0 起提供同步爬虫模块 `maize.sync`，与异步爬虫 `mai
 - `SyncLiteSpider`: `httpx.Client` 同步模式，构造函数配置
 - `SyncLiteCrawler`: `threading` + `queue.PriorityQueue` 线程池并发
 - 支持去重、深度控制、`per_domain_concurrency`、重试、优雅关闭
-- aiohttp 单依赖，不引入中间件/管道/调度器抽象
+- httpx 单依赖，不引入中间件/管道/调度器抽象
 
 ```python
 from maize.common.http import Request, Response
