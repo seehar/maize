@@ -1,3 +1,7 @@
+"""
+系统工具，提供平台兼容性修复和容器 ID 获取。
+"""
+
 import asyncio
 import platform
 from pathlib import Path

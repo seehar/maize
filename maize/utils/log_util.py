@@ -1,3 +1,7 @@
+"""
+日志工具，基于 ContextVar 管理 Spider 配置上下文，提供统一的 Logger 创建和缓存。
+"""
+
 import sys
 from contextvars import ContextVar
 from logging import INFO, Formatter, Logger, StreamHandler
@@ -33,6 +37,10 @@ def get_spider_settings() -> Optional["SpiderSettings"]:
 
 
 class LoggerManager:
+    """
+    日志管理器，按 (name, log_level) 缓存 Logger 实例，避免重复创建。
+    """
+
     logger: ClassVar[dict] = {}
 
     @classmethod
@@ -43,6 +51,15 @@ class LoggerManager:
         log_level: int | str | None = None,
         log_format: str = LOG_FORMAT,
     ) -> Logger:
+        """
+        获取或创建 Logger 实例。
+
+        :param spider_settings: Spider 配置，为 None 时从 ContextVar 获取
+        :param name: Logger 名称，默认 "default"
+        :param log_level: 日志级别，默认 INFO
+        :param log_format: 日志格式字符串
+        :return: Logger 实例
+        """
         # 如果没有传入 spider_settings，则从上下文中获取
         if spider_settings is None:
             spider_settings = get_spider_settings()

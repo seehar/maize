@@ -1,3 +1,10 @@
+"""
+HTTP 响应模型。
+
+定义 :class:`Response`，封装下载器返回的响应数据，
+提供 body/text 编解码、Cookie 解析、JSON 解析和 XPath 选择器等功能。
+"""
+
 import re
 from http.cookies import SimpleCookie
 from typing import TYPE_CHECKING, Any, Generic, TypeVar, Union
@@ -16,6 +23,23 @@ R = TypeVar("R")
 
 
 class Response(Generic[Driver, R]):
+    """
+    HTTP 响应对象。
+
+    封装下载器返回的响应数据，支持 body/text 自动编解码（含编码探测）、
+    Cookie 解析、JSON 反序列化和 XPath 选择器。
+
+    :param url: 响应 URL
+    :param headers: 响应头字典
+    :param request: 对应的请求对象
+    :param body: 响应体字节，默认空
+    :param text: 响应体文本，默认空
+    :param status: HTTP 状态码，默认 200
+    :param cookie_list: Cookie 列表，默认 None
+    :param driver: 浏览器驱动实例（RPA 下载器使用），默认 None
+    :param source_response: 下载器原始响应对象（如 httpx.Response），默认 None
+    """
+
     def __init__(
         self,
         url: str,
@@ -62,6 +86,16 @@ class Response(Generic[Driver, R]):
 
     @property
     def body(self) -> bytes:
+        """
+        响应体字节。
+
+        优先返回缓存；若无缓存则尝试用请求编码将 text 编码为 bytes，
+        编码失败时自动探测响应中的 charset。
+
+        :return: 响应体字节
+        :raises EncodeException: 编码失败且无法探测到可用编码时抛出
+        """
+
         if self._body_cache:
             return self._body_cache
 
@@ -80,6 +114,16 @@ class Response(Generic[Driver, R]):
 
     @property
     def text(self) -> str:
+        """
+        响应体文本。
+
+        优先返回缓存；若无缓存则尝试用请求编码将 body 解码为 str，
+        解码失败时自动探测响应中的 charset。
+
+        :return: 响应体文本
+        :raises DecodeException: 解码失败且无法探测到可用编码时抛出
+        """
+
         if self._text_cache:
             return self._text_cache
 
@@ -97,6 +141,15 @@ class Response(Generic[Driver, R]):
         return self._text_cache
 
     def _get_encoding(self) -> str | None:
+        """
+        从响应头和响应体中探测字符编码。
+
+        依次尝试：Content-Type 头中的 charset、响应体文本中的 charset 声明、
+        带引号的 charset 声明。
+
+        :return: 探测到的编码字符串，未找到时返回 None
+        """
+
         _encoding_re = re.compile(r"charset=([\w-]+)", flags=re.I)
 
         _headers_encoding_string = self.headers.get("Content-Type", "") or self.headers.get("content-type", "")
@@ -125,6 +178,15 @@ class Response(Generic[Driver, R]):
 
     @property
     def cookie_list(self) -> list[dict[str, str]]:
+        """
+        解析 Set-Cookie 头为 Cookie 字典列表。
+
+        每个字典包含 name、value、domain、path、expires、secure、httponly 字段。
+        结果会被缓存。
+
+        :return: Cookie 字典列表
+        """
+
         if self._cookie_list_cache:
             return self._cookie_list_cache
 
@@ -150,6 +212,14 @@ class Response(Generic[Driver, R]):
 
     @property
     def cookies(self) -> dict[str, Any]:
+        """
+        以键值对形式返回所有 Cookie。
+
+        基于 :attr:`cookie_list` 构建，结果会被缓存。
+
+        :return: Cookie 键值对字典
+        """
+
         if self._cookies_cache:
             return self._cookies_cache
 
@@ -157,12 +227,35 @@ class Response(Generic[Driver, R]):
         return self._cookies_cache
 
     def json(self) -> dict[str, Any]:
+        """
+        将响应体解析为 JSON 字典。
+
+        :return: 解析后的字典
+        :raises ValueError: 响应体不是合法 JSON 时抛出
+        """
+
         return ujson.loads(self.text)
 
     def urljoin(self, url: str) -> str:
+        """
+        将相对 URL 拼接为绝对 URL。
+
+        :param url: 相对或绝对 URL
+        :return: 拼接后的绝对 URL
+        """
+
         return _urljoin(self.url, url)
 
     def xpath(self, xpath: str) -> SelectorList[Selector]:
+        """
+        使用 XPath 表达式查询响应内容。
+
+        首次调用时自动构建 Selector 并缓存。
+
+        :param xpath: XPath 表达式
+        :return: 匹配结果列表
+        """
+
         if self._selector is None:
             self._selector = Selector(self.text)
 
@@ -170,4 +263,8 @@ class Response(Generic[Driver, R]):
 
     @property
     def meta(self) -> dict[str, Any]:
+        """
+        对应请求的自定义元数据字典。
+        """
+
         return self.request.meta

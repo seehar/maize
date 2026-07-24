@@ -1,3 +1,7 @@
+"""
+异步爬虫引擎，负责请求调度、下载、解析和输出的完整生命周期管理。
+"""
+
 from __future__ import annotations
 
 import asyncio
@@ -44,6 +48,11 @@ class AioEngine:
     """
 
     def __init__(self, crawler: Crawler):
+        """
+        初始化引擎。
+
+        :param crawler: 当前 Crawler 实例
+        """
         self.logger = get_logger(crawler.settings, self.__class__.__name__)
         self.crawler: Crawler = crawler
         self.settings: SpiderSettings = self.crawler.settings
@@ -94,6 +103,12 @@ class AioEngine:
         return downloader_cls
 
     async def start_spider(self, spider: StandardSpiderInterface):
+        """
+        启动 Spider，初始化调度器、中间件、下载器、处理器，并校验 start_requests。
+
+        :param spider: 要运行的 Spider 实例
+        :raises StartRequestsNotImplementedException: start_requests 未实现或不是异步生成器
+        """
         self.running = True
         self.start_requests_running = True
 
@@ -257,6 +272,12 @@ class AioEngine:
         self.task_manager.create_task(crawl_task())
 
     async def _fetch(self, request: Request) -> AsyncGenerator[Union[Request, Item], Any] | None:
+        """
+        执行单个请求的完整抓取流程：中间件 → 下载 → 响应处理 → 回调解析。
+
+        :param request: 待抓取的请求
+        :return: Spider 产出的异步生成器，无产出返回 None
+        """
         # Apply downloader middleware process_request
         request_or_response = await self._process_request_middleware(request)
         if request_or_response is None:
@@ -389,6 +410,11 @@ class AioEngine:
         return None
 
     async def enqueue_request(self, request: Request):
+        """
+        将请求入队到调度器，分布式模式下同时写入 Redis 队列。
+
+        :param request: 待入队的请求
+        """
         if self.__redis_util:
             await self.__redis_util.set(
                 f"{self.__redis_key_queue}:{request.hash}",
@@ -400,6 +426,11 @@ class AioEngine:
         await self.scheduler.enqueue_request(request)
 
     async def _get_next_request(self) -> Request | None:
+        """
+        从调度器获取下一个请求，分布式模式下通过 Redis 分布式锁去重。
+
+        :return: 下一个请求，无可用请求返回 None
+        """
         request: Request | None = await self.scheduler.next_request(self.crawler.spider.gte_priority)
         if not request:
             return None
@@ -435,6 +466,9 @@ class AioEngine:
         )
 
     async def close_spider(self):
+        """
+        关闭 Spider，依次关闭中间件管理器、下载器和处理器。
+        """
         self.logger.info("Closing spider")
         if self.downloader_middleware_manager:
             await self.downloader_middleware_manager.close()

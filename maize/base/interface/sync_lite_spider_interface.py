@@ -1,4 +1,5 @@
-"""同步 Lite 爬虫接口。
+"""
+同步 Lite 爬虫接口。
 
 与异步版 `LiteSpiderInterface` 对应，方法均为同步（非 async）。
 `start_requests` 返回普通 `Generator`，`parse` 返回 `Generator` 或 None。
@@ -15,31 +16,43 @@ if TYPE_CHECKING:
 
 
 class SyncLiteSpiderInterface(ABC):
-    """同步 Lite 爬虫接口"""
+    """
+    同步 Lite 爬虫接口。
+    """
 
     @property
     def concurrency(self) -> int:
-        """最大并发数"""
+        """
+        最大并发数。
+        """
         return 5
 
     @property
     def retry(self) -> int:
-        """重试次数"""
+        """
+        重试次数。
+        """
         return 3
 
     @property
     def proxy(self) -> str | None:
-        """代理地址"""
+        """
+        代理地址。
+        """
         return None
 
     @property
     def timeout(self) -> float:
-        """请求超时时间（秒）"""
+        """
+        请求超时时间（秒）。
+        """
         return 30.0
 
     @abstractmethod
     def start_requests(self) -> Generator["Request", None, None]:
-        """生成起始请求"""
+        """
+        生成起始请求。
+        """
 
     @abstractmethod
     def parse(self, response: "Response") -> Generator[Union["Request", "Item"], None, None] | None:

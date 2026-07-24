@@ -1,3 +1,10 @@
+"""
+异步 Classic 爬虫接口。
+
+定义 Spider 需实现的抽象契约：open / close 生命周期钩子、
+start_requests 起始请求生成器、parse 响应解析方法。
+"""
+
 from abc import ABC, abstractmethod
 from collections.abc import AsyncGenerator
 from typing import TYPE_CHECKING, Any
@@ -8,6 +15,12 @@ if TYPE_CHECKING:
 
 
 class SpiderInterface(ABC):
+    """
+    异步 Classic 爬虫抽象接口。
+
+    所有异步 Classic Spider 的基类，声明 open / close / start_requests / parse 抽象方法。
+    """
+
     def __init__(self):
         super().__init__()
 

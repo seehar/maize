@@ -1,3 +1,10 @@
+"""
+异步 Lite 爬虫接口。
+
+定义 LiteSpider 需实现的抽象契约，包括并发、重试、代理等配置属性
+以及 start_requests / parse 抽象方法。
+"""
+
 from abc import ABC, abstractmethod
 from collections.abc import AsyncGenerator
 from typing import TYPE_CHECKING, Any, Union
@@ -9,31 +16,43 @@ if TYPE_CHECKING:
 
 
 class LiteSpiderInterface(ABC):
-    """Lite 爬虫接口"""
+    """
+    Lite 爬虫接口。
+    """
 
     @property
     def concurrency(self) -> int:
-        """最大并发数"""
+        """
+        最大并发数。
+        """
         return 5
 
     @property
     def retry(self) -> int:
-        """重试次数"""
+        """
+        重试次数。
+        """
         return 3
 
     @property
     def proxy(self) -> str | None:
-        """代理地址"""
+        """
+        代理地址。
+        """
         return None
 
     @property
     def timeout(self) -> float:
-        """请求超时时间（秒）"""
+        """
+        请求超时时间（秒）。
+        """
         return 30.0
 
     @abstractmethod
     async def start_requests(self) -> AsyncGenerator["Request", Any]:
-        """生成起始请求"""
+        """
+        生成起始请求。
+        """
 
     @abstractmethod
     async def parse(self, response: "Response") -> AsyncGenerator[Union["Request", "Item"], Any] | None:

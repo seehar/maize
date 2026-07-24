@@ -1,3 +1,10 @@
+"""
+异步标准 Spider 接口。
+
+在 SpiderInterface 基础上增加 create_instance 工厂方法、idle 状态判断
+和 run 启动入口（内部创建事件循环）。
+"""
+
 import asyncio
 from abc import ABC
 from typing import TYPE_CHECKING, Optional
@@ -12,12 +19,25 @@ if TYPE_CHECKING:
 
 
 class StandardSpiderInterface(SpiderInterface, ABC):
+    """
+    异步标准 Spider 接口。
+
+    提供 create_instance 工厂方法绑定 Crawler、idle 空闲判断、
+    以及 run() 同步入口（内部通过 asyncio 事件循环驱动）。
+    """
+
     __spider_type__: str
     stats_collector: Optional["StatsCollector"]
     gte_priority: int | None
 
     @classmethod
     def create_instance(cls, crawler: "Crawler"):
+        """
+        创建 Spider 实例并绑定 Crawler。
+
+        :param crawler: 关联的 Crawler 实例
+        :return: 绑定了 crawler 的 Spider 实例
+        """
         instance = cls()
         instance.crawler = crawler
         return instance

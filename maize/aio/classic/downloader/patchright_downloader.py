@@ -1,3 +1,9 @@
+"""
+基于 Patchright 的浏览器下载器。
+
+Patchright 是 Playwright 的反检测分支，继承 BaseBrowserDownloader 的公共逻辑。
+"""
+
 from patchright.async_api import (
     Browser,
     BrowserContext,

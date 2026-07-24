@@ -1,3 +1,9 @@
+"""
+基于 httpx 的异步下载器。
+
+每次请求创建独立的 AsyncClient，支持请求级代理和全局代理隧道。
+"""
+
 import typing
 
 import httpx
@@ -13,6 +19,15 @@ if typing.TYPE_CHECKING:
 
 
 class HTTPXDownloader(BaseDownloader):
+    """
+    httpx 下载器实现。
+
+    每次 download 创建临时 AsyncClient（httpx 0.28 不支持 per-request proxy），
+    通过 Proxy 对象统一管理代理配置。
+
+    :param crawler: Crawler 实例，用于获取配置和日志
+    """
+
     def __init__(self, crawler: "Crawler"):
         super().__init__(crawler)
 
@@ -20,6 +35,11 @@ class HTTPXDownloader(BaseDownloader):
         self.httpx_proxy: Proxy | None = None
 
     async def open(self):
+        """
+        初始化下载器配置。
+
+        从 settings 读取请求超时和代理隧道信息，构建 httpx.Proxy 和 Timeout 对象。
+        """
         await super().open()
         request_timeout = self.crawler.settings.request.request_timeout
 
@@ -36,6 +56,15 @@ class HTTPXDownloader(BaseDownloader):
         self._timeout = httpx.Timeout(timeout=request_timeout)
 
     async def download(self, request: Request) -> typing.Union[DownloadResponse, Request]:
+        """
+        下载单个请求。
+
+        创建临时 AsyncClient 发送请求，失败时尝试重试，
+        重试耗尽后返回带错误原因的 DownloadResponse。
+
+        :param request: 待下载的请求对象
+        :return: 成功返回包含 Response 的 DownloadResponse，重试时返回新 Request，失败返回带 reason 的 DownloadResponse
+        """
         await self.random_wait()
         try:
             proxies = self._get_proxy(request)
@@ -78,6 +107,14 @@ class HTTPXDownloader(BaseDownloader):
 
     @staticmethod
     def structure_response(request: Request, response: httpx.Response, body: bytes) -> Response[None, httpx.Response]:
+        """
+        将 httpx Response 转换为框架统一 Response。
+
+        :param request: 原始请求
+        :param response: httpx 原始响应
+        :param body: 已读取的响应体字节
+        :return: 框架统一的 Response 实例
+        """
         return Response[None, httpx.Response](
             url=request.url,
             headers=dict(response.headers),

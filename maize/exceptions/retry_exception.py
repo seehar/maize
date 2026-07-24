@@ -1,3 +1,8 @@
+"""
+重试相关异常。
+"""
+
+
 class MaxRetryException(Exception):
     """最大重试次数异常"""
 

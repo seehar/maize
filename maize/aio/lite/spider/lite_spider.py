@@ -1,3 +1,10 @@
+"""
+Lite 异步爬虫基类。
+
+轻量级爬虫实现，内置 aiohttp 会话管理、并发控制、失败重试和代理支持，
+无需 SpiderSettings 配置文件，通过构造函数参数即可使用。
+"""
+
 import asyncio
 import logging
 import typing
@@ -34,6 +41,15 @@ class LiteSpider(LiteSpiderInterface):
         timeout: float | None = None,
         log_level: str | None = None,
     ):
+        """
+        初始化 Lite 爬虫。
+
+        :param concurrency: 最大并发数，默认 5
+        :param retry: 请求失败重试次数，默认 3
+        :param proxy: 代理地址（如 ``"http://host:port"``），默认 None
+        :param timeout: 请求超时时间（秒），默认 30.0
+        :param log_level: 日志级别，默认 ``"INFO"``
+        """
         super().__init__()
         self._concurrency = concurrency
         self._retry = retry

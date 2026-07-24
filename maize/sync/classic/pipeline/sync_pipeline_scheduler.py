@@ -23,6 +23,11 @@ class SyncPipelineScheduler:
     """同步管道数据调度。"""
 
     def __init__(self, settings: "SpiderSettings"):
+        """
+        初始化管道调度器。
+
+        :param settings: 爬虫配置
+        """
         self.settings = settings
         self.logger = get_logger(settings, self.__class__.__name__)
         self.item_pipelines: list[SyncBasePipeline] = []
@@ -52,6 +57,9 @@ class SyncPipelineScheduler:
         return self.item_queue.qsize()
 
     def open(self):
+        """
+        加载并打开所有管道，无配置时使用 SyncEmptyPipeline。
+        """
         pipeline_path_list = self.settings.pipeline.pipelines
         if not pipeline_path_list:
             # 默认使用同步空管道
@@ -70,6 +78,11 @@ class SyncPipelineScheduler:
             self.item_pipelines.append(pipeline_instance)
 
     def close(self) -> PipelineProcessResult:
+        """
+        关闭调度器，处理剩余 Item 和重试队列，然后关闭所有管道。
+
+        :return: 处理结果统计
+        """
         self.logger.debug("pipeline scheduler closing")
         close_process_result = PipelineProcessResult()
         while not self.item_queue.empty():
@@ -97,6 +110,12 @@ class SyncPipelineScheduler:
         return close_process_result
 
     def process(self, item: "Item") -> PipelineProcessResult:
+        """
+        将 Item 入队，达到批量或时间间隔时触发处理。
+
+        :param item: 待处理的 Item
+        :return: 处理结果统计
+        """
         pipeline_process_result = PipelineProcessResult()
         self.item_queue.put(item)
         current_time = int(time.time())
@@ -111,6 +130,11 @@ class SyncPipelineScheduler:
         return pipeline_process_result
 
     def _process_item(self) -> PipelineProcessResult:
+        """
+        批量处理队列中的 Item。
+
+        :return: 处理结果统计
+        """
         process_result = PipelineProcessResult()
         batch_items = []
         for _ in range(self.item_handle_batch_max_size):
@@ -133,11 +157,17 @@ class SyncPipelineScheduler:
         return process_result
 
     def process_error_items(self):
+        """
+        处理错误队列中的所有 Item。
+        """
         self.logger.info(f"需要处理的错误任务个数: {self.error_item_queue.qsize()}")
         while not self.error_item_queue.empty():
             self._single_process_error_items()
 
     def _single_process_error_items(self):
+        """
+        批量处理错误队列中的 Item。
+        """
         if self.error_item_queue.empty():
             return
 
@@ -156,6 +186,11 @@ class SyncPipelineScheduler:
             pipeline.process_error_item(batch_items)
 
     def process_retry_items(self) -> PipelineProcessResult:
+        """
+        处理重试队列中的 Item。
+
+        :return: 处理结果统计
+        """
         process_result = PipelineProcessResult()
         if self.error_item_queue.empty():
             return process_result
@@ -170,6 +205,11 @@ class SyncPipelineScheduler:
         return process_result
 
     def _retry_error_items(self) -> tuple[bool, PipelineProcessResult]:
+        """
+        批量重试错误队列中的 Item。
+
+        :return: (是否继续重试, 处理结果统计)
+        """
         process_result = PipelineProcessResult()
         self.logger.info("retry error items")
         batch_items = []
@@ -204,7 +244,17 @@ class SyncPipelineScheduler:
                 self.retry_item_queue.put(item)
 
     def idle(self):
+        """
+        检查 Item 队列是否为空。
+
+        :return: 队列为空返回 True
+        """
         return len(self) == 0
 
     def error_task_idle(self):
+        """
+        检查错误队列是否为空。
+
+        :return: 队列为空返回 True
+        """
         return self.error_item_queue.qsize() == 0

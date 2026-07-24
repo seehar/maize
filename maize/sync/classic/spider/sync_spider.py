@@ -27,6 +27,9 @@ class SyncSpider(SyncStandardSpiderInterface):
     __spider_type__: str = "spider"
 
     def __init__(self):
+        """
+        初始化同步 Spider，创建线程锁和状态字段。
+        """
         super().__init__()
         self._lock = threading.Lock()
 
@@ -50,6 +53,11 @@ class SyncSpider(SyncStandardSpiderInterface):
 
     @abstractmethod
     def start_requests(self) -> Generator[Request, Any, None]:
+        """
+        生成初始请求（子类必须实现）。
+
+        :return: 请求生成器
+        """
         raise NotImplementedError
 
     def parse(self, response: Response):
@@ -81,6 +89,11 @@ class SyncSpider(SyncStandardSpiderInterface):
             self.gte_priority = gte_priority
 
     def idle(self) -> bool:
+        """
+        检查 Spider 是否空闲（统计上报完成且未暂停）。
+
+        :return: 空闲返回 True
+        """
         return (self.stats_collector.idle() if self.stats_collector else True) and not self.is_pause()
 
     def is_pause(self):

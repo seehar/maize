@@ -1,3 +1,7 @@
+"""
+同步 Lite Spider 基类，httpx.Client 同步请求 + 线程池并发。
+"""
+
 import logging
 from collections.abc import Generator
 
@@ -35,6 +39,15 @@ class SyncLiteSpider(SyncLiteSpiderInterface):
         timeout: float | None = None,
         log_level: str | None = None,
     ):
+        """
+        初始化同步 Lite Spider。
+
+        :param concurrency: 最大并发数，默认 5
+        :param retry: 最大请求尝试次数（含首次），默认 3
+        :param proxy: 代理地址，默认 None
+        :param timeout: 请求超时时间（秒），默认 30.0
+        :param log_level: 日志级别，默认 "INFO"
+        """
         super().__init__()
         self._concurrency = concurrency
         self._retry = retry

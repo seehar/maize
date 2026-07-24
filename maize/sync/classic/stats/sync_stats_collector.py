@@ -21,6 +21,11 @@ class SyncStatsCollector:
     """同步统计收集器，线程安全。"""
 
     def __init__(self, spider_name: str):
+        """
+        初始化同步统计收集器。
+
+        :param spider_name: Spider 名称，用于上报标识
+        """
         self._settings = get_spider_settings()
         self._spider_name = spider_name
 
@@ -35,12 +40,18 @@ class SyncStatsCollector:
         self._container_id: str = ""
 
     def open(self):
+        """
+        打开统计收集器，记录容器 ID 和启动时间。
+        """
         if container_id := get_container_id():
             self._container_id = container_id
 
         self._start_time = datetime.datetime.now()
 
     def close(self):
+        """
+        关闭统计收集器，上报剩余统计数据并打印运行时间摘要。
+        """
         self._end_time = datetime.datetime.now()
 
         if self._stats:
@@ -111,6 +122,11 @@ class SyncStatsCollector:
                 self._logger.warning(f"upload stat error: {e}，准备第 {attempt + 1} 次重试")
 
     def record_download_success(self, status_code: int):
+        """
+        记录一次下载成功，按状态码分类计数。
+
+        :param status_code: HTTP 响应状态码
+        """
         status_code_str = str(status_code)
         with self._lock:
             stats, upload_data = self._increment()
@@ -131,18 +147,29 @@ class SyncStatsCollector:
         self._maybe_upload(upload_data)
 
     def record_parse_success(self):
+        """
+        记录一次解析成功。
+        """
         with self._lock:
             stats, upload_data = self._increment()
             stats.parse_success_count += 1
         self._maybe_upload(upload_data)
 
     def record_parse_fail(self):
+        """
+        记录一次解析失败。
+        """
         with self._lock:
             stats, upload_data = self._increment()
             stats.parse_fail_count += 1
         self._maybe_upload(upload_data)
 
     def record_pipeline_success(self, count: int = 1):
+        """
+        记录管道处理成功的数据条数。
+
+        :param count: 成功条数，默认 1，为 0 时直接返回
+        """
         if not count:
             return
         with self._lock:
@@ -151,6 +178,11 @@ class SyncStatsCollector:
         self._maybe_upload(upload_data)
 
     def record_pipeline_fail(self, count: int = 1):
+        """
+        记录管道处理失败的数据条数。
+
+        :param count: 失败条数，默认 1，为 0 时直接返回
+        """
         if not count:
             return
         with self._lock:
@@ -159,6 +191,12 @@ class SyncStatsCollector:
         self._maybe_upload(upload_data)
 
     def get_and_clear_stats(self, minute_key: str) -> SpiderStatistics | None:
+        """
+        获取并清除指定分钟的统计数据。
+
+        :param minute_key: 分钟键（``YYYY-MM-DD HH:MM`` 格式）
+        :return: 统计数据，不存在则返回 None
+        """
         with self._lock:
             stats = self._stats.get(minute_key, None)
             if stats:

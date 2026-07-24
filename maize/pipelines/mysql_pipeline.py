@@ -1,3 +1,9 @@
+"""
+MySQL 数据管道。
+
+将 Item 批量写入 MySQL 数据库，基于 Item 的 __table_name__ 和字段自动生成 INSERT 语句。
+"""
+
 from typing import TYPE_CHECKING
 
 from maize.pipelines.base_pipeline import BasePipeline
@@ -10,12 +16,27 @@ if TYPE_CHECKING:
 
 
 class MysqlPipeline(BasePipeline):
+    """
+    MySQL 数据管道，将 Item 批量插入 MySQL 表。
+
+    通过 SpiderSettings 中的 mysql 配置建立连接，使用 executemany 批量写入。
+
+    :param settings: 爬虫配置对象，需包含有效的 mysql 连接信息
+    """
+
     def __init__(self, settings: "SpiderSettings"):
         super().__init__(settings=settings)
         self.mysql: MysqlSingletonUtil | None = None
         self.logger = get_logger(settings, self.__class__.__name__)
 
     async def open(self):
+        """
+        初始化 MySQL 连接。
+
+        从 settings.mysql 读取连接参数并创建 MysqlSingletonUtil 实例。
+
+        :raises ValueError: 当 host/db/user/password 任一配置缺失时抛出
+        """
         host = self.settings.mysql.host
         port = self.settings.mysql.port or 3306
         db = self.settings.mysql.db
@@ -29,13 +50,17 @@ class MysqlPipeline(BasePipeline):
         await self.mysql.open()
 
     async def close(self):
+        """
+        关闭 MySQL 连接。
+        """
         await self.mysql.close()
 
     async def process_item(self, items: list["Item"]) -> bool:
         """
-        批量处理 item
-        :param items:
-        @return: 成功 True，否则 False
+        批量处理 Item，写入 MySQL。
+
+        :param items: 待写入的 Item 列表
+        :return: 写入成功返回 True，发生异常返回 False
         """
         if not items:
             return True
@@ -48,6 +73,13 @@ class MysqlPipeline(BasePipeline):
             return False
 
     async def _process_items(self, items: list["Item"]):
+        """
+        执行批量 INSERT 操作。
+
+        根据第一个 Item 的字段名和 __table_name__ 生成 SQL，使用 executemany 批量插入。
+
+        :param items: 同类型 Item 列表（字段结构一致）
+        """
         first_item = items[0]
         item_key = first_item.model_dump().keys()
         item_data_list = []
@@ -61,4 +93,9 @@ class MysqlPipeline(BasePipeline):
         self.logger.info(f"process item row: {row}")
 
     async def process_error_item(self, items: list["Item"]):
+        """
+        处理错误 Item，当前为空实现（不额外处理失败数据）。
+
+        :param items: 超过重试次数的 Item 列表
+        """
         pass

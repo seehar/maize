@@ -1,4 +1,5 @@
-"""同步标准 Spider 接口。
+"""
+同步标准 Spider 接口。
 
 与异步版 `StandardSpiderInterface` 对应，提供 `create_instance`、`idle` 和同步 `run` 入口。
 `run` 直接在当前线程执行，不创建事件循环。
@@ -17,18 +18,35 @@ if TYPE_CHECKING:
 
 
 class SyncStandardSpiderInterface(SyncSpiderInterface, ABC):
+    """
+    同步标准 Spider 接口。
+
+    提供 create_instance 工厂方法绑定 SyncCrawler、idle 空闲判断、
+    以及 run() 同步入口（直接在当前线程执行）。
+    """
+
     __spider_type__: str
     stats_collector: "SyncStatsCollector | None"
     gte_priority: int | None
 
     @classmethod
     def create_instance(cls, crawler: "SyncCrawler"):
+        """
+        创建 Spider 实例并绑定 SyncCrawler。
+
+        :param crawler: 关联的 SyncCrawler 实例
+        :return: 绑定了 crawler 的 Spider 实例
+        """
         instance = cls()
         instance.crawler = crawler
         return instance
 
     def idle(self) -> bool:
-        """判断爬虫是否空闲"""
+        """
+        判断爬虫是否空闲。
+
+        :return: 没有待处理的请求或任务时返回 True
+        """
         return True
 
     def run(

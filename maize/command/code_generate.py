@@ -1,3 +1,7 @@
+"""
+代码生成器，根据模板生成 Spider 和 Item 脚手架。
+"""
+
 from pathlib import Path
 
 import click
@@ -37,6 +41,13 @@ class CodeGenerate:
         click.echo(f"✅ 项目 {spider_name} 创建成功！")
 
     def get_spider_template(self, spider_name: str, url: str | None = None) -> str:
+        """
+        获取 Spider 模板代码。
+
+        :param spider_name: Spider 名称（蛇形命名）
+        :param url: 目标 URL，为 None 时交互式输入
+        :return: Spider 代码字符串
+        """
         if not url:
             url = input("目标网站：")
 
@@ -47,6 +58,12 @@ class CodeGenerate:
         return spider_template.replace("SpiderTemplate", self._get_class_name(spider_name)).replace("url_template", url)
 
     def get_item_template(self, spider_name: str) -> str:
+        """
+        获取 Item 模板代码。
+
+        :param spider_name: Spider 名称（蛇形命名）
+        :return: Item 代码字符串
+        """
         template = self._get_template_file_content(TemplateFile.ITEM)
         return template.replace("ItemTemplate", f"{self._get_class_name(spider_name)}Item")
 
@@ -56,6 +73,12 @@ class CodeGenerate:
 
     @staticmethod
     def _get_class_name(spider_name: str):
+        """
+        将蛇形命名转换为帕斯卡命名。
+
+        :param spider_name: 蛇形命名的 Spider 名称
+        :return: 帕斯卡命名的类名
+        """
         spider_name_split = spider_name.split("_")
         class_name_list = []
         for name in spider_name_split:

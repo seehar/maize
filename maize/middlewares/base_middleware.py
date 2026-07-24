@@ -1,3 +1,10 @@
+"""
+中间件基类定义。
+
+定义 BaseMiddleware 抽象基类及三种中间件子类：DownloaderMiddleware、SpiderMiddleware、PipelineMiddleware，
+提供统一的生命周期方法（open/close）和各阶段处理接口。
+"""
+
 from abc import ABC, abstractmethod
 from collections.abc import AsyncGenerator
 from typing import TYPE_CHECKING
@@ -68,9 +75,15 @@ class DownloaderMiddleware(BaseMiddleware):
     """
 
     async def open(self):
+        """
+        爬虫打开时调用，下载器中间件默认无需初始化资源。
+        """
         pass
 
     async def close(self):
+        """
+        爬虫关闭时调用，下载器中间件默认无需清理资源。
+        """
         pass
 
     async def process_request(
@@ -129,9 +142,15 @@ class SpiderMiddleware(BaseMiddleware):
     """
 
     async def open(self):
+        """
+        爬虫打开时调用，爬虫中间件默认无需初始化资源。
+        """
         pass
 
     async def close(self):
+        """
+        爬虫关闭时调用，爬虫中间件默认无需清理资源。
+        """
         pass
 
     async def process_spider_input(self, response: "Response", spider: "StandardSpiderInterface") -> None:
@@ -193,9 +212,15 @@ class PipelineMiddleware(BaseMiddleware):
     """
 
     async def open(self):
+        """
+        爬虫打开时调用，管道中间件默认无需初始化资源。
+        """
         pass
 
     async def close(self):
+        """
+        爬虫关闭时调用，管道中间件默认无需清理资源。
+        """
         pass
 
     async def process_item_before(self, item: "Item", spider: "StandardSpiderInterface") -> "Item | None":

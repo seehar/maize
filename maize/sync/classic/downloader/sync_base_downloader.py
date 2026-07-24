@@ -20,6 +20,10 @@ if TYPE_CHECKING:
 
 
 class SyncDownloaderMeta(ABCMeta):
+    """
+    同步下载器元类，校验子类是否实现了 download 和 structure_response。
+    """
+
     def __subclasscheck__(cls, subclass):
         return (
             issubclass(subclass, SyncBaseDownloader)
@@ -36,6 +40,9 @@ class SyncBaseDownloader(ABC, metaclass=SyncDownloaderMeta):
         self.logger = get_logger(crawler.settings, self.__class__.__name__, crawler.settings.log_level)
 
     def open(self):
+        """
+        打开下载器，打印下载器类和并发数信息。
+        """
         self.logger.info(
             f"{self.crawler.spider} <downloader class: {type(self).__name__}> "
             f"<concurrency: {self.crawler.settings.concurrency}>"
@@ -73,6 +80,9 @@ class SyncBaseDownloader(ABC, metaclass=SyncDownloaderMeta):
         return None
 
     def close(self):
+        """
+        关闭下载器，打印关闭日志。
+        """
         self.logger.info(f"{self.crawler.spider} <downloader class: {type(self).__name__}> closed")
 
     def process_error_request(self, request: Request):

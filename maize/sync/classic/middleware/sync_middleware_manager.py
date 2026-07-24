@@ -28,6 +28,12 @@ class SyncMiddlewareManager:
     """同步中间件管理器基类。"""
 
     def __init__(self, crawler: "SyncCrawler", middleware_configs: dict[str | type, int]):
+        """
+        初始化中间件管理器。
+
+        :param crawler: 当前 SyncCrawler 实例
+        :param middleware_configs: 中间件配置，键为路径或类，值为优先级
+        """
         self.crawler = crawler
         self.settings = crawler.settings
         self.middleware_configs = middleware_configs
@@ -51,6 +57,9 @@ class SyncMiddlewareManager:
             return None
 
     def open(self):
+        """
+        加载、排序并打开所有中间件。
+        """
         for middleware_path, priority in self.middleware_configs.items():
             middleware = self._load_middleware(middleware_path, priority)
             if middleware:
@@ -65,6 +74,9 @@ class SyncMiddlewareManager:
                 self.logger.error(f"Error opening middleware {middleware.__class__.__name__}: {e}")
 
     def close(self):
+        """
+        关闭所有中间件。
+        """
         for middleware, _ in self.middlewares:
             try:
                 middleware.close()
@@ -76,6 +88,13 @@ class SyncDownloaderMiddlewareManager(SyncMiddlewareManager):
     """同步下载器中间件管理器。"""
 
     def process_request(self, request: "Request", spider: "SyncSpider") -> "Request | Response | None":
+        """
+        按优先级顺序执行下载器中间件的 process_request。
+
+        :param request: 待处理的请求
+        :param spider: 当前 Spider
+        :return: 处理后的 Request、短路 Response 或 None（丢弃）
+        """
         for middleware, _ in self.middlewares:
             if not isinstance(middleware, SyncDownloaderMiddleware):
                 continue
@@ -98,6 +117,14 @@ class SyncDownloaderMiddlewareManager(SyncMiddlewareManager):
     def process_response(
         self, request: "Request", response: "Response", spider: "SyncSpider"
     ) -> "Response | Request | None":
+        """
+        按优先级逆序执行下载器中间件的 process_response。
+
+        :param request: 原始请求
+        :param response: 待处理的响应
+        :param spider: 当前 Spider
+        :return: 处理后的 Response、重试 Request 或 None（丢弃）
+        """
         for middleware, _ in reversed(self.middlewares):
             if not isinstance(middleware, SyncDownloaderMiddleware):
                 continue
@@ -118,6 +145,14 @@ class SyncDownloaderMiddlewareManager(SyncMiddlewareManager):
     def process_exception(
         self, request: "Request", exception: Exception, spider: "SyncSpider"
     ) -> "Request | Response | None":
+        """
+        按优先级逆序执行下载器中间件的 process_exception。
+
+        :param request: 原始请求
+        :param exception: 下载异常
+        :param spider: 当前 Spider
+        :return: 处理后的 Request/Response，未处理返回 None
+        """
         for middleware, _ in reversed(self.middlewares):
             if not isinstance(middleware, SyncDownloaderMiddleware):
                 continue
@@ -136,6 +171,13 @@ class SyncSpiderMiddlewareManager(SyncMiddlewareManager):
     """同步爬虫中间件管理器。"""
 
     def process_spider_input(self, response: "Response", spider: "SyncSpider") -> bool:
+        """
+        按优先级顺序执行 Spider 中间件的 process_spider_input。
+
+        :param response: 下载响应
+        :param spider: 当前 Spider
+        :return: 是否继续处理（False 表示丢弃）
+        """
         for middleware, _ in self.middlewares:
             if not isinstance(middleware, SyncSpiderMiddleware):
                 continue
@@ -152,6 +194,14 @@ class SyncSpiderMiddlewareManager(SyncMiddlewareManager):
         return True
 
     def process_spider_output(self, response: "Response", result: Generator, spider: "SyncSpider") -> Generator:
+        """
+        按优先级逆序执行 Spider 中间件的 process_spider_output。
+
+        :param response: 下载响应
+        :param result: Spider 产出的生成器
+        :param spider: 当前 Spider
+        :return: 处理后的生成器
+        """
         for middleware, _ in reversed(self.middlewares):
             if not isinstance(middleware, SyncSpiderMiddleware):
                 continue
@@ -165,6 +215,14 @@ class SyncSpiderMiddlewareManager(SyncMiddlewareManager):
     def process_spider_exception(
         self, response: "Response", exception: Exception, spider: "SyncSpider"
     ) -> Generator | None:
+        """
+        按优先级逆序执行 Spider 中间件的 process_spider_exception。
+
+        :param response: 下载响应
+        :param exception: Spider 异常
+        :param spider: 当前 Spider
+        :return: 处理后的生成器，未处理返回 None
+        """
         for middleware, _ in reversed(self.middlewares):
             if not isinstance(middleware, SyncSpiderMiddleware):
                 continue
@@ -179,6 +237,13 @@ class SyncSpiderMiddlewareManager(SyncMiddlewareManager):
         return None
 
     def process_start_requests(self, start_requests: Generator, spider: "SyncSpider") -> Generator:
+        """
+        按优先级逆序执行 Spider 中间件的 process_start_requests。
+
+        :param start_requests: 初始请求生成器
+        :param spider: 当前 Spider
+        :return: 处理后的生成器
+        """
         for middleware, _ in reversed(self.middlewares):
             if not isinstance(middleware, SyncSpiderMiddleware):
                 continue
@@ -194,6 +259,13 @@ class SyncPipelineMiddlewareManager(SyncMiddlewareManager):
     """同步管道中间件管理器。"""
 
     def process_item_before(self, item: "Item | None", spider: "SyncSpider") -> "Item | None":
+        """
+        按优先级顺序执行管道中间件的 process_item_before。
+
+        :param item: 待处理的 Item
+        :param spider: 当前 Spider
+        :return: 处理后的 Item，丢弃返回 None
+        """
         for middleware, _ in self.middlewares:
             if not isinstance(middleware, SyncPipelineMiddleware):
                 continue
@@ -208,6 +280,13 @@ class SyncPipelineMiddlewareManager(SyncMiddlewareManager):
         return item
 
     def process_item_after(self, item: "Item | None", spider: "SyncSpider") -> "Item | None":
+        """
+        按优先级逆序执行管道中间件的 process_item_after。
+
+        :param item: 待处理的 Item
+        :param spider: 当前 Spider
+        :return: 处理后的 Item，丢弃返回 None
+        """
         for middleware, _ in reversed(self.middlewares):
             if not isinstance(middleware, SyncPipelineMiddleware):
                 continue

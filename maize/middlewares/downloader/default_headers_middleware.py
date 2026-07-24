@@ -33,9 +33,15 @@ class DefaultHeadersMiddleware(DownloaderMiddleware):
     """
 
     async def open(self):
+        """
+        爬虫打开时调用，默认请求头中间件无需初始化资源。
+        """
         pass
 
     async def close(self):
+        """
+        爬虫关闭时调用，默认请求头中间件无需清理资源。
+        """
         pass
 
     def __init__(self, settings: Optional["SpiderSettings"] = None, default_headers: dict[str, str] | None = None):

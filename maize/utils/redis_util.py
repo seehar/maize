@@ -1,3 +1,7 @@
+"""
+Redis 工具，基于 redis.asyncio 提供异步 Redis 操作。
+"""
+
 from redis import asyncio as aioredis
 from redis.typing import EncodableT, ExpiryT, KeyT
 
@@ -5,6 +9,17 @@ from .tools import SingletonType
 
 
 class RedisUtil:
+    """
+    Redis 异步工具类，封装连接池和常用操作。
+
+    :param url: Redis 连接 URL，优先于 host/port 参数
+    :param username: 用户名，默认 None
+    :param password: 密码，默认 None
+    :param host: 主机地址，默认 None
+    :param port: 端口，默认 None
+    :param db: 数据库编号，默认 None
+    """
+
     def __init__(
         self,
         url: str | None = None,

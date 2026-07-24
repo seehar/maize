@@ -37,9 +37,15 @@ class UserAgentMiddleware(DownloaderMiddleware):
     """
 
     async def open(self):
+        """
+        爬虫打开时调用，User-Agent 中间件无需初始化资源。
+        """
         pass
 
     async def close(self):
+        """
+        爬虫关闭时调用，User-Agent 中间件无需清理资源。
+        """
         pass
 
     def __init__(self, settings=None, user_agent_list=None, mode="random"):

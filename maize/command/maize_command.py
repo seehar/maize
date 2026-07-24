@@ -1,3 +1,7 @@
+"""
+maize 命令行入口，基于 click 提供 CLI 命令。
+"""
+
 import click
 
 from .code_generate import CodeGenerate
@@ -5,6 +9,9 @@ from .code_generate import CodeGenerate
 
 @click.group()
 def cli():
+    """
+    maize 命令行工具入口。
+    """
     pass
 
 

@@ -37,6 +37,12 @@ class SyncLiteCrawler:
     """
 
     def __init__(self, spider: typing.Any, concurrency: int | None = None):
+        """
+        初始化同步 Lite 爬虫运行器。
+
+        :param spider: SyncLiteSpider 实例
+        :param concurrency: 最大并发数，默认使用 spider.concurrency
+        """
         self.spider = spider
         self.concurrency = concurrency if concurrency is not None else spider.concurrency
         self._items: list[Item] = []

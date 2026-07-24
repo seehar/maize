@@ -1,3 +1,7 @@
+"""
+项目工具，提供配置加载和动态类导入能力。
+"""
+
 import sys
 from collections.abc import Callable
 from importlib import import_module

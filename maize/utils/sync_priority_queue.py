@@ -20,12 +20,22 @@ class SyncSpiderPriorityQueue:
         self._counter = itertools.count()
 
     def qsize(self) -> int:
+        """
+        返回队列当前元素数量。
+
+        :return: 队列中的请求数
+        """
         return self._queue.qsize()
 
     def __len__(self) -> int:
         return self._queue.qsize()
 
     def empty(self) -> bool:
+        """
+        检查队列是否为空。
+
+        :return: 队列为空返回 True
+        """
         return self._queue.empty()
 
     def put(self, request: "Request") -> None:

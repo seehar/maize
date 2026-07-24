@@ -25,6 +25,11 @@ class SyncProcessor:
     """同步处理器，线程安全。"""
 
     def __init__(self, crawler: "SyncCrawler"):
+        """
+        初始化同步处理器。
+
+        :param crawler: 当前 SyncCrawler 实例
+        """
         self.crawler: SyncCrawler = crawler
         self.logger = get_logger(crawler.settings, self.__class__.__name__)
 
@@ -42,6 +47,9 @@ class SyncProcessor:
         return self.queue.qsize()
 
     def open(self):
+        """
+        打开管道中间件管理器和管道调度器。
+        """
         self.pipeline_middleware_manager.open()
         self.pipeline_scheduler.open()
 
@@ -79,6 +87,9 @@ class SyncProcessor:
                         self.crawler.spider.stats_collector.record_pipeline_fail(process_result.fail_count)
 
     def close(self):
+        """
+        关闭管道调度器并记录最终统计，然后关闭管道中间件管理器。
+        """
         close_process_result = self.pipeline_scheduler.close()
         if self.crawler.spider and self.crawler.spider.stats_collector:
             self.crawler.spider.stats_collector.record_pipeline_success(close_process_result.success_count)
@@ -87,8 +98,18 @@ class SyncProcessor:
         self.logger.debug("processor closed")
 
     def enqueue(self, output: Union[Request, Item]):
+        """
+        将 Spider 产出（Request 或 Item）入队并立即触发消费。
+
+        :param output: Spider 产出的 Request 或 Item
+        """
         self.queue.put(output)
         self.process()
 
     def idle(self) -> bool:
+        """
+        检查处理器队列是否为空。
+
+        :return: 队列为空返回 True
+        """
         return len(self) == 0

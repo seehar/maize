@@ -1,3 +1,10 @@
+"""
+浏览器下载器基类。
+
+抽取 Playwright/Patchright 的公共逻辑，包括浏览器生命周期管理、
+页面池、请求拦截、资源过滤和 stealth 注入等。
+"""
+
 import asyncio
 import re
 from abc import ABCMeta, abstractmethod
@@ -35,6 +42,10 @@ ResponseT = TypeVar("ResponseT")
 
 # 定义轻量协议用于路由和请求对象的类型提示，避免直接依赖第三方类型或使用 Any
 class _RouteProtocol(Protocol):
+    """
+    路由对象协议，定义 abort 和 continue_ 方法的最小接口。
+    """
+
     async def abort(self) -> None:  # pragma: no cover - simple protocol
         ...
 
@@ -43,6 +54,12 @@ class _RouteProtocol(Protocol):
 
 
 class _RequestProtocol(Protocol):
+    """
+    请求对象协议，定义 resource_type/resourceType 和 url 属性的最小接口。
+
+    兼容 Playwright（resource_type）和 Patchright（resourceType）的字段命名差异。
+    """
+
     # 不同驱动可能使用不同字段名(resource_type 或 resourceType)
     resource_type: str | None
     resourceType: str | None  # noqa: N815 - matches third-party library naming
@@ -66,6 +83,14 @@ class BaseBrowserDownloader(
     """Playwright/Patchright 通用基类，抽取公共逻辑"""
 
     def __init__(self, crawler: "Crawler"):
+        """
+        初始化浏览器下载器。
+
+        从 crawler.settings 读取 RPA 相关配置（headless、窗口大小、
+        代理、stealth、URL 拦截规则等），初始化页面池和拦截缓存。
+
+        :param crawler: Crawler 实例，用于获取配置和日志
+        """
         super().__init__(crawler)
         self.playwright: PlaywrightT | None = None
         self.browser: BrowserT | None = None
@@ -122,6 +147,12 @@ class BaseBrowserDownloader(
         raise NotImplementedError
 
     async def open(self):
+        """
+        打开下载器，初始化浏览器引擎资源。
+
+        读取超时和会话配置，创建页面池；
+        若启用会话复用则启动 Playwright 实例、创建浏览器和上下文。
+        """
         # 打开下载器，初始化播放引擎等资源
         await super().open()
 

@@ -1,3 +1,9 @@
+"""
+Classic 异步爬虫运行器。
+
+包含 Crawler（单个爬虫实例的生命周期管理）和 CrawlerProcess（多爬虫进程级调度入口）。
+"""
+
 import asyncio
 import logging
 import typing
@@ -13,6 +19,15 @@ if typing.TYPE_CHECKING:
 
 
 class Crawler:
+    """
+    单个爬虫实例的运行容器。
+
+    负责创建 Spider 实例、初始化 AioEngine 并驱动完整的爬取生命周期。
+
+    :param spider_cls: 爬虫类（StandardSpiderInterface 的实现类）
+    :param settings: 爬虫全局配置
+    """
+
     def __init__(self, spider_cls: "StandardSpiderInterface", settings: "SpiderSettings"):
         self.spider_cls = spider_cls
         self.spider: StandardSpiderInterface | None = None
@@ -20,6 +35,11 @@ class Crawler:
         self.settings: SpiderSettings = settings
 
     async def crawl(self):
+        """
+        执行爬虫主流程。
+
+        依次完成：设置上下文 → 创建 Spider → open → 启动引擎 → close。
+        """
         # 设置 settings 到上下文中，这样后续调用 get_logger() 时可以自动获取
         set_spider_settings(self.settings)
 
@@ -62,6 +82,11 @@ class Crawler:
                 self.settings.merge_settings_from_dict(custom_settings)
 
     def idle(self) -> bool:
+        """
+        判断爬虫是否空闲（无待处理请求且未暂停）。
+
+        :return: 空闲返回 True，否则 False
+        """
         return self.spider.idle()
 
 
@@ -75,6 +100,12 @@ class CrawlerProcess:
         settings: typing.Optional["SpiderSettings"] = None,
         settings_path: str | None = "settings.Settings",
     ):
+        """
+        初始化爬虫进程。
+
+        :param settings: SpiderSettings 实例，为 None 时从 settings_path 加载
+        :param settings_path: 配置模块路径，默认 ``"settings.Settings"``，加载失败时回退到默认配置
+        """
         self.crawlers: typing.Final[set[Crawler]] = set()
         self._active: typing.Final[set] = set()
         self.settings: SpiderSettings = settings if settings else self.__get_settings(settings_path)

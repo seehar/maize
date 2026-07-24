@@ -35,6 +35,12 @@ class LiteCrawler:
     """
 
     def __init__(self, spider: typing.Any, concurrency: int | None = None):
+        """
+        初始化 Lite 爬虫运行器。
+
+        :param spider: LiteSpider 实例
+        :param concurrency: 最大并发 Worker 数，为 None 时使用 spider.concurrency
+        """
         self.spider = spider
         self.concurrency = concurrency if concurrency is not None else spider.concurrency
         self._items: list[Item] = []
@@ -133,6 +139,7 @@ class LiteCrawler:
         request_queue: asyncio.PriorityQueue[tuple[float, int, Request | None]] = asyncio.PriorityQueue()
 
         async def feed_start_requests():
+            """惰性拉取 spider.start_requests() 并将请求入队，收到停止信号时中断。"""
             try:
                 async for request in self.spider.start_requests():
                     if stop_event.is_set():
@@ -144,6 +151,7 @@ class LiteCrawler:
         feed_task = asyncio.create_task(feed_start_requests())
 
         async def worker():
+            """消费优先级队列中的请求，收到哨兵或停止信号时退出。"""
             while True:
                 if stop_event.is_set():
                     # 停止接受新请求， drain 当前 in-flight 后退出

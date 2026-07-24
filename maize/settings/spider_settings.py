@@ -1,3 +1,7 @@
+"""
+爬虫配置定义，支持环境变量、YAML、TOML 多格式加载。
+"""
+
 from pathlib import Path
 from typing import Any
 

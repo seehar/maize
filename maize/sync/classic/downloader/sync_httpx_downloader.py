@@ -31,6 +31,9 @@ class SyncHttpxDownloader(SyncBaseDownloader):
         self._client: httpx.Client | None = None
 
     def open(self):
+        """
+        打开下载器，初始化超时、代理和共享 httpx.Client 连接池。
+        """
         super().open()
         request_timeout = self.crawler.settings.request.request_timeout
 
@@ -53,6 +56,14 @@ class SyncHttpxDownloader(SyncBaseDownloader):
         )
 
     def download(self, request: Request) -> typing.Union[DownloadResponse, Request]:
+        """
+        执行 HTTP 请求下载。
+
+        复用共享 client；仅当 per-request proxy 或 max_redirects 与全局不同时创建临时 client。
+
+        :param request: 请求对象
+        :return: 下载结果，失败时可能返回重试 Request
+        """
         if not self._client:
             raise RuntimeError("Client not initialized. Did you call open()?")
 
@@ -113,6 +124,14 @@ class SyncHttpxDownloader(SyncBaseDownloader):
 
     @staticmethod
     def structure_response(request: Request, response: httpx.Response, body: bytes) -> Response[None, httpx.Response]:
+        """
+        将 httpx 响应封装为 maize Response。
+
+        :param request: 原始请求
+        :param response: httpx 响应对象
+        :param body: 响应体字节
+        :return: 封装后的 Response
+        """
         return Response[None, httpx.Response](
             url=request.url,
             headers=dict(response.headers),
@@ -123,6 +142,9 @@ class SyncHttpxDownloader(SyncBaseDownloader):
         )
 
     def close(self):
+        """
+        关闭下载器，释放共享 httpx.Client 连接池。
+        """
         super().close()
         if self._client:
             self._client.close()

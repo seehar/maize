@@ -1,3 +1,7 @@
+"""
+同步中间件基类和管理器，覆盖下载器、Spider、管道三层中间件。
+"""
+
 from maize.sync.classic.middleware.sync_base_middleware import (
     SyncBaseMiddleware,
     SyncDownloaderMiddleware,

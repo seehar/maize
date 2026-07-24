@@ -1,3 +1,7 @@
+"""
+通用工具，包含重试装饰器和单例元类。
+"""
+
 import asyncio
 import functools
 import logging
@@ -64,6 +68,10 @@ def retry_asyncio(retry_times: int = 3, interval: int = 0):
 
 
 class SingletonType(type):
+    """
+    单例元类，确保每个类只有一个实例（线程安全）。
+    """
+
     single_lock = RLock()
 
     def __call__(cls, *args, **kwargs):

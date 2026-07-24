@@ -1,3 +1,7 @@
+"""
+爬虫运行统计收集器，按分钟粒度记录下载、解析、管道的成功/失败计数，并上报到 maize-cob。
+"""
+
 import asyncio
 import datetime
 import os
@@ -15,7 +19,21 @@ from maize.utils.system_util import get_container_id
 
 
 class StatsCollector:
+    """
+    爬虫运行统计收集器。
+
+    按分钟粒度（``YYYY-MM-DD HH:MM``）聚合统计数据，每分钟自动上报上一分钟的
+    统计到 ``maize_cob_api``（若配置）。爬虫关闭时上报剩余所有分钟的数据。
+
+    :param spider_name: Spider 名称，用于上报标识
+    """
+
     def __init__(self, spider_name: str):
+        """
+        初始化统计收集器。
+
+        :param spider_name: Spider 名称，用于上报标识
+        """
         self._settings = get_spider_settings()
         self._spider_name = spider_name
 
@@ -31,12 +49,18 @@ class StatsCollector:
         self._container_id: str = ""
 
     async def open(self):
+        """
+        打开统计收集器，记录容器 ID 和启动时间。
+        """
         if container_id := get_container_id():
             self._container_id = container_id
 
         self._start_time = datetime.datetime.now()
 
     async def close(self):
+        """
+        关闭统计收集器，上报剩余统计数据并打印运行时间摘要。
+        """
         self._end_time = datetime.datetime.now()
 
         if self._stats:
@@ -66,6 +90,11 @@ class StatsCollector:
             await self._upload_stat(pre_minute_key)
 
     async def record_download_success(self, status_code: int):
+        """
+        记录一次下载成功，按状态码分类计数。
+
+        :param status_code: HTTP 响应状态码
+        """
         status_code_str = str(status_code)
         async with self._increment() as stats:
             stats.download_success_count += 1
@@ -91,14 +120,25 @@ class StatsCollector:
             stats.download_fail_reason[reason] += 1
 
     async def record_parse_success(self):
+        """
+        记录一次解析成功。
+        """
         async with self._increment() as stats:
             stats.parse_success_count += 1
 
     async def record_parse_fail(self):
+        """
+        记录一次解析失败。
+        """
         async with self._increment() as stats:
             stats.parse_fail_count += 1
 
     async def record_pipeline_success(self, count: int = 1):
+        """
+        记录管道处理成功的数据条数。
+
+        :param count: 成功条数，默认 1，为 0 时直接返回
+        """
         if not count:
             return
 
@@ -106,6 +146,11 @@ class StatsCollector:
             stats.pipeline_success_count += count
 
     async def record_pipeline_fail(self, count: int = 1):
+        """
+        记录管道处理失败的数据条数。
+
+        :param count: 失败条数，默认 1，为 0 时直接返回
+        """
         if not count:
             return
 
@@ -113,6 +158,12 @@ class StatsCollector:
             stats.pipeline_fail_count += count
 
     async def get_and_clear_stats(self, minute_key: str):
+        """
+        获取并清除指定分钟的统计数据。
+
+        :param minute_key: 分钟键（``YYYY-MM-DD HH:MM`` 格式）
+        :return: 统计数据，不存在则返回 None
+        """
         async with self._lock:
             stats = self._stats.get(minute_key, None)
             if stats:
@@ -159,4 +210,9 @@ class StatsCollector:
         self._task_manager.create_task(upload_stat())
 
     def idle(self) -> bool:
+        """
+        检查上报任务是否全部完成。
+
+        :return: 所有上报任务完成返回 True
+        """
         return self._task_manager.all_done()

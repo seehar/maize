@@ -33,9 +33,15 @@ class ItemCleanerMiddleware(PipelineMiddleware):
     """
 
     async def open(self):
+        """
+        爬虫打开时调用，清洗中间件无需初始化资源。
+        """
         pass
 
     async def close(self):
+        """
+        爬虫关闭时调用，清洗中间件无需清理资源。
+        """
         pass
 
     def __init__(

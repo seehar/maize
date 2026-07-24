@@ -1,3 +1,9 @@
+"""
+基于 Playwright 的浏览器下载器。
+
+继承 BaseBrowserDownloader 的公共逻辑，提供标准 Playwright 驱动支持。
+"""
+
 from playwright.async_api import (
     Browser,
     BrowserContext,

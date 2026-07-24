@@ -34,6 +34,9 @@ class HttpErrorMiddleware(SpiderMiddleware):
     """
 
     async def open(self):
+        """
+        爬虫打开时调用，HTTP 错误中间件无需初始化资源。
+        """
         pass
 
     def __init__(

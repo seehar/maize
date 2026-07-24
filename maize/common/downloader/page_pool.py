@@ -1,3 +1,10 @@
+"""
+浏览器页面连接池。
+
+基于 :class:`asyncio.Condition` 实现页面复用与并发控制，
+供 Playwright / Patchright 下载器管理多个浏览器页面。
+"""
+
 import asyncio
 from typing import TYPE_CHECKING
 
@@ -10,9 +17,18 @@ if TYPE_CHECKING:
 
 
 class PagePool:
-    """页面连接池，用于管理多个并发页面"""
+    """
+    页面连接池，管理多个并发浏览器页面的获取、释放与关闭。
+    """
 
     def __init__(self, crawler: "Crawler", max_pages: int = 10):
+        """
+        初始化页面连接池。
+
+        :param crawler: 爬虫实例，用于获取设置和日志配置
+        :param max_pages: 最大并发页面数，默认 10
+        """
+
         self.max_pages = max_pages
         self.available_pages: list[Page] = []
         self.in_use_pages: set[Page] = set()
@@ -20,7 +36,9 @@ class PagePool:
         self.logger = get_logger(crawler.settings, self.__class__.__name__, crawler.settings.log_level)
 
     async def acquire_page(self, context: "BrowserContext") -> "Page":
-        """获取一个页面"""
+        """
+        获取一个页面。
+        """
         async with self._cond:
             if self.available_pages:
                 # 复用可用页面
@@ -46,7 +64,9 @@ class PagePool:
             return page
 
     async def release_page(self, page: "Page"):
-        """释放页面回连接池"""
+        """
+        释放页面回连接池。
+        """
         async with self._cond:
             if page in self.in_use_pages:
                 self.in_use_pages.remove(page)
@@ -60,7 +80,9 @@ class PagePool:
                 self._cond.notify()
 
     async def close_all(self):
-        """关闭所有页面"""
+        """
+        关闭所有页面。
+        """
         async with self._cond:
             for page in self.available_pages + list(self.in_use_pages):
                 try:

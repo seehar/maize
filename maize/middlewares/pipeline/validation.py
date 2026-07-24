@@ -1,3 +1,10 @@
+"""
+Item 验证中间件。
+
+在 Item 进入 Pipeline 前验证必填字段、字段类型和字段值条件，
+可配置丢弃无效 Item 或仅记录日志。
+"""
+
 from typing import TYPE_CHECKING
 
 from maize.middlewares.base_middleware import PipelineMiddleware
@@ -23,6 +30,9 @@ class ItemValidationMiddleware(PipelineMiddleware):
     """
 
     async def open(self):
+        """
+        爬虫打开时调用，验证中间件无需初始化资源。
+        """
         pass
 
     def __init__(self, settings=None, required_fields=None, drop_invalid_items=True, log_level="warning"):

@@ -1,3 +1,9 @@
+"""
+下载响应模型。
+
+封装下载器的返回结果，包含响应对象和失败原因。
+"""
+
 from typing import Generic, TypeVar
 
 from pydantic import BaseModel, ConfigDict, Field
@@ -9,7 +15,9 @@ R = TypeVar("R")
 
 
 class DownloadResponse(BaseModel, Generic[Driver, R]):
-    """下载响应模型"""
+    """
+    下载响应模型。
+    """
 
     # 响应
     response: Response[Driver, R] | None = Field(default=None, description="下载响应对象")

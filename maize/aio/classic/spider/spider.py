@@ -1,3 +1,9 @@
+"""
+Classic 异步爬虫基类。
+
+用户继承 Spider 并实现 start_requests 和 parse 方法来定义抓取逻辑。
+"""
+
 import asyncio
 from abc import abstractmethod
 from collections.abc import AsyncGenerator
@@ -16,9 +22,19 @@ if TYPE_CHECKING:
 
 
 class Spider(StandardSpiderInterface):
+    """
+    Classic 异步爬虫基类。
+
+    提供生命周期管理（open/close）、统计收集、暂停/恢复控制。
+    用户需实现 start_requests 和 parse 方法。
+    """
+
     __spider_type__: str = "spider"
 
     def __init__(self):
+        """
+        初始化爬虫实例，设置锁、crawler 引用和统计收集器占位。
+        """
         super().__init__()
         self._lock = asyncio.Lock()
         # __spider_type__ is a class-level attribute; subclasses override it.
@@ -50,6 +66,11 @@ class Spider(StandardSpiderInterface):
 
     @abstractmethod
     async def start_requests(self) -> AsyncGenerator[Request, Any]:
+        """
+        生成初始请求的异步生成器（子类必须实现）。
+
+        :return: 异步生成器，yield Request 对象
+        """
         raise NotImplementedError
 
     async def parse(self, response: Response):
@@ -94,6 +115,11 @@ class Spider(StandardSpiderInterface):
             self.gte_priority = gte_priority
 
     def idle(self) -> bool:
+        """
+        判断爬虫是否空闲（统计收集器空闲且未暂停）。
+
+        :return: 空闲返回 True，否则 False
+        """
         return self.stats_collector.idle() and not self.is_pause()
 
     def is_pause(self):

@@ -1,7 +1,15 @@
+"""
+字符串工具，提供命名格式转换。
+"""
+
 import re
 
 
 class StringUtil:
+    """
+    字符串工具类，提供命名格式转换的静态方法。
+    """
+
     @staticmethod
     def camel_to_snake(camel_string: str) -> str:
         """

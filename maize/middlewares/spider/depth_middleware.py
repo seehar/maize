@@ -28,9 +28,15 @@ class DepthMiddleware(SpiderMiddleware):
     """
 
     async def close(self):
+        """
+        爬虫关闭时调用，深度中间件无需清理资源。
+        """
         pass
 
     async def open(self):
+        """
+        爬虫打开时调用，深度中间件无需初始化资源。
+        """
         pass
 
     def __init__(self, settings=None, max_depth=0, depth_priority_enabled=False):

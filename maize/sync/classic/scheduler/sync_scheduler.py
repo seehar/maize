@@ -23,9 +23,17 @@ class SyncScheduler:
         return len(self.request_queue)
 
     def idle(self) -> bool:
+        """
+        检查调度器队列是否为空。
+
+        :return: 队列为空返回 True
+        """
         return len(self) == 0
 
     def open(self):
+        """
+        打开调度器，创建优先级队列。
+        """
         self.request_queue = SyncSpiderPriorityQueue()
 
     def next_request(self, gte_priority: int | None = None) -> "Request | None":
@@ -43,5 +51,10 @@ class SyncScheduler:
         return self.request_queue.get_by_priority(gte_priority)
 
     def enqueue_request(self, request: "Request"):
+        """
+        将请求入队到优先级队列。
+
+        :param request: 待入队的请求
+        """
         if self.request_queue is not None:
             self.request_queue.put(request)

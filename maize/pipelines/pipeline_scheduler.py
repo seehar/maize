@@ -1,3 +1,10 @@
+"""
+管道数据调度器。
+
+管理 Item 的入队、批量处理、错误重试和最终清理，
+按配置的时间间隔和批次大小将 Item 分发给已注册的 Pipeline 实例。
+"""
+
 import time
 from asyncio import Queue
 from typing import TYPE_CHECKING
@@ -17,6 +24,14 @@ class PipelineScheduler:
     """
 
     def __init__(self, settings: "SpiderSettings"):
+        """
+        初始化管道调度器。
+
+        根据 settings.pipeline 配置创建 item 队列、error item 队列和 retry 队列，
+        并读取批次大小、处理间隔、最大重试次数等参数。
+
+        :param settings: 爬虫配置对象，需包含 pipeline 配置段
+        """
         self.settings = settings
         self.logger = get_logger(settings, self.__class__.__name__)
         self.item_pipelines: list[BasePipeline] = []
@@ -46,6 +61,11 @@ class PipelineScheduler:
         return self.item_queue.qsize()
 
     async def open(self):
+        """
+        加载并初始化所有已配置的 Pipeline 实例。
+
+        按 settings.pipeline.pipelines 中的路径逐一加载类、实例化并调用其 open() 方法。
+        """
         pipeline_path_list = self.settings.pipeline.pipelines
         for pipeline_path in pipeline_path_list:
             self.logger.info(f"Loading pipeline: {pipeline_path}")
@@ -54,6 +74,14 @@ class PipelineScheduler:
             self.item_pipelines.append(pipeline_instance)
 
     async def close(self) -> PipelineProcessResult:
+        """
+        关闭调度器，处理队列中所有剩余 Item 后关闭各 Pipeline。
+
+        依次处理：item_queue 剩余数据 → retry_item_queue 重试 → error_item_queue 最终处理，
+        最后调用每个 Pipeline 的 close() 方法。
+
+        :return: 汇总的处理结果
+        """
         self.logger.debug("pipeline scheduler closing")
         close_process_result = PipelineProcessResult()
         while not self.item_queue.empty():
@@ -84,6 +112,12 @@ class PipelineScheduler:
         return close_process_result
 
     async def process(self, item: "Item") -> PipelineProcessResult:
+        """
+        将 Item 入队，满足时间间隔或队列满时触发批量处理。
+
+        :param item: 待处理的 Item 对象
+        :return: 本次调用产生的处理结果（可能为空结果）
+        """
         pipeline_process_result = PipelineProcessResult()
         await self.item_queue.put(item)
         current_time = int(time.time())
@@ -124,6 +158,9 @@ class PipelineScheduler:
         return process_result
 
     async def process_error_items(self):
+        """
+        处理 error_item_queue 中所有超过重试次数的 Item，分发给各 Pipeline 的 process_error_item。
+        """
         self.logger.info(f"需要处理的错误任务个数: {self.error_item_queue.qsize()}")
         while not self.error_item_queue.empty():
             await self._single_process_error_items()
@@ -220,7 +257,17 @@ class PipelineScheduler:
                 await self.retry_item_queue.put(item)
 
     def idle(self):
+        """
+        判断 item 队列是否为空。
+
+        :return: 队列为空返回 True，否则 False
+        """
         return len(self) == 0
 
     def error_task_idle(self):
+        """
+        判断 error item 队列是否为空。
+
+        :return: 队列为空返回 True，否则 False
+        """
         return self.error_item_queue.qsize() == 0

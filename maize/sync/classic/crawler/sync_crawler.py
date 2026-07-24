@@ -21,6 +21,12 @@ class SyncCrawler:
     """同步爬虫运行器（单个 Spider）。"""
 
     def __init__(self, spider_cls: "SyncStandardSpiderInterface", settings: "SpiderSettings"):
+        """
+        初始化同步爬虫运行器。
+
+        :param spider_cls: Spider 类
+        :param settings: 爬虫配置
+        """
         self.spider_cls = spider_cls
         self.settings: SpiderSettings = settings
         self.spider: SyncStandardSpiderInterface | None = None
@@ -55,6 +61,11 @@ class SyncCrawler:
             self.settings.merge_settings_from_dict(spider.custom_settings)
 
     def idle(self) -> bool:
+        """
+        检查 Spider 是否空闲。
+
+        :return: Spider 未创建或已空闲返回 True
+        """
         if self.spider is None:
             return True
         return self.spider.idle()
@@ -72,6 +83,12 @@ class SyncCrawlerProcess:
         settings: typing.Optional["SpiderSettings"] = None,
         settings_path: str | None = "settings.Settings",
     ):
+        """
+        初始化同步爬虫进程管理器。
+
+        :param settings: 爬虫配置对象，为 None 时从 settings_path 加载
+        :param settings_path: 配置文件模块路径，默认 "settings.Settings"
+        """
         self._active: typing.Final[list[SyncCrawler]] = []
         self.settings: SpiderSettings = settings if settings else self.__get_settings(settings_path)
 

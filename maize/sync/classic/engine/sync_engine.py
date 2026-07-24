@@ -45,6 +45,11 @@ class SyncEngine:
     """同步爬虫引擎。"""
 
     def __init__(self, crawler: SyncCrawler):
+        """
+        初始化同步引擎。
+
+        :param crawler: 当前 SyncCrawler 实例
+        """
         self.logger = get_logger(crawler.settings, self.__class__.__name__)
         self.crawler: SyncCrawler = crawler
         self.settings: SpiderSettings = self.crawler.settings
@@ -76,6 +81,12 @@ class SyncEngine:
         return downloader_cls
 
     def start_spider(self, spider: SyncSpider):
+        """
+        启动 Spider，初始化调度器、中间件、下载器、处理器和任务管理器。
+
+        :param spider: 要运行的 SyncSpider 实例
+        :raises StartRequestsNotImplementedException: start_requests 未实现或不是生成器
+        """
         self.running = True
         self.start_requests_running = True
 
@@ -229,6 +240,12 @@ class SyncEngine:
         self.task_manager.create_task(crawl_task)
 
     def _fetch(self, request: Request) -> Generator[Union[Request, Item], Any, None] | None:
+        """
+        执行单个请求的完整抓取流程：中间件 → 下载 → 响应处理 → 回调解析。
+
+        :param request: 待抓取的请求
+        :return: Spider 产出的生成器，无产出返回 None
+        """
         # Apply downloader middleware process_request
         request_or_response = self._process_request_middleware(request)
         if request_or_response is None:
@@ -358,6 +375,11 @@ class SyncEngine:
         return None
 
     def enqueue_request(self, request: Request):
+        """
+        将请求入队到调度器。
+
+        :param request: 待入队的请求
+        """
         self._schedule_request(request)
 
     def _schedule_request(self, request: Request):
@@ -365,6 +387,11 @@ class SyncEngine:
         self.scheduler.enqueue_request(request)
 
     def _get_next_request(self) -> Request | None:
+        """
+        从调度器获取下一个请求。
+
+        :return: 下一个请求，无可用请求返回 None
+        """
         assert self.scheduler is not None
         assert self.crawler.spider is not None
         request: Request | None = self.scheduler.next_request(self.crawler.spider.gte_priority)
@@ -391,6 +418,9 @@ class SyncEngine:
         )
 
     def close_spider(self):
+        """
+        关闭 Spider，等待线程任务完成后依次关闭中间件、下载器、处理器和任务管理器。
+        """
         self.logger.info("Closing spider")
         # 等待所有线程任务完成
         while not self.task_manager.all_done():

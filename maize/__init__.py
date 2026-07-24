@@ -1,3 +1,7 @@
+"""
+maize 异步爬虫框架，提供 Lite（轻量）和 Classic（完整）两种爬虫模式，同时支持异步和同步。
+"""
+
 from maize.aio.classic.crawler.crawler import CrawlerProcess
 from maize.aio.classic.downloader.aiohttp_downloader import AioHttpDownloader
 from maize.aio.classic.downloader.httpx_downloader import HTTPXDownloader

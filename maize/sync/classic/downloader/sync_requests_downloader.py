@@ -42,6 +42,11 @@ class SyncRequestsDownloader(SyncBaseDownloader):
         return self._local.session
 
     def open(self):
+        """
+        打开下载器，校验 requests 已安装，初始化超时和全局代理。
+
+        :raises ImportError: requests 未安装
+        """
         super().open()
         if requests is None:
             raise ImportError("requests is not installed. Install it with: pip install requests")
@@ -54,6 +59,12 @@ class SyncRequestsDownloader(SyncBaseDownloader):
             self._proxies = {"http": proxy_url, "https": proxy_url}
 
     def download(self, request: Request) -> typing.Union[DownloadResponse, Request]:
+        """
+        执行 HTTP 请求下载，使用当前线程的 Session。
+
+        :param request: 请求对象
+        :return: 下载结果，失败时可能返回重试 Request
+        """
         try:
             headers = request.get_headers_sync()
             proxy_url = self._get_request_proxy(request)
@@ -94,6 +105,14 @@ class SyncRequestsDownloader(SyncBaseDownloader):
     def structure_response(
         request: Request, response: "requests.Response", body: bytes
     ) -> Response[None, "requests.Response"]:
+        """
+        将 requests 响应封装为 maize Response。
+
+        :param request: 原始请求
+        :param response: requests 响应对象
+        :param body: 响应体字节
+        :return: 封装后的 Response
+        """
         return Response[None, requests.Response](
             url=request.url,
             headers=dict(response.headers),
@@ -104,5 +123,8 @@ class SyncRequestsDownloader(SyncBaseDownloader):
         )
 
     def close(self):
+        """
+        关闭下载器（thread-local Session 随线程结束自动回收）。
+        """
         super().close()
         # thread-local sessions 随线程结束自动回收，无需显式关闭
