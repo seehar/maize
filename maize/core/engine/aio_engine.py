@@ -14,6 +14,7 @@ import ujson
 from maize.aio.classic.scheduler.scheduler import Scheduler
 from maize.common.http import Request, Response
 from maize.common.items import Item
+from maize.common.model.download_response_model import DownloadResponse
 from maize.core.processor import Processor
 from maize.core.task.task_manager import TaskManager
 from maize.exceptions.spider_exception import (
@@ -243,12 +244,16 @@ class AioEngine:
                 task_request = await anext(self.task_requests)
             except StopAsyncIteration:
                 self.task_requests = None
+                self._single_task_requests_running = False
+                self.task_requests_running = False
+                self.logger.info("All task requests have been processed.")
             except RuntimeError:
                 self.task_requests_running = False
             except Exception as e:
                 # 1. 发起请求的 task 全部运行完毕
                 # 2. 调度器是否空闲
                 # 3. 下载器是否空闲
+                had_task_requests = self.task_requests is not None
                 self.task_requests = None
                 if not self._idle():
                     await asyncio.sleep(0.1)
@@ -257,8 +262,8 @@ class AioEngine:
                 self._single_task_requests_running = False
                 self.logger.info("All task requests have been processed.")
 
-                if self.task_requests is not None:
-                    self.logger.info(f"Error during start_requests: {e}")
+                if had_task_requests:
+                    self.logger.info(f"Error during task_requests: {e}")
             else:
                 await self.enqueue_request(task_request)
 
@@ -312,7 +317,7 @@ class AioEngine:
         result = await self.downloader_middleware_manager.process_request(request, self.spider)
         if result is None:
             return None
-        if result.__class__.__name__ == "Response":
+        if isinstance(result, Response):
             return result
         return result
 
@@ -326,11 +331,11 @@ class AioEngine:
             result = await self.downloader_middleware_manager.process_exception(request, e, self.spider)
             if result is None:
                 raise
-            if result.__class__.__name__ == "Request":
+            if isinstance(result, Request):
                 await self.enqueue_request(result)
                 return None
-            if result.__class__.__name__ == "Response":
-                return type("DownloadResult", (), {"response": result, "reason": None})()
+            if isinstance(result, Response):
+                return DownloadResponse(response=result)
             return None
 
     async def _process_response_middleware(self, request: Request, response: Response) -> Response | None:
@@ -340,7 +345,7 @@ class AioEngine:
         result = await self.downloader_middleware_manager.process_response(request, response, self.spider)
         if result is None:
             return None
-        if result.__class__.__name__ == "Request":
+        if isinstance(result, Request):
             await self.enqueue_request(result)
             return None
         return result

@@ -22,6 +22,7 @@ from maize.common.items.field import Field
 from maize.core.decorator_entry import SpiderEntry
 from maize.pipelines.base_pipeline import BasePipeline
 from maize.pipelines.empty_pipeline import EmptyPipeline
+from maize.pipelines.mysql_pipeline import MysqlPipeline
 from maize.settings.spider_settings import SpiderSettings
 from maize.sync.classic.crawler.sync_crawler import SyncCrawlerProcess
 from maize.sync.classic.downloader.sync_base_downloader import SyncBaseDownloader
@@ -49,6 +50,7 @@ __all__ = [
     "Item",
     "LogLevelEnum",
     "Method",
+    "MysqlPipeline",
     "PipelineEnum",
     "Request",
     "Response",

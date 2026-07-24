@@ -426,7 +426,6 @@ settings.mysql.password = "password"
 | `downloader_middlewares` | `dict[str \| type, int]` | `{}` | 下载器中间件，key 为类路径，value 为优先级 |
 | `spider_middlewares` | `dict[str \| type, int]` | `{}` | 爬虫中间件 |
 | `pipeline_middlewares` | `dict[str \| type, int]` | `{}` | 管道中间件 |
-| `enable_builtin_middlewares` | `bool` | `True` | 是否启用内置中间件 |
 
 优先级为整数，数字越小越先执行（`process_response` 等反向方法除外）。建议范围：
 

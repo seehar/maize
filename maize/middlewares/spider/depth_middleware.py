@@ -7,6 +7,7 @@
 from collections.abc import AsyncGenerator
 from typing import TYPE_CHECKING
 
+from maize.common.http.request import Request
 from maize.middlewares.base_middleware import SpiderMiddleware
 
 if TYPE_CHECKING:
@@ -116,7 +117,7 @@ class DepthMiddleware(SpiderMiddleware):
 
         async for item in result:
             # 如果是 Request，检查并更新深度
-            if item.__class__.__name__ == "Request":
+            if isinstance(item, Request):
                 new_depth = current_depth + 1
 
                 # 检查是否超过最大深度

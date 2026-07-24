@@ -19,8 +19,8 @@ class SpiderDownloaderEnum(str, Enum):
 
     AIOHTTP = "maize.AioHttpDownloader"
     HTTPX = "maize.HTTPXDownloader"
-    PLAYWRIGHT = "maize.downloader.playwright_downloader.PlaywrightDownloader"
-    PATCHRIGHT = "maize.downloader.patchright_downloader.PatchrightDownloader"
+    PLAYWRIGHT = "maize.aio.classic.downloader.playwright_downloader.PlaywrightDownloader"
+    PATCHRIGHT = "maize.aio.classic.downloader.patchright_downloader.PatchrightDownloader"
 
 
 @unique

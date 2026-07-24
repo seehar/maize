@@ -179,11 +179,6 @@ class MiddlewareSettings(BaseModel):
         description="管道中间件配置，格式: {'middleware.path': priority} 或 {MiddlewareClass: priority}",
     )
 
-    enable_builtin_middlewares: bool = Field(
-        default=True,
-        description="是否启用内置中间件",
-    )
-
 
 class SpiderSettings(BaseSettings):
     """爬虫配置主类"""

@@ -4,5 +4,6 @@
 
 from maize.pipelines.base_pipeline import BasePipeline
 from maize.pipelines.empty_pipeline import EmptyPipeline
+from maize.pipelines.mysql_pipeline import MysqlPipeline
 
-__all__ = ["BasePipeline", "EmptyPipeline"]
+__all__ = ["BasePipeline", "EmptyPipeline", "MysqlPipeline"]

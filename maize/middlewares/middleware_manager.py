@@ -7,6 +7,8 @@ Maize 框架的中间件管理器
 from collections.abc import AsyncGenerator
 from typing import TYPE_CHECKING
 
+from maize.common.http.request import Request
+from maize.common.http.response import Response
 from maize.middlewares.base_middleware import (
     BaseMiddleware,
     DownloaderMiddleware,
@@ -19,8 +21,6 @@ from maize.utils.project_util import load_class
 if TYPE_CHECKING:
     from maize.aio.classic.crawler.crawler import Crawler
     from maize.base.interface.standard_spider_interface import StandardSpiderInterface
-    from maize.common.http.request import Request
-    from maize.common.http.response import Response
     from maize.common.items import Item
 
 
@@ -126,7 +126,7 @@ class DownloaderMiddlewareManager(MiddlewareManager):
                 result = await middleware.process_request(request, spider)
 
                 # 如果中间件返回 Response，停止并返回
-                if result.__class__.__name__ == "Response":
+                if isinstance(result, Response):
                     self.logger.debug(
                         f"Middleware {middleware.__class__.__name__} returned Response, stopping request processing"
                     )
@@ -169,7 +169,7 @@ class DownloaderMiddlewareManager(MiddlewareManager):
                 result = await middleware.process_response(request, response, spider)
 
                 # 如果中间件返回 Request，表示要重试
-                if result.__class__.__name__ == "Request":
+                if isinstance(result, Request):
                     self.logger.debug(f"Middleware {middleware.__class__.__name__} returned Request, will retry")
                     return result
 
