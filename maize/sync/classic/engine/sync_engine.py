@@ -19,6 +19,7 @@ from typing import TYPE_CHECKING, Any, Union
 
 from maize.common.http import Request, Response
 from maize.common.items import Item
+from maize.common.model.download_response_model import DownloadResponse
 from maize.exceptions.spider_exception import (
     OutputException,
     StartRequestsNotImplementedException,
@@ -303,7 +304,7 @@ class SyncEngine:
                 self.enqueue_request(result)
                 return None
             if isinstance(result, Response):
-                return type("DownloadResult", (), {"response": result, "reason": None})()
+                return DownloadResponse(response=result)
             return None
 
     def _process_response_middleware(self, request: Request, response: Response) -> Response | None:
