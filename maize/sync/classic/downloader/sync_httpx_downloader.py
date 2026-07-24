@@ -59,8 +59,11 @@ class SyncHttpxDownloader(SyncBaseDownloader):
         request_proxy = self._get_proxy(request)
 
         try:
-            # per-request proxy 与全局不同时，创建临时 client
-            if request_proxy is not None and request_proxy != self.httpx_proxy:
+            # per-request proxy 或 max_redirects 与全局不同时，创建临时 client
+            need_temp_client = (
+                request_proxy is not None and request_proxy != self.httpx_proxy
+            ) or request.max_redirects != 20
+            if need_temp_client:
                 client = httpx.Client(
                     timeout=self._timeout,
                     proxy=request_proxy,

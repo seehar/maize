@@ -225,62 +225,62 @@ class SyncLiteCrawler:
 
     def _process(self, request: Request, request_queue: queue.PriorityQueue) -> None:
         """处理单个请求：fetch + parse + 处理产出"""
-        parent_depth = request.meta.get("_lite_depth", 0)
-        start_time = time.monotonic()
-        sem = self._get_domain_semaphore(request.url)
-
-        def _do_fetch() -> Response:
-            if sem:
-                with sem:
-                    return self._fetch_with_retry(request)
-            return self._fetch_with_retry(request)
-
         try:
-            response = _do_fetch()
-        except Exception as e:
+            parent_depth = request.meta.get("_lite_depth", 0)
+            start_time = time.monotonic()
+            sem = self._get_domain_semaphore(request.url)
+
+            def _do_fetch() -> Response:
+                if sem:
+                    with sem:
+                        return self._fetch_with_retry(request)
+                return self._fetch_with_retry(request)
+
+            try:
+                response = _do_fetch()
+            except Exception as e:
+                elapsed = time.monotonic() - start_time
+                self.logger.error(
+                    f"fetch_failed url={request.url} elapsed={elapsed:.2f}s retry={request.current_retry_count} error={e}"
+                )
+                with self._lock:
+                    self._stats["failed"] += 1
+                return
+
             elapsed = time.monotonic() - start_time
-            self.logger.error(
-                f"fetch_failed url={request.url} elapsed={elapsed:.2f}s retry={request.current_retry_count} error={e}"
+            self.logger.info(
+                f"request url={request.url} status={response.status} "
+                f"elapsed={elapsed:.2f}s retry={request.current_retry_count}"
             )
-            with self._lock:
-                self._stats["failed"] += 1
-            request_queue.task_done()
-            return
 
-        elapsed = time.monotonic() - start_time
-        self.logger.info(
-            f"request url={request.url} status={response.status} "
-            f"elapsed={elapsed:.2f}s retry={request.current_retry_count}"
-        )
+            if 0 < response.status < 400:
+                with self._lock:
+                    self._stats["succeeded"] += 1
+            else:
+                with self._lock:
+                    self._stats["failed"] += 1
 
-        if 0 < response.status < 400:
-            with self._lock:
-                self._stats["succeeded"] += 1
-        else:
-            with self._lock:
-                self._stats["failed"] += 1
+            callback = request.callback or self.spider.parse
 
-        callback = request.callback or self.spider.parse
-
-        try:
-            result = callback(response)
-            if result is not None:
-                for output in result:
-                    if isinstance(output, Request):
-                        output.meta["_lite_depth"] = parent_depth + 1
-                        self._enqueue(output, request_queue)
-                    elif isinstance(output, Item):
-                        with self._lock:
-                            self._items.append(output)
-                            self._stats["items"] += 1
-                        try:
-                            self.spider.process_item(output)
-                        except Exception as e:
-                            self.logger.error(f"process_item_failed url={request.url} error={e}")
-        except Exception as e:
-            self.logger.error(
-                f"parse_failed url={request.url} status={response.status} elapsed={elapsed:.2f}s error={e}"
-            )
+            try:
+                result = callback(response)
+                if result is not None:
+                    for output in result:
+                        if isinstance(output, Request):
+                            output.meta["_lite_depth"] = parent_depth + 1
+                            self._enqueue(output, request_queue)
+                        elif isinstance(output, Item):
+                            with self._lock:
+                                self._items.append(output)
+                                self._stats["items"] += 1
+                            try:
+                                self.spider.process_item(output)
+                            except Exception as e:
+                                self.logger.error(f"process_item_failed url={request.url} error={e}")
+            except Exception as e:
+                self.logger.error(
+                    f"parse_failed url={request.url} status={response.status} elapsed={elapsed:.2f}s error={e}"
+                )
         finally:
             request_queue.task_done()
 
@@ -289,8 +289,8 @@ class SyncLiteCrawler:
         带重试的请求。
 
         重试条件由 ``spider.should_retry`` 决定（默认：status==0 / >=500 / 429）。
-        每次重试前递增指数退避延迟（1s, 2s, 4s...），``time.sleep`` 阻塞当前 worker 线程，
-        收到停止信号时需等待 sleep 结束才能退出。
+        每次重试前递增指数退避延迟（1s, 2s, 4s...），使用 ``stop_event.wait``
+        替代 ``time.sleep``，收到停止信号时立即退出等待。
 
         :param request: 请求对象
         :returns: 最终的响应对象
@@ -313,7 +313,7 @@ class SyncLiteCrawler:
                     f"retry url={request.url} attempt={attempt + 1}/{self.spider.retry} "
                     f"status={response.status} delay={delay}s"
                 )
-                time.sleep(delay)
+                self._stop_event.wait(timeout=delay)
 
         if last_response is not None:
             return last_response

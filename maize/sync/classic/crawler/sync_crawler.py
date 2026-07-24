@@ -34,10 +34,11 @@ class SyncCrawler:
         self.spider = self._create_spider()
         self.spider.open()
 
-        self.engine = self._create_engine()
-        self.engine.start_spider(self.spider)  # type: ignore[arg-type]
-
-        self.spider.close()
+        try:
+            self.engine = self._create_engine()
+            self.engine.start_spider(self.spider)  # type: ignore[arg-type]
+        finally:
+            self.spider.close()
 
     def _create_spider(self) -> "SyncStandardSpiderInterface":
         """创建 Spider 实例并注入 custom_settings。"""

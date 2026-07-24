@@ -56,6 +56,7 @@ __all__ = [
     "SyncBasePipeline",
     "SyncCrawlerProcess",
     "SyncDownloaderMiddleware",
+    "SyncEmptyPipeline",
     "SyncHttpxDownloader",
     "SyncLiteCrawler",
     "SyncLiteSpider",

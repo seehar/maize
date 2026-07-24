@@ -200,12 +200,14 @@ class SyncLiteSpider(SyncLiteSpiderInterface):
         try:
             headers = request.get_headers_sync()
 
-            # httpx 不支持 per-request proxy，需创建临时 client
-            if request_proxy and request_proxy != self.proxy:
+            # httpx 不支持 per-request proxy/max_redirects，需创建临时 client
+            need_temp_client = (request_proxy and request_proxy != self.proxy) or request.max_redirects != 20
+            if need_temp_client:
                 client = httpx.Client(
                     timeout=self.timeout,
                     headers=self.default_headers,
                     proxy=request_proxy,
+                    max_redirects=request.max_redirects,
                 )
                 should_close = True
             else:
