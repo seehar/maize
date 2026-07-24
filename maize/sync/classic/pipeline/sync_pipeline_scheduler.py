@@ -4,6 +4,7 @@
 批量处理、错误重试、超限处理逻辑与异步版一致。
 """
 
+import asyncio
 import queue
 import time
 from typing import TYPE_CHECKING
@@ -59,23 +60,32 @@ class SyncPipelineScheduler:
     def open(self):
         """
         加载并打开所有管道，无配置时使用 SyncEmptyPipeline。
+
+        异步管道类（``process_item`` 为 coroutine function）在同步调度器中会返回
+        未被 await 的协程，导致 Item 被静默丢弃。检测到异步管道时降级为
+        ``SyncEmptyPipeline`` 并告警，避免数据丢失。
         """
         pipeline_path_list = self.settings.pipeline.pipelines
         if not pipeline_path_list:
             # 默认使用同步空管道
-            pipeline_instance = SyncEmptyPipeline(self.settings)
-            pipeline_instance.open()
-            self.item_pipelines.append(pipeline_instance)
+            self._append_pipeline(SyncEmptyPipeline(self.settings))
             return
 
         for pipeline_path in pipeline_path_list:
             self.logger.info(f"Loading pipeline: {pipeline_path}")
-            if isinstance(pipeline_path, str):
-                pipeline_instance = load_class(pipeline_path)(self.settings)
-            else:
-                pipeline_instance = pipeline_path(self.settings)
-            pipeline_instance.open()
-            self.item_pipelines.append(pipeline_instance)
+            pipeline_cls = load_class(pipeline_path) if isinstance(pipeline_path, str) else pipeline_path
+            if asyncio.iscoroutinefunction(pipeline_cls.process_item):
+                self.logger.warning(
+                    f"Pipeline {pipeline_path} is async; sync crawler requires sync pipelines. "
+                    f"Falling back to SyncEmptyPipeline to avoid silently dropping items."
+                )
+                self._append_pipeline(SyncEmptyPipeline(self.settings))
+                continue
+            self._append_pipeline(pipeline_cls(self.settings))
+
+    def _append_pipeline(self, pipeline_instance: "SyncBasePipeline"):
+        pipeline_instance.open()
+        self.item_pipelines.append(pipeline_instance)
 
     def close(self) -> PipelineProcessResult:
         """
