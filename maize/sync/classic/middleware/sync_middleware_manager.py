@@ -7,6 +7,8 @@
 from collections.abc import Generator
 from typing import TYPE_CHECKING
 
+from maize.common.http.request import Request
+from maize.common.http.response import Response
 from maize.sync.classic.middleware.sync_base_middleware import (
     SyncBaseMiddleware,
     SyncDownloaderMiddleware,
@@ -17,8 +19,6 @@ from maize.utils.log_util import get_logger
 from maize.utils.project_util import load_class
 
 if TYPE_CHECKING:
-    from maize.common.http.request import Request
-    from maize.common.http.response import Response
     from maize.common.items import Item
     from maize.sync.classic.crawler.sync_crawler import SyncCrawler
     from maize.sync.classic.spider.sync_spider import SyncSpider
