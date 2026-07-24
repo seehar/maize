@@ -3,6 +3,8 @@
 
 定义 Spider 需实现的抽象契约：open / close 生命周期钩子、
 start_requests 起始请求生成器、parse 响应解析方法。
+
+同步版对应接口：``maize.base.interface.sync_spider_interface.SyncSpiderInterface``
 """
 
 from abc import ABC, abstractmethod

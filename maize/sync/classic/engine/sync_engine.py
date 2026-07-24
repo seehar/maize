@@ -74,12 +74,26 @@ class SyncEngine:
         self.spider_middleware_manager: SyncSpiderMiddlewareManager | None = None
 
     def _get_downloader(self):
+        """获取下载器类，校验是否实现了 SyncBaseDownloader 接口。"""
         downloader_cls = load_class(self.settings.downloader)
         if not issubclass(downloader_cls, SyncBaseDownloader):
             raise TypeError(
                 f"The downloader class ({self.settings.downloader}) does not fully implement required interface"
             )
         return downloader_cls
+
+    def _create_scheduler(self) -> SyncScheduler:
+        """创建并打开同步调度器。测试可重写注入 mock。"""
+        scheduler = SyncScheduler()
+        scheduler.open()
+        return scheduler
+
+    def _create_downloader(self) -> SyncBaseDownloader:
+        """创建并打开同步下载器。测试可重写注入 mock。"""
+        downloader_cls = load_class(self.settings.downloader)
+        downloader = downloader_cls(self.crawler)
+        downloader.open()
+        return downloader
 
     def start_spider(self, spider: SyncSpider):
         """
@@ -93,8 +107,7 @@ class SyncEngine:
 
         self.logger.info(f"spider started. (project name: {self.settings.project_name})")
         self.spider = spider
-        self.scheduler = SyncScheduler()
-        self.scheduler.open()
+        self.scheduler = self._create_scheduler()
 
         # 初始化中间件管理器
         self.downloader_middleware_manager = SyncDownloaderMiddlewareManager(
@@ -107,9 +120,7 @@ class SyncEngine:
         )
         self.spider_middleware_manager.open()
 
-        downloader_cls = load_class(self.settings.downloader)
-        self.downloader = downloader_cls(self.crawler)
-        self.downloader.open()
+        self.downloader = self._create_downloader()
 
         self.processor = SyncProcessor(self.crawler)
         self.processor.open()

@@ -3,6 +3,8 @@
 
 在 SpiderInterface 基础上增加 create_instance 工厂方法、idle 状态判断
 和 run 启动入口（内部创建事件循环）。
+
+同步版对应接口：``maize.base.interface.sync_standard_spider_interface.SyncStandardSpiderInterface``
 """
 
 import asyncio

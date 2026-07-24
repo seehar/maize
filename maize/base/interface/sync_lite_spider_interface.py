@@ -1,8 +1,9 @@
 """
 同步 Lite 爬虫接口。
 
-与异步版 `LiteSpiderInterface` 对应，方法均为同步（非 async）。
-`start_requests` 返回普通 `Generator`，`parse` 返回 `Generator` 或 None。
+与异步版 ``LiteSpiderInterface``（``maize.base.interface.lite_spider_interface``）对应，
+方法均为同步（非 async）。``start_requests`` 返回普通 ``Generator``，
+``parse`` 返回 ``Generator`` 或 None。
 """
 
 from abc import ABC, abstractmethod

@@ -3,6 +3,8 @@
 
 定义 LiteSpider 需实现的抽象契约，包括并发、重试、代理等配置属性
 以及 start_requests / parse 抽象方法。
+
+同步版对应接口：``maize.base.interface.sync_lite_spider_interface.SyncLiteSpiderInterface``
 """
 
 from abc import ABC, abstractmethod

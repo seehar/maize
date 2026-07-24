@@ -1,7 +1,8 @@
 """
 同步 Spider 接口。
 
-与异步版 `SpiderInterface` 对应，`start_requests` / `parse` / `open` / `close` 均为同步。
+与异步版 ``SpiderInterface``（``maize.base.interface.spider_interface``）对应，
+``start_requests`` / ``parse`` / ``open`` / ``close`` 均为同步。
 """
 
 from abc import ABC, abstractmethod

@@ -1,8 +1,9 @@
 """
 同步标准 Spider 接口。
 
-与异步版 `StandardSpiderInterface` 对应，提供 `create_instance`、`idle` 和同步 `run` 入口。
-`run` 直接在当前线程执行，不创建事件循环。
+与异步版 ``StandardSpiderInterface``（``maize.base.interface.standard_spider_interface``）对应，
+提供 ``create_instance``、``idle`` 和同步 ``run`` 入口。
+``run`` 直接在当前线程执行，不创建事件循环。
 """
 
 from abc import ABC

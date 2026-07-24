@@ -96,12 +96,28 @@ class AioEngine:
         return f"{redis_key_prefix}:{spider_name}:{key}"
 
     def _get_downloader(self):
+        """获取下载器类，校验是否实现了 BaseDownloader 接口。"""
         downloader_cls = load_class(self.settings.downloader)
         if not issubclass(downloader_cls, BaseDownloader):
             raise TypeError(
                 f"The downloader class ({self.settings.downloader}) does not fully implement required interface"
             )
         return downloader_cls
+
+    def _create_scheduler(self) -> Scheduler:
+        """创建并打开调度器。测试可重写注入 mock。"""
+        scheduler = Scheduler()
+        if scheduler.open:
+            scheduler.open()
+        return scheduler
+
+    async def _create_downloader(self) -> BaseDownloader:
+        """创建并打开下载器。测试可重写注入 mock。"""
+        downloader_cls = load_class(self.settings.downloader)
+        downloader = downloader_cls(self.crawler)
+        if downloader.open:
+            await downloader.open()
+        return downloader
 
     async def start_spider(self, spider: StandardSpiderInterface):
         """
@@ -116,9 +132,7 @@ class AioEngine:
         self.logger.info(f"spider started. (project name: {self.settings.project_name})")
         self.spider = spider
         self.__init_redis()
-        self.scheduler = Scheduler()
-        if self.scheduler.open:
-            self.scheduler.open()
+        self.scheduler = self._create_scheduler()
 
         # 初始化中间件管理器
         self.downloader_middleware_manager = DownloaderMiddlewareManager(
@@ -131,11 +145,7 @@ class AioEngine:
         )
         await self.spider_middleware_manager.open()
 
-        downloader_cls = load_class(self.settings.downloader)
-        self.downloader = downloader_cls(self.crawler)
-        if self.downloader.open:
-            await self.downloader.open()
-
+        self.downloader = await self._create_downloader()
         self.processor = Processor(self.crawler)
         await self.processor.open()
 

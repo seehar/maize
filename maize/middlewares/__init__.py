@@ -1,23 +1,14 @@
 """
-Maize Middleware System
+异步 Classic 中间件系统。
 
-This package provides a flexible middleware system for the Maize web scraping framework.
-Middlewares can process requests, responses, spider callbacks, and items at various
-stages of the scraping pipeline.
+本包为异步 Classic 爬虫专属。同步 Classic 的对应实现在
+``maize/sync/classic/middleware/`` 下。两套中间件接口不共享——
+异步中间件方法为 ``async def``，同步中间件为普通方法。
 
-Middleware Types:
-    - DownloaderMiddleware: Process requests before downloading and responses after
-    - SpiderMiddleware: Process spider input/output and start requests
-    - PipelineMiddleware: Process items before/after pipeline processing
-
-Example:
-    >>> from maize.middleware import DownloaderMiddleware
-    >>>
-    >>> class MyMiddleware(DownloaderMiddleware):
-    ...     async def process_request(self, request, spider):
-    ...         # Modify request before downloading
-    ...         request.headers['User-Agent'] = 'MyBot/1.0'
-    ...         return request
+中间件类型：
+    - DownloaderMiddleware: 请求前/响应后处理
+    - SpiderMiddleware: 爬虫输入/输出处理
+    - PipelineMiddleware: Item 管道前/后处理
 """
 
 from maize.middlewares.base_middleware import (
