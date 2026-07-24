@@ -57,18 +57,11 @@
 
 ## 文档字符串
 
-1. **公共类/函数添加 docstring（reStructuredText 格式）**
-   ```python
-   def crawl(self, url: str) -> Response:
-       """
-       发起爬取请求并返回响应。
+完整规范见 `.claude/rules/docstring.md`，核心要点：
 
-       :param url: 目标 URL
-       :return: 响应对象
-       """
-   ```
-
-2. **简短方法可省略 docstring**，但 `__init__` 除外
+- 所有 docstring 使用 reStructuredText 格式
+- 开头 `"""` 必须单独占一行
+- 公共类、公共方法、`__init__`、模块文件必须有 docstring
 
 ---
 
