@@ -41,6 +41,11 @@ class SyncTaskManager:
 
         future = self._executor.submit(func, *args, **kwargs)  # type: ignore[union-attr]
 
+        # 先加入 current_task 再注册回调，避免任务在注册回调前完成导致 discard 早于 add，
+        # 使已完成 future 永久残留在 current_task 中，all_done() 永远为 False。
+        with self._lock:
+            self.current_task.add(future)
+
         def done_callback(_fut: Future) -> None:
             exc = _fut.exception()
             if exc is not None:
@@ -50,8 +55,6 @@ class SyncTaskManager:
             self.semaphore.release()
 
         future.add_done_callback(done_callback)
-        with self._lock:
-            self.current_task.add(future)
         return future
 
     def all_done(self) -> bool:
