@@ -2,8 +2,10 @@
 
 requests 是同步爬虫生态中最成熟的 HTTP 库，提供丰富的特性（session、auth、streaming 等）。
 本下载器需安装 ``requests``（非 maize 默认依赖）。
+每个 worker 线程使用独立的 Session（threading.local），避免并发竞态。
 """
 
+import threading
 import typing
 
 from maize.common.http import Response
@@ -24,20 +26,26 @@ class SyncRequestsDownloader(SyncBaseDownloader):
     """基于 requests.Session 的同步下载器。
 
     需要额外安装 ``requests``：``pip install requests``。
+    每个 worker 线程持有独立 Session（threading.local），线程安全。
     """
 
     def __init__(self, crawler: "SyncCrawler"):
         super().__init__(crawler)
-        self._session: requests.Session | None = None
+        self._local = threading.local()
         self._timeout: float | None = None
         self._proxies: dict[str, str] | None = None
+
+    def _get_session(self) -> "requests.Session":
+        """获取当前线程的 Session，不存在则创建。"""
+        if not hasattr(self._local, "session"):
+            self._local.session = requests.Session()
+        return self._local.session
 
     def open(self):
         super().open()
         if requests is None:
             raise ImportError("requests is not installed. Install it with: pip install requests")
 
-        self._session = requests.Session()
         self._timeout = self.crawler.settings.request.request_timeout
 
         proxy_tunnel = self.crawler.settings.proxy.proxy_url
@@ -49,8 +57,10 @@ class SyncRequestsDownloader(SyncBaseDownloader):
         try:
             headers = request.get_headers_sync()
             proxy_url = self._get_request_proxy(request)
+            proxies = {"http": proxy_url, "https": proxy_url} if proxy_url else self._proxies
 
-            response = self._session.request(  # type: ignore[union-attr]
+            session = self._get_session()
+            response = session.request(
                 method=request.method,
                 url=request.url,
                 headers=headers,
@@ -58,7 +68,7 @@ class SyncRequestsDownloader(SyncBaseDownloader):
                 json=request.json,
                 params=request.params,
                 cookies=request.cookies,
-                proxies={"http": proxy_url, "https": proxy_url} if proxy_url else None,
+                proxies=proxies,
                 allow_redirects=request.follow_redirects,
                 timeout=self._timeout,
             )
@@ -95,6 +105,4 @@ class SyncRequestsDownloader(SyncBaseDownloader):
 
     def close(self):
         super().close()
-        if self._session:
-            self._session.close()
-            self._session = None
+        # thread-local sessions 随线程结束自动回收，无需显式关闭

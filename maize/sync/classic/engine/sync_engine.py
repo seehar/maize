@@ -57,7 +57,7 @@ class SyncEngine:
         self.task_requests: Generator[Request, Any, None] | None = None
 
         self.spider: SyncSpider | None = None
-        self.task_manager = SyncTaskManager(self.settings.concurrency)
+        self.task_manager = SyncTaskManager(self.settings.concurrency, logger=self.logger)
         self.start_requests_running = False
         self.task_requests_running = False
         self._single_task_requests_running = False

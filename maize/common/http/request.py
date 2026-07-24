@@ -1,4 +1,5 @@
 import hashlib
+import inspect
 import typing
 
 from maize.common.constant.request_constant import Method
@@ -123,4 +124,13 @@ class Request:
 
     def get_headers_sync(self) -> dict:
         """同步获取请求头，用于同步爬虫。"""
-        return self.headers_func() if self.headers_func else self.headers
+        if self.headers_func:
+            result = self.headers_func()
+            if inspect.iscoroutine(result):
+                result.close()
+                raise TypeError(
+                    "headers_func returned a coroutine; sync spiders require a sync callable. "
+                    "Use a plain function returning dict, not an async function."
+                )
+            return result
+        return self.headers

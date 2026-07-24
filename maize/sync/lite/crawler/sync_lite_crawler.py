@@ -5,6 +5,7 @@
 复用 ``Request``/``Response``/``Item`` 等共享模型，不引入中间件/管道/调度器抽象。
 """
 
+import contextlib
 import logging
 import queue
 import signal
@@ -111,8 +112,8 @@ class SyncLiteCrawler:
         4. 启动 concurrency 个 Worker 线程，消费优先级队列
         5. 所有请求处理完毕后清理资源，输出统计汇总
         """
+        self._stop_event.clear()
         self.spider.open()
-        self.spider.on_start()
 
         # 信号处理（仅主线程有效）
         def _signal_handler(_signum, _frame):
@@ -131,46 +132,48 @@ class SyncLiteCrawler:
                 # 非主线程无法注册信号处理器
                 pass
 
-        request_queue: queue.PriorityQueue[tuple[float, int, Request | None]] = queue.PriorityQueue()
-        feed_done = threading.Event()
+        try:
+            self.spider.on_start()
 
-        def feed_start_requests():
-            try:
-                for request in self.spider.start_requests():
+            request_queue: queue.PriorityQueue[tuple[float, int, Request | None]] = queue.PriorityQueue()
+            feed_done = threading.Event()
+
+            def feed_start_requests():
+                try:
+                    for request in self.spider.start_requests():
+                        if self._stop_event.is_set():
+                            break
+                        self._enqueue(request, request_queue)
+                except Exception as e:
+                    self.logger.error(f"start_requests error: {e}")
+                finally:
+                    feed_done.set()
+
+            def worker():
+                while True:
                     if self._stop_event.is_set():
                         break
-                    self._enqueue(request, request_queue)
-            except Exception as e:
-                self.logger.error(f"start_requests error: {e}")
-            finally:
-                feed_done.set()
-
-        def worker():
-            while True:
-                if self._stop_event.is_set():
-                    break
-                try:
-                    _priority, _seq, request = request_queue.get(timeout=0.5)
-                except queue.Empty:
-                    if feed_done.is_set() and request_queue.empty():
+                    try:
+                        _priority, _seq, request = request_queue.get(timeout=0.5)
+                    except queue.Empty:
+                        if feed_done.is_set() and request_queue.empty():
+                            break
+                        continue
+                    if request is None:
+                        request_queue.task_done()
                         break
-                    continue
-                if request is None:
-                    request_queue.task_done()
-                    break
-                try:
-                    self._process(request, request_queue)
-                except Exception as e:
-                    self.logger.error(f"worker error: {e}")
+                    try:
+                        self._process(request, request_queue)
+                    except Exception as e:
+                        self.logger.error(f"worker error: {e}")
 
-        feed_thread = threading.Thread(target=feed_start_requests, daemon=True)
-        feed_thread.start()
+            feed_thread = threading.Thread(target=feed_start_requests, daemon=True)
+            feed_thread.start()
 
-        workers = [threading.Thread(target=worker, daemon=True) for _ in range(self.concurrency)]
-        for w in workers:
-            w.start()
+            workers = [threading.Thread(target=worker, daemon=True) for _ in range(self.concurrency)]
+            for w in workers:
+                w.start()
 
-        try:
             # 等待 feed 完成
             feed_thread.join()
 
@@ -178,17 +181,26 @@ class SyncLiteCrawler:
             for _ in workers:
                 with self._lock:
                     self._tie_breaker += 1
-                request_queue.put((float("inf"), self._tie_breaker, None))
+                    request_queue.put((float("inf"), self._tie_breaker, None))
 
             for w in workers:
                 w.join()
         finally:
             # 恢复之前的信号处理器，避免嵌入式场景中 handler 残留
             for sig in signal_handlers_registered:
-                signal.signal(sig, previous_handlers[sig])
+                with contextlib.suppress(Exception):
+                    signal.signal(sig, previous_handlers[sig])
 
-            self.spider.on_close()
-            self.spider.close()
+            try:
+                self.spider.on_close()
+            except Exception as e:
+                self.logger.error(f"on_close error: {e}")
+
+            try:
+                self.spider.close()
+            except Exception as e:
+                self.logger.error(f"close error: {e}")
+
             self._log_stats()
 
     def _log_stats(self) -> None:
