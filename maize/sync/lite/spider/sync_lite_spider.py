@@ -137,6 +137,7 @@ class SyncLiteSpider(SyncLiteSpiderInterface):
         self._client = httpx.Client(
             timeout=self.timeout,
             headers=self.default_headers,
+            proxy=self.proxy,
         )
 
     def close(self) -> None:
