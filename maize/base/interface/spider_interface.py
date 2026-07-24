@@ -7,27 +7,23 @@ start_requests 起始请求生成器、parse 响应解析方法。
 同步版对应接口：``maize.base.interface.sync_spider_interface.SyncSpiderInterface``
 """
 
-from abc import ABC, abstractmethod
+from abc import abstractmethod
 from collections.abc import AsyncGenerator
 from typing import TYPE_CHECKING, Any
+
+from maize.base.interface._shared import _SpiderContract
 
 if TYPE_CHECKING:
     from maize.common.http.request import Request
     from maize.common.http.response import Response
 
 
-class SpiderInterface(ABC):
+class SpiderInterface(_SpiderContract):
     """
     异步 Classic 爬虫抽象接口。
 
     所有异步 Classic Spider 的基类，声明 open / close / start_requests / parse 抽象方法。
     """
-
-    def __init__(self):
-        super().__init__()
-
-    def __str__(self):
-        return self.__class__.__name__
 
     @abstractmethod
     async def open(self) -> None:

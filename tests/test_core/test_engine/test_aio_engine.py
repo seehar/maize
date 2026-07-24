@@ -46,7 +46,7 @@ class TestAioEngineIdle:
         crawler = _make_crawler()
         engine = AioEngine(crawler)
         engine.scheduler = MagicMock()
-        engine.scheduler.idle.return_value = True
+        engine.scheduler.qsize.return_value = 0
         engine.downloader = MagicMock()
         engine.downloader.idle.return_value = True
         engine.processor = MagicMock()
@@ -60,7 +60,7 @@ class TestAioEngineIdle:
         crawler = _make_crawler()
         engine = AioEngine(crawler)
         engine.scheduler = MagicMock()
-        engine.scheduler.idle.return_value = False
+        engine.scheduler.qsize.return_value = 1
         engine.downloader = MagicMock()
         engine.downloader.idle.return_value = True
         engine.processor = MagicMock()
@@ -75,7 +75,7 @@ class TestAioEngineIdle:
         crawler = _make_crawler()
         engine = AioEngine(crawler)
         engine.scheduler = MagicMock()
-        engine.scheduler.idle.return_value = True
+        engine.scheduler.qsize.return_value = 0
         engine.downloader = MagicMock()
         engine.downloader.idle.return_value = False
         engine.processor = MagicMock()
@@ -90,7 +90,7 @@ class TestAioEngineIdle:
         crawler = _make_crawler()
         engine = AioEngine(crawler)
         engine.scheduler = MagicMock()
-        engine.scheduler.idle.return_value = True
+        engine.scheduler.qsize.return_value = 0
         engine.downloader = MagicMock()
         engine.downloader.idle.return_value = True
         engine.processor = MagicMock()

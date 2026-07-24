@@ -47,9 +47,10 @@ def _make_aio_engine() -> AioEngine:
     engine.spider.stats_collector.record_parse_success = AsyncMock()
     engine.spider.stats_collector.record_parse_fail = AsyncMock()
     engine.scheduler = MagicMock()
-    engine.scheduler.enqueue_request = AsyncMock()
-    engine.scheduler.next_request = AsyncMock(return_value=None)
-    engine.scheduler.idle.return_value = True
+    engine.scheduler.put = AsyncMock()
+    engine.scheduler.get = AsyncMock(return_value=None)
+    engine.scheduler.get_by_priority = AsyncMock(return_value=None)
+    engine.scheduler.qsize.return_value = 0
     engine.downloader = MagicMock()
     engine.downloader.idle.return_value = True
     engine.downloader.fetch = AsyncMock()
@@ -73,9 +74,10 @@ def _make_sync_engine() -> SyncEngine:
     engine.spider.gte_priority = None
     engine.spider.stats_collector = MagicMock()
     engine.scheduler = MagicMock()
-    engine.scheduler.enqueue_request = MagicMock()
-    engine.scheduler.next_request = MagicMock(return_value=None)
-    engine.scheduler.idle.return_value = True
+    engine.scheduler.put = MagicMock()
+    engine.scheduler.get = MagicMock(return_value=None)
+    engine.scheduler.get_by_priority = MagicMock(return_value=None)
+    engine.scheduler.qsize.return_value = 0
     engine.downloader = MagicMock()
     engine.downloader.idle.return_value = True
     engine.downloader.fetch = MagicMock()
@@ -182,7 +184,7 @@ class TestDoDownloadExceptionMiddlewareReturnsRequest:
 
         result = await engine._do_download(Request(url="http://x"))
         assert result is None
-        engine.scheduler.enqueue_request.assert_called_once_with(retry_req)
+        engine.scheduler.put.assert_called_once_with(retry_req)
 
     def test_sync(self):
         engine = _make_sync_engine()
@@ -193,7 +195,7 @@ class TestDoDownloadExceptionMiddlewareReturnsRequest:
 
         result = engine._do_download(Request(url="http://x"))
         assert result is None
-        engine.scheduler.enqueue_request.assert_called_once_with(retry_req)
+        engine.scheduler.put.assert_called_once_with(retry_req)
 
 
 class TestDoDownloadExceptionMiddlewareReturnsResponse:
@@ -367,12 +369,12 @@ class TestIdleCheck:
     @pytest.mark.asyncio
     async def test_aio_scheduler_busy(self):
         engine = _make_aio_engine()
-        engine.scheduler.idle.return_value = False
+        engine.scheduler.qsize.return_value = 1
         assert engine._idle() is False
 
     def test_sync_scheduler_busy(self):
         engine = _make_sync_engine()
-        engine.scheduler.idle.return_value = False
+        engine.scheduler.qsize.return_value = 1
         assert engine._idle() is False
 
 
@@ -394,7 +396,8 @@ class TestCrawlTaskRequestsStopIteration:
             yield
 
         engine.task_requests = empty_gen()
-        engine.scheduler.next_request = AsyncMock(return_value=None)
+        engine.scheduler.get = AsyncMock(return_value=None)
+        engine.scheduler.get_by_priority = AsyncMock(return_value=None)
 
         await engine._crawl_task_requests()
         assert engine.task_requests is None
@@ -411,7 +414,8 @@ class TestCrawlTaskRequestsStopIteration:
             yield
 
         engine.task_requests = empty_gen()
-        engine.scheduler.next_request = MagicMock(return_value=None)
+        engine.scheduler.get = MagicMock(return_value=None)
+        engine.scheduler.get_by_priority = MagicMock(return_value=None)
 
         engine._crawl_task_requests()
         assert engine.task_requests is None

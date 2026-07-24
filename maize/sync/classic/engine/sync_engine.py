@@ -30,7 +30,7 @@ from maize.sync.classic.middleware.sync_middleware_manager import (
     SyncSpiderMiddlewareManager,
 )
 from maize.sync.classic.processor.sync_processor import SyncProcessor
-from maize.sync.classic.scheduler.sync_scheduler import SyncScheduler
+from maize.sync.classic.scheduler import SyncSpiderPriorityQueue
 from maize.sync.classic.task.sync_task_manager import SyncTaskManager
 from maize.utils.log_util import get_logger
 from maize.utils.project_util import load_class
@@ -56,7 +56,7 @@ class SyncEngine:
         self.settings: SpiderSettings = self.crawler.settings
 
         self.downloader: SyncBaseDownloader | None = None
-        self.scheduler: SyncScheduler | None = None
+        self.scheduler: SyncSpiderPriorityQueue | None = None
         self.processor: SyncProcessor | None = None
 
         self.start_requests: Generator | None = None
@@ -82,11 +82,9 @@ class SyncEngine:
             )
         return downloader_cls
 
-    def _create_scheduler(self) -> SyncScheduler:
-        """创建并打开同步调度器。测试可重写注入 mock。"""
-        scheduler = SyncScheduler()
-        scheduler.open()
-        return scheduler
+    def _create_scheduler(self) -> SyncSpiderPriorityQueue:
+        """创建同步调度器。测试可重写注入 mock。"""
+        return SyncSpiderPriorityQueue()
 
     def _create_downloader(self) -> SyncBaseDownloader:
         """创建并打开同步下载器。测试可重写注入 mock。"""
@@ -393,11 +391,8 @@ class SyncEngine:
 
         :param request: 待入队的请求
         """
-        self._schedule_request(request)
-
-    def _schedule_request(self, request: Request):
         assert self.scheduler is not None
-        self.scheduler.enqueue_request(request)
+        self.scheduler.put(request)
 
     def _get_next_request(self) -> Request | None:
         """
@@ -407,8 +402,8 @@ class SyncEngine:
         """
         assert self.scheduler is not None
         assert self.crawler.spider is not None
-        request: Request | None = self.scheduler.next_request(self.crawler.spider.gte_priority)
-        return request
+        gte = self.crawler.spider.gte_priority
+        return self.scheduler.get_by_priority(gte) if gte is not None else self.scheduler.get()
 
     def _handle_spider_output(self, outputs: Generator[Union[Request, Item], Any, None]):
         assert self.processor is not None
@@ -418,10 +413,15 @@ class SyncEngine:
             else:
                 raise OutputException(f"{type(spider_output)} must return `Request` or `Item`")
 
+    def _scheduler_idle(self) -> bool:
+        """调度器是否空闲。测试可重写。"""
+        assert self.scheduler is not None
+        return self.scheduler.qsize() == 0
+
     def _idle(self) -> bool:
         return (
             self.scheduler is not None
-            and self.scheduler.idle()
+            and self._scheduler_idle()
             and self.downloader is not None
             and self.downloader.idle()
             and self.task_manager.all_done()

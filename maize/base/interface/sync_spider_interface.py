@@ -5,27 +5,23 @@
 ``start_requests`` / ``parse`` / ``open`` / ``close`` 均为同步。
 """
 
-from abc import ABC, abstractmethod
+from abc import abstractmethod
 from collections.abc import Generator
 from typing import TYPE_CHECKING, Any
+
+from maize.base.interface._shared import _SpiderContract
 
 if TYPE_CHECKING:
     from maize.common.http.request import Request
     from maize.common.http.response import Response
 
 
-class SyncSpiderInterface(ABC):
+class SyncSpiderInterface(_SpiderContract):
     """
     同步 Classic 爬虫抽象接口。
 
     所有同步 Classic Spider 的基类，声明 open / close / start_requests / parse 抽象方法。
     """
-
-    def __init__(self):
-        super().__init__()
-
-    def __str__(self):
-        return self.__class__.__name__
 
     @abstractmethod
     def open(self) -> None:

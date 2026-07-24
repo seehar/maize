@@ -66,8 +66,8 @@ def _make_engine() -> SyncEngine:
     crawler.spider = engine.spider
 
     engine.scheduler = MagicMock()
-    engine.scheduler.idle.return_value = True
-    engine.scheduler.next_request.return_value = None
+    engine.scheduler.qsize.return_value = 0
+    engine.scheduler.get.return_value = None
 
     engine.downloader = MagicMock()
     engine.downloader.idle.return_value = True
@@ -102,7 +102,7 @@ class TestCrawlStartRequestsBranches:
         engine.spider_middleware_manager = None
 
         idle_calls = [False, True]
-        engine.scheduler.idle.side_effect = lambda: idle_calls.pop(0) if idle_calls else True
+        engine.scheduler.qsize.side_effect = lambda: 0 if (idle_calls.pop(0) if idle_calls else True) else 1
         engine.downloader.idle.return_value = True
         engine.processor.idle.return_value = True
         engine.task_manager.all_done.return_value = True
@@ -125,7 +125,7 @@ class TestCrawlStartRequestsBranches:
         engine.spider_middleware_manager = None
 
         # _get_next_request 始终返回 None，让 next(start_requests) 驱动流程
-        engine.scheduler.next_request.return_value = None
+        engine.scheduler.get.return_value = None
 
         idle_calls = [False, True]
 
@@ -134,7 +134,7 @@ class TestCrawlStartRequestsBranches:
                 return idle_calls.pop(0)
             return True
 
-        engine.scheduler.idle.side_effect = lambda: True
+        engine.scheduler.qsize.side_effect = lambda: 0
         engine.downloader.idle.return_value = True
         engine.processor.idle.return_value = True
         engine.task_manager.all_done.return_value = True
@@ -153,11 +153,11 @@ class TestCrawlStartRequestsBranches:
 
         req = Request(url="http://example.com")
         engine.start_requests = iter([req])
-        engine.scheduler.next_request.return_value = None
+        engine.scheduler.get.return_value = None
 
         engine._crawl_start_requests()
         assert engine.start_requests_running is False
-        engine.scheduler.enqueue_request.assert_called_once_with(req)
+        engine.scheduler.put.assert_called_once_with(req)
 
 
 class TestCrawlTaskRequestsBranches:
@@ -172,10 +172,10 @@ class TestCrawlTaskRequestsBranches:
             yield
 
         engine.task_requests = bad_gen()
-        engine.scheduler.next_request.return_value = None
+        engine.scheduler.get.return_value = None
 
         # _idle() 返回 True 直接退出
-        engine.scheduler.idle.return_value = True
+        engine.scheduler.qsize.return_value = 0
         engine.downloader.idle.return_value = True
         engine.processor.idle.return_value = True
         engine.task_manager.all_done.return_value = True
@@ -195,7 +195,7 @@ class TestCrawlTaskRequestsBranches:
             yield
 
         engine.task_requests = bad_gen()
-        engine.scheduler.next_request.return_value = None
+        engine.scheduler.get.return_value = None
 
         idle_calls = [False, True]
 
@@ -222,7 +222,7 @@ class TestFetchBranches:
 
         result = engine._fetch(req)
         assert result is None
-        engine.scheduler.enqueue_request.assert_called_once_with(retry_req)
+        engine.scheduler.put.assert_called_once_with(retry_req)
 
     def test_download_result_none(self):
         """_do_download 返回 None。"""
@@ -299,7 +299,7 @@ class TestDoDownloadException:
         req = Request(url="http://example.com")
         result = engine._do_download(req)
         assert result is None
-        engine.scheduler.enqueue_request.assert_called_once_with(retry_req)
+        engine.scheduler.put.assert_called_once_with(retry_req)
 
     def test_exception_middleware_returns_response(self):
         """中间件返回 Response 时包装为 DownloadResponse。"""
@@ -350,7 +350,7 @@ class TestProcessResponseMiddleware:
         resp = Response(url="http://example.com", headers={}, status=200, body=b"ok", request=req)
         result = engine._process_response_middleware(req, resp)
         assert result is None
-        engine.scheduler.enqueue_request.assert_called_once_with(retry_req)
+        engine.scheduler.put.assert_called_once_with(retry_req)
 
 
 class TestProcessRequestMiddleware:

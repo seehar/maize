@@ -11,44 +11,18 @@ from abc import ABC, abstractmethod
 from collections.abc import AsyncGenerator
 from typing import TYPE_CHECKING, Any, Union
 
+from maize.base.interface._shared import _LiteSpiderConfig
+
 if TYPE_CHECKING:
     from maize.common.http.request import Request
     from maize.common.http.response import Response
     from maize.common.items import Item
 
 
-class LiteSpiderInterface(ABC):
+class LiteSpiderInterface(_LiteSpiderConfig, ABC):
     """
     Lite 爬虫接口。
     """
-
-    @property
-    def concurrency(self) -> int:
-        """
-        最大并发数。
-        """
-        return 5
-
-    @property
-    def retry(self) -> int:
-        """
-        重试次数。
-        """
-        return 3
-
-    @property
-    def proxy(self) -> str | None:
-        """
-        代理地址。
-        """
-        return None
-
-    @property
-    def timeout(self) -> float:
-        """
-        请求超时时间（秒）。
-        """
-        return 30.0
 
     @abstractmethod
     async def start_requests(self) -> AsyncGenerator["Request", Any]:

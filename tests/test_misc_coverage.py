@@ -59,7 +59,7 @@ from maize.sync.classic.middleware.sync_middleware_manager import (
 )
 from maize.sync.classic.pipeline.sync_empty_pipeline import SyncEmptyPipeline
 from maize.sync.classic.pipeline.sync_pipeline_scheduler import SyncPipelineScheduler
-from maize.sync.classic.scheduler.sync_scheduler import SyncScheduler
+from maize.sync.classic.scheduler import SyncSpiderPriorityQueue
 from maize.sync.classic.spider.sync_spider import SyncSpider
 from maize.sync.classic.spider.sync_task_spider import SyncTaskSpider
 from maize.sync.classic.stats.sync_stats_collector import SyncStatsCollector
@@ -78,33 +78,31 @@ def _setup():
     set_spider_settings(SpiderSettings())
 
 
-# --- SyncScheduler ---
+# --- SyncSpiderPriorityQueue ---
 
 
 class TestSyncSchedulerBranches:
-    def test_len_before_open(self):
-        scheduler = SyncScheduler()
-        assert len(scheduler) == 0
+    def test_len_empty(self):
+        queue = SyncSpiderPriorityQueue()
+        assert len(queue) == 0
 
-    def test_next_request_before_open(self):
-        scheduler = SyncScheduler()
-        assert scheduler.next_request() is None
+    def test_next_request_empty(self):
+        queue = SyncSpiderPriorityQueue()
+        assert queue.get() is None
 
     def test_next_request_with_priority(self):
-        scheduler = SyncScheduler()
-        scheduler.open()
+        queue = SyncSpiderPriorityQueue()
         req = Request(url="http://example.com", priority=5)
-        scheduler.enqueue_request(req)
+        queue.put(req)
         # get_by_priority 返回 None 当优先级不匹配
-        result = scheduler.next_request(gte_priority=10)
+        result = queue.get_by_priority(gte_priority=10)
         assert result is None
 
     def test_next_request_with_matching_priority(self):
-        scheduler = SyncScheduler()
-        scheduler.open()
+        queue = SyncSpiderPriorityQueue()
         req = Request(url="http://example.com", priority=5)
-        scheduler.enqueue_request(req)
-        result = scheduler.next_request(gte_priority=5)
+        queue.put(req)
+        result = queue.get_by_priority(gte_priority=5)
         assert result is not None
         assert result.url == "http://example.com"
 

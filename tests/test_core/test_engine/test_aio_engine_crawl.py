@@ -25,9 +25,10 @@ def _make_engine():
     engine.spider.stats_collector.record_parse_success = AsyncMock()
     engine.spider.stats_collector.record_parse_fail = AsyncMock()
     engine.scheduler = MagicMock()
-    engine.scheduler.enqueue_request = AsyncMock()
-    engine.scheduler.next_request = AsyncMock(return_value=None)
-    engine.scheduler.idle.return_value = True
+    engine.scheduler.put = AsyncMock()
+    engine.scheduler.get = AsyncMock(return_value=None)
+    engine.scheduler.get_by_priority = AsyncMock(return_value=None)
+    engine.scheduler.qsize.return_value = 0
     engine.downloader = MagicMock()
     engine.downloader.idle.return_value = True
     engine.downloader.fetch = AsyncMock()
@@ -149,12 +150,13 @@ class TestEnqueueAndGetNextRequest:
         engine = _make_engine()
         req = Request("https://example.com")
         await engine.enqueue_request(req)
-        engine.scheduler.enqueue_request.assert_called_once_with(req)
+        engine.scheduler.put.assert_called_once_with(req)
 
     @pytest.mark.asyncio
     async def test_get_next_request_empty(self):
         engine = _make_engine()
-        engine.scheduler.next_request = AsyncMock(return_value=None)
+        engine.scheduler.get = AsyncMock(return_value=None)
+        engine.scheduler.get_by_priority = AsyncMock(return_value=None)
         result = await engine._get_next_request()
         assert result is None
 
@@ -162,7 +164,8 @@ class TestEnqueueAndGetNextRequest:
     async def test_get_next_request_returns_request(self):
         engine = _make_engine()
         req = Request("https://example.com")
-        engine.scheduler.next_request = AsyncMock(return_value=req)
+        engine.scheduler.get = AsyncMock(return_value=req)
+        engine.scheduler.get_by_priority = AsyncMock(return_value=req)
         engine.crawler.spider.gte_priority = None
         result = await engine._get_next_request()
         assert result is req
@@ -183,7 +186,8 @@ class TestCrawlStartRequests:
 
         engine.start_requests = gen()
         engine.start_requests_running = True
-        engine.scheduler.next_request = AsyncMock(return_value=None)
+        engine.scheduler.get = AsyncMock(return_value=None)
+        engine.scheduler.get_by_priority = AsyncMock(return_value=None)
 
         # _crawl will be called; mock it to avoid full fetch
         engine._crawl = AsyncMock()
@@ -209,7 +213,8 @@ class TestCrawlStartRequests:
         engine.spider_middleware_manager.process_start_requests = passthrough
         engine.start_requests = gen()
         engine.start_requests_running = True
-        engine.scheduler.next_request = AsyncMock(return_value=None)
+        engine.scheduler.get = AsyncMock(return_value=None)
+        engine.scheduler.get_by_priority = AsyncMock(return_value=None)
         engine._crawl = AsyncMock()
 
         await engine._crawl_start_requests()
@@ -239,7 +244,7 @@ class TestProcessResponseMiddleware:
         resp = Response(url="https://example.com", headers={}, request=req, status=200, text="ok")
         result = await engine._process_response_middleware(req, resp)
         assert result is None
-        engine.scheduler.enqueue_request.assert_called_once_with(retry_req)
+        engine.scheduler.put.assert_called_once_with(retry_req)
 
 
 class TestProcessRequestMiddleware:

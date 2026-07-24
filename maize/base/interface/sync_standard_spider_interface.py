@@ -9,16 +9,16 @@
 from abc import ABC
 from typing import TYPE_CHECKING, Optional
 
+from maize.base.interface._shared import _StandardSpiderMixin
 from maize.base.interface.sync_spider_interface import SyncSpiderInterface
 from maize.sync.classic.crawler.sync_crawler import SyncCrawlerProcess
 
 if TYPE_CHECKING:
     from maize.settings import SpiderSettings
-    from maize.sync.classic.crawler.sync_crawler import SyncCrawler
     from maize.sync.classic.stats.sync_stats_collector import SyncStatsCollector
 
 
-class SyncStandardSpiderInterface(SyncSpiderInterface, ABC):
+class SyncStandardSpiderInterface(SyncSpiderInterface, _StandardSpiderMixin, ABC):
     """
     同步标准 Spider 接口。
 
@@ -26,29 +26,8 @@ class SyncStandardSpiderInterface(SyncSpiderInterface, ABC):
     以及 run() 同步入口（直接在当前线程执行）。
     """
 
-    __spider_type__: str
     stats_collector: "SyncStatsCollector | None"
     gte_priority: int | None
-
-    @classmethod
-    def create_instance(cls, crawler: "SyncCrawler"):
-        """
-        创建 Spider 实例并绑定 SyncCrawler。
-
-        :param crawler: 关联的 SyncCrawler 实例
-        :return: 绑定了 crawler 的 Spider 实例
-        """
-        instance = cls()
-        instance.crawler = crawler
-        return instance
-
-    def idle(self) -> bool:
-        """
-        判断爬虫是否空闲。
-
-        :return: 没有待处理的请求或任务时返回 True
-        """
-        return True
 
     def run(
         self,

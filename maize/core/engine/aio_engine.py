@@ -11,7 +11,7 @@ from typing import TYPE_CHECKING, Any, Union
 
 import ujson
 
-from maize.aio.classic.scheduler.scheduler import Scheduler
+from maize.aio.classic.scheduler import SpiderPriorityQueue
 from maize.common.http import Request, Response
 from maize.common.items import Item
 from maize.common.model.download_response_model import DownloadResponse
@@ -59,7 +59,7 @@ class AioEngine:
         self.settings: SpiderSettings = self.crawler.settings
 
         self.downloader: BaseDownloader | None = None
-        self.scheduler: Scheduler | None = None
+        self.scheduler: SpiderPriorityQueue | None = None
         self.processor: Processor | None = None
 
         self.start_requests: AsyncGenerator | None = None
@@ -104,12 +104,9 @@ class AioEngine:
             )
         return downloader_cls
 
-    def _create_scheduler(self) -> Scheduler:
+    def _create_scheduler(self) -> SpiderPriorityQueue:
         """创建并打开调度器。测试可重写注入 mock。"""
-        scheduler = Scheduler()
-        if scheduler.open:
-            scheduler.open()
-        return scheduler
+        return SpiderPriorityQueue()
 
     async def _create_downloader(self) -> BaseDownloader:
         """创建并打开下载器。测试可重写注入 mock。"""
@@ -435,10 +432,7 @@ class AioEngine:
                 f"{self.__redis_key_queue}:{request.hash}",
                 ujson.dumps(request.model_dump),
             )
-        await self._schedule_request(request)
-
-    async def _schedule_request(self, request: Request):
-        await self.scheduler.enqueue_request(request)
+        await self.scheduler.put(request)
 
     async def _get_next_request(self) -> Request | None:
         """
@@ -446,7 +440,10 @@ class AioEngine:
 
         :return: 下一个请求，无可用请求返回 None
         """
-        request: Request | None = await self.scheduler.next_request(self.crawler.spider.gte_priority)
+        gte = self.crawler.spider.gte_priority
+        request: Request | None = (
+            await self.scheduler.get_by_priority(gte) if gte is not None else await self.scheduler.get()
+        )
         if not request:
             return None
 
@@ -471,9 +468,13 @@ class AioEngine:
             else:
                 raise OutputException(f"{type(spider_output)} must return `Request` or `Item`")
 
+    def _scheduler_idle(self) -> bool:
+        """调度器是否空闲。测试可重写。"""
+        return self.scheduler.qsize() == 0
+
     def _idle(self) -> bool:
         return (
-            self.scheduler.idle()
+            self._scheduler_idle()
             and self.downloader.idle()
             and self.task_manager.all_done()
             and self.processor.idle()

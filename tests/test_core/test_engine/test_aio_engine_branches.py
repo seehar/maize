@@ -39,9 +39,10 @@ def _make_engine():
     engine.spider.stats_collector.record_parse_success = AsyncMock()
     engine.spider.stats_collector.record_parse_fail = AsyncMock()
     engine.scheduler = MagicMock()
-    engine.scheduler.enqueue_request = AsyncMock()
-    engine.scheduler.next_request = AsyncMock(return_value=None)
-    engine.scheduler.idle.return_value = True
+    engine.scheduler.put = AsyncMock()
+    engine.scheduler.get = AsyncMock(return_value=None)
+    engine.scheduler.get_by_priority = AsyncMock(return_value=None)
+    engine.scheduler.qsize.return_value = 0
     engine.downloader = MagicMock()
     engine.downloader.idle.return_value = True
     engine.downloader.fetch = AsyncMock()
@@ -94,7 +95,8 @@ class TestCrawlStartRequestsNotIdle:
 
         engine.start_requests = bad_gen()
         engine.spider_middleware_manager = None
-        engine.scheduler.next_request = AsyncMock(return_value=None)
+        engine.scheduler.get = AsyncMock(return_value=None)
+        engine.scheduler.get_by_priority = AsyncMock(return_value=None)
 
         idle_calls = [False, True]
 
@@ -122,7 +124,8 @@ class TestCrawlTaskRequestsBranches:
             yield
 
         engine.task_requests = empty_gen()
-        engine.scheduler.next_request = AsyncMock(return_value=None)
+        engine.scheduler.get = AsyncMock(return_value=None)
+        engine.scheduler.get_by_priority = AsyncMock(return_value=None)
 
         await engine._crawl_task_requests()
         assert engine.task_requests is None
@@ -138,7 +141,8 @@ class TestCrawlTaskRequestsBranches:
             yield
 
         engine.task_requests = runtime_error_gen()
-        engine.scheduler.next_request = AsyncMock(return_value=None)
+        engine.scheduler.get = AsyncMock(return_value=None)
+        engine.scheduler.get_by_priority = AsyncMock(return_value=None)
 
         await engine._crawl_task_requests()
         assert engine.task_requests_running is False
@@ -154,7 +158,8 @@ class TestCrawlTaskRequestsBranches:
             yield
 
         engine.task_requests = bad_gen()
-        engine.scheduler.next_request = AsyncMock(return_value=None)
+        engine.scheduler.get = AsyncMock(return_value=None)
+        engine.scheduler.get_by_priority = AsyncMock(return_value=None)
 
         idle_calls = [False, True]
 
@@ -258,7 +263,7 @@ class TestProcessResponseMiddlewareRequest:
         resp = Response(url="http://example.com", headers={}, status=200, body=b"ok", request=req)
         result = await engine._process_response_middleware(req, resp)
         assert result is None
-        engine.scheduler.enqueue_request.assert_called_once_with(retry_req)
+        engine.scheduler.put.assert_called_once_with(retry_req)
 
 
 class TestRedisImportFallback:

@@ -23,10 +23,14 @@ def _make_engine():
     engine.spider.stats_collector.record_parse_success = AsyncMock()
     engine.spider.stats_collector.record_parse_fail = AsyncMock()
     engine.scheduler = MagicMock()
-    engine.scheduler.enqueue_request = AsyncMock()
+    engine.scheduler.put = AsyncMock()
+    engine.scheduler.get = AsyncMock(return_value=None)
+    engine.scheduler.get_by_priority = AsyncMock(return_value=None)
+    engine.scheduler.qsize.return_value = 0
     engine.downloader = MagicMock()
     engine.processor = MagicMock()
     engine.processor.enqueue = AsyncMock()
+    engine.processor.idle.return_value = True
     engine.task_manager = MagicMock()
     engine.task_manager.all_done.return_value = True
     return engine
@@ -85,7 +89,7 @@ class TestAioEngineFetch:
 
         result = await engine._fetch(req)
         assert result is None
-        engine.scheduler.enqueue_request.assert_called_once_with(retry_req)
+        engine.scheduler.put.assert_called_once_with(retry_req)
 
     @pytest.mark.asyncio
     async def test_fetch_download_fail_with_error_callback(self):
@@ -184,7 +188,7 @@ class TestAioEngineDoDownload:
 
         result = await engine._do_download(req)
         assert result is None
-        engine.scheduler.enqueue_request.assert_called_once_with(retry_req)
+        engine.scheduler.put.assert_called_once_with(retry_req)
 
     @pytest.mark.asyncio
     async def test_do_download_middleware_returns_response(self):

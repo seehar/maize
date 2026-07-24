@@ -24,9 +24,10 @@ def _make_engine():
     engine.spider.stats_collector.record_parse_success = AsyncMock()
     engine.spider.stats_collector.record_parse_fail = AsyncMock()
     engine.scheduler = MagicMock()
-    engine.scheduler.enqueue_request = AsyncMock()
-    engine.scheduler.next_request = AsyncMock(return_value=None)
-    engine.scheduler.idle.return_value = True
+    engine.scheduler.put = AsyncMock()
+    engine.scheduler.get = AsyncMock(return_value=None)
+    engine.scheduler.get_by_priority = AsyncMock(return_value=None)
+    engine.scheduler.qsize.return_value = 0
     engine.downloader = MagicMock()
     engine.downloader.idle.return_value = True
     engine.downloader.fetch = AsyncMock()
@@ -55,7 +56,7 @@ class TestEngineRedisPaths:
         req = Request("https://example.com")
         await engine.enqueue_request(req)
         engine._AioEngine__redis_util.set.assert_called_once()
-        engine.scheduler.enqueue_request.assert_called_once_with(req)
+        engine.scheduler.put.assert_called_once_with(req)
 
     @pytest.mark.asyncio
     async def test_get_next_request_with_redis(self):
@@ -63,7 +64,8 @@ class TestEngineRedisPaths:
         engine = _make_engine()
         engine.crawler.spider.gte_priority = None
         req = Request("https://example.com")
-        engine.scheduler.next_request = AsyncMock(return_value=req)
+        engine.scheduler.get = AsyncMock(return_value=req)
+        engine.scheduler.get_by_priority = AsyncMock(return_value=req)
         engine._AioEngine__redis_util = MagicMock()
         engine._AioEngine__redis_util.set = AsyncMock()
         engine._AioEngine__redis_util.delete = AsyncMock()
@@ -81,7 +83,8 @@ class TestEngineRedisPaths:
         engine = _make_engine()
         engine.crawler.spider.gte_priority = None
         req = Request("https://example.com")
-        engine.scheduler.next_request = AsyncMock(return_value=req)
+        engine.scheduler.get = AsyncMock(return_value=req)
+        engine.scheduler.get_by_priority = AsyncMock(return_value=req)
         engine.is_distributed = True
         engine._AioEngine__redis_util = MagicMock()
         engine._AioEngine__redis_util.nx_set = AsyncMock(return_value=False)
@@ -96,7 +99,8 @@ class TestEngineRedisPaths:
         engine = _make_engine()
         engine.crawler.spider.gte_priority = None
         req = Request("https://example.com")
-        engine.scheduler.next_request = AsyncMock(return_value=req)
+        engine.scheduler.get = AsyncMock(return_value=req)
+        engine.scheduler.get_by_priority = AsyncMock(return_value=req)
         engine.is_distributed = True
         engine._AioEngine__redis_util = MagicMock()
         engine._AioEngine__redis_util.nx_set = AsyncMock(return_value=True)
@@ -198,8 +202,9 @@ class TestCrawlStartRequestsEdgeCases:
             yield  # never reached
 
         engine.start_requests = bad_gen()
-        engine.scheduler.next_request = AsyncMock(return_value=None)
-        engine.scheduler.idle.return_value = True
+        engine.scheduler.get = AsyncMock(return_value=None)
+        engine.scheduler.get_by_priority = AsyncMock(return_value=None)
+        engine.scheduler.qsize.return_value = 0
         engine.downloader.idle.return_value = True
         engine.processor.idle.return_value = True
         engine.task_manager.all_done.return_value = True
@@ -221,7 +226,8 @@ class TestCrawlStartRequestsEdgeCases:
             yield
 
         engine.start_requests = gen()
-        engine.scheduler.next_request = AsyncMock(return_value=None)
+        engine.scheduler.get = AsyncMock(return_value=None)
+        engine.scheduler.get_by_priority = AsyncMock(return_value=None)
 
         # First check: not idle -> sleep -> second check: idle -> stop
         call_count = 0
@@ -231,7 +237,7 @@ class TestCrawlStartRequestsEdgeCases:
             call_count += 1
             return call_count > 1
 
-        engine.scheduler.idle.return_value = True
+        engine.scheduler.qsize.return_value = 0
         engine.downloader.idle.return_value = True
         engine.processor.idle.return_value = True
         engine.task_manager.all_done.return_value = True

@@ -16,7 +16,7 @@ from maize.sync.classic.middleware import (
 )
 from maize.sync.classic.pipeline import SyncBasePipeline, SyncEmptyPipeline, SyncPipelineScheduler
 from maize.sync.classic.processor import SyncProcessor
-from maize.sync.classic.scheduler import SyncScheduler
+from maize.sync.classic.scheduler import SyncSpiderPriorityQueue
 from maize.sync.classic.spider import SyncSpider, SyncTaskSpider
 
 __all__ = [
@@ -35,9 +35,9 @@ __all__ = [
     "SyncPipelineScheduler",
     "SyncProcessor",
     "SyncRequestsDownloader",
-    "SyncScheduler",
     "SyncSpider",
     "SyncSpiderMiddleware",
     "SyncSpiderMiddlewareManager",
+    "SyncSpiderPriorityQueue",
     "SyncTaskSpider",
 ]

@@ -12,15 +12,15 @@ from abc import ABC
 from typing import TYPE_CHECKING, Optional
 
 from maize.aio.classic.crawler.crawler import CrawlerProcess
+from maize.base.interface._shared import _StandardSpiderMixin
 from maize.base.interface.spider_interface import SpiderInterface
 
 if TYPE_CHECKING:
-    from maize.aio.classic.crawler.crawler import Crawler
     from maize.core.stats.stats_collector import StatsCollector
     from maize.settings import SpiderSettings
 
 
-class StandardSpiderInterface(SpiderInterface, ABC):
+class StandardSpiderInterface(SpiderInterface, _StandardSpiderMixin, ABC):
     """
     异步标准 Spider 接口。
 
@@ -28,29 +28,8 @@ class StandardSpiderInterface(SpiderInterface, ABC):
     以及 run() 同步入口（内部通过 asyncio 事件循环驱动）。
     """
 
-    __spider_type__: str
     stats_collector: Optional["StatsCollector"]
     gte_priority: int | None
-
-    @classmethod
-    def create_instance(cls, crawler: "Crawler"):
-        """
-        创建 Spider 实例并绑定 Crawler。
-
-        :param crawler: 关联的 Crawler 实例
-        :return: 绑定了 crawler 的 Spider 实例
-        """
-        instance = cls()
-        instance.crawler = crawler
-        return instance
-
-    def idle(self) -> bool:
-        """
-        判断爬虫是否空闲
-
-        :return: 如果爬虫没有待处理的请求或任务，返回 True，否则返回 False
-        """
-        return True
 
     async def _async_run(
         self,

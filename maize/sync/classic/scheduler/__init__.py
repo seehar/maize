@@ -1,7 +1,9 @@
 """
-同步请求调度器，基于优先级队列管理待抓取请求。
+同步请求调度器。
+
+直接使用 ``SyncSpiderPriorityQueue``，无额外包装层。
 """
 
-from maize.sync.classic.scheduler.sync_scheduler import SyncScheduler
+from maize.utils.sync_priority_queue import SyncSpiderPriorityQueue
 
-__all__ = ["SyncScheduler"]
+__all__ = ["SyncSpiderPriorityQueue"]
