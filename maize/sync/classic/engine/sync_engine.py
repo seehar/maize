@@ -218,6 +218,7 @@ class SyncEngine:
                 self.task_requests_running = False
                 self.logger.info("All task requests have been processed.")
             except Exception as e:
+                had_task_requests = self.task_requests is not None
                 self.task_requests = None
                 if not self._idle():
                     time.sleep(0.1)
@@ -226,8 +227,8 @@ class SyncEngine:
                 self._single_task_requests_running = False
                 self.logger.info("All task requests have been processed.")
 
-                if self.task_requests is not None:
-                    self.logger.info(f"Error during start_requests: {e}")
+                if had_task_requests:
+                    self.logger.info(f"Error during task_requests: {e}")
             else:
                 self.enqueue_request(task_request)
 
