@@ -296,7 +296,7 @@ class SyncLiteCrawler:
 
         重试条件由 ``spider.should_retry`` 决定（默认：status==0 / >=500 / 429）。
         每次重试前递增指数退避延迟（1s, 2s, 4s...），使用 ``stop_event.wait``
-        替代 ``time.sleep``，收到停止信号时立即退出等待。
+        替代 ``time.sleep``，收到停止信号时中止后续重试并立即返回。
 
         :param request: 请求对象
         :returns: 最终的响应对象
@@ -319,7 +319,9 @@ class SyncLiteCrawler:
                     f"retry url={request.url} attempt={attempt + 1}/{self.spider.retry} "
                     f"status={response.status} delay={delay}s"
                 )
-                self._stop_event.wait(timeout=delay)
+                if self._stop_event.wait(timeout=delay):
+                    # 收到停止信号，中止后续重试
+                    break
 
         if last_response is not None:
             return last_response
