@@ -17,6 +17,7 @@ from maize.common.items import Item
 from maize.common.items.field import Field
 from maize.common.model.download_response_model import DownloadResponse
 from maize.core.engine.aio_engine import AioEngine
+from maize.exceptions.spider_exception import OutputException
 from maize.settings import SpiderSettings
 from maize.sync.classic.engine.sync_engine import SyncEngine
 
@@ -332,8 +333,6 @@ class TestHandleSpiderOutputInvalidType:
 
     @pytest.mark.asyncio
     async def test_aio(self):
-        from maize.exceptions.spider_exception import OutputException
-
         engine = _make_aio_engine()
 
         async def gen():
@@ -343,8 +342,6 @@ class TestHandleSpiderOutputInvalidType:
             await engine._handle_spider_output(gen())
 
     def test_sync(self):
-        from maize.exceptions.spider_exception import OutputException
-
         engine = _make_sync_engine()
 
         def gen():
