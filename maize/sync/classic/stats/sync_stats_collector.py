@@ -38,15 +38,19 @@ class SyncStatsCollector:
 
         self._last_upload_key: str = ""
         self._container_id: str = ""
+        self._upload_client: httpx.Client | None = None
 
     def open(self):
         """
-        打开统计收集器，记录容器 ID 和启动时间。
+        打开统计收集器，记录容器 ID 和启动时间，创建共享上传 Client。
         """
         if container_id := get_container_id():
             self._container_id = container_id
 
         self._start_time = datetime.datetime.now()
+
+        if self._settings and self._settings.maize_cob_api:
+            self._upload_client = httpx.Client()
 
     def close(self):
         """
@@ -58,6 +62,10 @@ class SyncStatsCollector:
             key_list = list(self._stats.keys())
             for key in key_list:
                 self._upload_stat(key)
+
+        if self._upload_client:
+            self._upload_client.close()
+            self._upload_client = None
 
         self._logger.info("-" * 100)
         self._logger.info(f"爬虫运行时间: {self._start_time} ~ {self._end_time}")
@@ -114,9 +122,10 @@ class SyncStatsCollector:
             return
         for attempt in range(3):
             try:
-                with httpx.Client() as client:
-                    response = client.post(self._settings.maize_cob_api, json=upload_data)
-                    self._logger.info(f"upload stat: <{response.status_code}> {response.text}")
+                if not self._upload_client:
+                    return
+                response = self._upload_client.post(self._settings.maize_cob_api, json=upload_data)
+                self._logger.info(f"upload stat: <{response.status_code}> {response.text}")
                 break
             except Exception as e:
                 self._logger.warning(f"upload stat error: {e}，准备第 {attempt + 1} 次重试")
