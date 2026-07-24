@@ -35,7 +35,6 @@ class SyncProcessor:
 
         self.queue: queue.Queue = queue.Queue()
         self._lock = threading.Lock()
-        self.item_pipelines: list = []
 
         self.pipeline_scheduler: SyncPipelineScheduler = SyncPipelineScheduler(self.crawler.settings)
 
