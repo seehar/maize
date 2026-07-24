@@ -223,7 +223,7 @@ class TestResponse:
 
     def test_cookies_property(self, mock_request):
         """Test cookies property"""
-        cached_cookies = [{"key": "session", "value": "abc123"}]
+        cached_cookies = [{"name": "session", "value": "abc123"}]
         response = Response(
             url="https://example.com",
             headers={},
@@ -342,7 +342,7 @@ class TestResponse:
 
     def test_cookies_cached_after_first_access(self, mock_request):
         """cookies property caches dict after first access."""
-        cached_cookies = [{"key": "a", "value": "1"}]
+        cached_cookies = [{"name": "a", "value": "1"}]
         response = Response(
             url="https://example.com",
             headers={},

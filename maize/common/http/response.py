@@ -223,7 +223,7 @@ class Response(Generic[Driver, R]):
         if self._cookies_cache:
             return self._cookies_cache
 
-        self._cookies_cache = {cookie["key"]: cookie["value"] for cookie in self.cookie_list}
+        self._cookies_cache = {cookie["name"]: cookie["value"] for cookie in self.cookie_list}
         return self._cookies_cache
 
     def json(self) -> dict[str, Any]:

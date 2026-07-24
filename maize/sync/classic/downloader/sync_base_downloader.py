@@ -25,11 +25,8 @@ class SyncDownloaderMeta(ABCMeta):
     """
 
     def __subclasscheck__(cls, subclass):
-        return (
-            issubclass(subclass, SyncBaseDownloader)
-            and hasattr(subclass, "download")
-            and hasattr(subclass, "structure_response")
-        )
+        required = ("download", "structure_response")
+        return all(hasattr(subclass, method) and callable(getattr(subclass, method, None)) for method in required)
 
 
 class SyncBaseDownloader(ABC, metaclass=SyncDownloaderMeta):
